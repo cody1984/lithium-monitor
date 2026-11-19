@@ -1,42 +1,43 @@
-"""Lithium monitor cloud job - runs in GitHub Actions, never on your machine.
+"""Lithium monitor cloud job - runs in GitHub Actions.
 
-Feeds per run:
-  1. GFEX futures (LC2701)      AKShare -> sina daily bar: close, volume, OI
-  2. Spot (99qh via AKShare)    spot trend for 碳酸锂 - flagged PROXY for SMM BG carbonate
-  3. Indicative GFEX USD price  metalcharts free API (optional, needs METALCHARTS_KEY)
-  4. FX                         frankfurter.app (ECB reference, keyless)
-Not automated (by design):
-  - GFEX registered receipts: no free feed. Bundled prints stay until updated manually
-    (X transcriptions or GFEX Chinese bulletin). Exact per-warehouse: metalcharts Ultimate.
-  - SGX LICF: delayed/thin; update occasionally by hand.
-Failures never abort the run: a feed that fails keeps its last values; gaps stay gaps.
+Feeds per run (each isolated: a failure keeps last values and the run still commits):
+  fx            frankfurter.app (ECB reference, keyless)
+  gfex-akshare  GFEX LC daily bar via AKShare (Sina): close, volume, open interest
+  spot-99qh     100ppi (生意社) spot + dominant-contract settlement via AKShare
+                (label kept as spot-99qh so existing logs stay comparable)
+  equities      LTR.AX and PLS.AX daily closes via yfinance (Yahoo, unofficial)
+Manual by design: GFEX receipts, SGX LICF, SC6 spodumene, SMM inventory, cathode output.
 """
 import csv, json, os, sys, traceback
 from datetime import datetime, timezone, timedelta
 
 SNAP, CSV = "market_snapshot.json", "market_daily.csv"
 CONTRACT = os.environ.get("GFEX_CONTRACT", "LC2701")
-KEY = os.environ.get("METALCHARTS_KEY", "")
 PER = timezone(timedelta(hours=8))
+SERIES = ("smm_spot", "gfex_futures", "sgx_licf", "gfex_receipts", "spodumene", "equities")
+
 
 def tofloat(x):
     try:
         v = float(str(x).replace(",", ""))
-        return v if v == v else None  # NaN guard
+        return v if v == v else None
     except (TypeError, ValueError):
         return None
+
 
 def load():
     if os.path.exists(SNAP):
         with open(SNAP, encoding="utf-8") as f:
             s = json.load(f)
     else:
-        s = {"schema": "lithium-monitor/1", "generated_at": "", "fx_usdcny": 6.6665,
-             "feeds": {}, "series": {"smm_spot": [], "gfex_futures": [], "sgx_licf": [], "gfex_receipts": []},
-             "context": []}
-    for k in ("smm_spot", "gfex_futures", "sgx_licf", "gfex_receipts"):
+        s = {"schema": "lithium-monitor/2", "generated_at": "", "fx_usdcny": 6.6665,
+             "feeds": {}, "series": {}, "context": []}
+    s.setdefault("series", {})
+    s.setdefault("feeds", {})
+    for k in SERIES:
         s["series"].setdefault(k, [])
     return s
+
 
 def upsert(series, date, **vals):
     row = next((r for r in series if r.get("date") == date), None)
@@ -48,10 +49,12 @@ def upsert(series, date, **vals):
             row[k] = v
     series.sort(key=lambda r: r["date"])
 
+
 def fetch_fx():
     import requests
     r = requests.get("https://api.frankfurter.app/latest?from=USD&to=CNY", timeout=20)
     return r.json()["rates"]["CNY"] if r.ok else None
+
 
 def fetch_gfex_akshare(s):
     import akshare as ak
@@ -60,12 +63,12 @@ def fetch_gfex_akshare(s):
         d = str(row["date"])[:10]
         upsert(s["series"]["gfex_futures"], d, contract=CONTRACT,
                close=tofloat(row["close"]), volume=tofloat(row.get("volume")),
-               oi=tofloat(row.get("hold")) or None,
-               note="sina daily via AKShare; settlement replaces close when GFEX EOD is loaded")
+               oi=tofloat(row.get("hold")),
+               note="Sina daily bar via AKShare; settlement replaces close when 100ppi supplies it")
+
 
 def fetch_spot_100ppi(s):
     import akshare as ak
-    from datetime import timedelta
     smm = s["series"]["smm_spot"]
     got, d = 0, datetime.now(PER).date()
     for _ in range(12):
@@ -102,67 +105,66 @@ def fetch_spot_100ppi(s):
     s["feeds"]["smm_spot"] = {"status": "proxy", "last_date": smm[-1]["date"],
         "note": "Automated leg is 100ppi battery-grade spot via AKShare - a proxy for SMM. Existing exact SMM rows are never overwritten."}
 
-def fetch_metalcharts(s, fx):
-    if not KEY or not fx:
-        return
-    import requests
-    price = None
-    for sym in ("LC", "LI"):
-        r = requests.get(f"https://api.metalcharts.org/v1/prices?symbols={sym}",
-                         headers={"Authorization": f"Bearer {KEY}"}, timeout=20)
-        if r.ok:
-            data = r.json().get("data") or {}
-            entry = data.get(sym) or next(iter(data.values()), None)
-            if entry and entry.get("price"):
-                price = float(entry["price"])
-                break
-    if price:
-        d = datetime.now(PER).strftime("%Y-%m-%d")
-        have = next((r for r in s["series"]["gfex_futures"] if r["date"] == d), None)
-        if not have or have.get("close") is None:
-            upsert(s["series"]["gfex_futures"], d, contract=CONTRACT,
-                   close=round(price * fx), note="INDICATIVE - metalcharts live quote converted at ECB FX")
+
+def fetch_equities(s):
+    import yfinance as yf
+    eq = s["series"]["equities"]
+    h = yf.download(["LTR.AX", "PLS.AX"], period="10d", interval="1d",
+                    progress=False, auto_adjust=False)["Close"]
+    n = 0
+    for ts, row in h.iterrows():
+        ltr, pls = tofloat(row.get("LTR.AX")), tofloat(row.get("PLS.AX"))
+        if ltr is None and pls is None:
+            continue
+        upsert(eq, ts.strftime("%Y-%m-%d"), ltr=ltr, pls=pls)
+        n += 1
+    if not n:
+        raise RuntimeError("no equity rows returned")
+    s["feeds"]["equities"] = {"status": "ok", "last_date": eq[-1]["date"],
+        "note": "LTR.AX and PLS.AX closes via yfinance (Yahoo, unofficial endpoint). The latest bar can be intraday."}
+
 
 def write_csv(s):
-    maps = {k: {r["date"]: r for r in s["series"][k]} for k in s["series"]}
+    maps = {k: {r["date"]: r for r in s["series"].get(k, [])} for k in SERIES}
     dates = sorted({d for m in maps.values() for d in m})
     with open(CSV, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["date", "smm_spot_avg", "gfex_lc_settle", "gfex_lc_close",
-                    "gfex_oi", "gfex_volume", "sgx_licf_usd_kg", "gfex_receipts"])
+        w.writerow(["date", "smm_spot_avg", "gfex_lc_settle", "gfex_lc_close", "gfex_oi",
+                    "gfex_volume", "sgx_licf_usd_kg", "gfex_receipts",
+                    "ltr_close", "pls_close", "spodumene_sc6_usd_t"])
         for d in dates:
             smm, gf = maps["smm_spot"].get(d, {}), maps["gfex_futures"].get(d, {})
-            sg, rec = maps["sgx_licf"].get(d, {}), maps["gfex_receipts"].get(d, {})
+            sg, rc = maps["sgx_licf"].get(d, {}), maps["gfex_receipts"].get(d, {})
+            eq, sp = maps["equities"].get(d, {}), maps["spodumene"].get(d, {})
             w.writerow([d, smm.get("avg", ""), gf.get("settle", ""), gf.get("close", ""),
                         gf.get("oi", ""), gf.get("volume", ""), sg.get("price_usd_kg", ""),
-                        rec.get("quantity", "")])
+                        rc.get("quantity", ""), eq.get("ltr", ""), eq.get("pls", ""),
+                        sp.get("price_usd_t", "")])
+
 
 def main():
     s = load()
-    fx = None
-    for name, fn in [("fx", fetch_fx), ("gfex-akshare", lambda: fetch_gfex_akshare(s)),
-                     ("spot-99qh", lambda: fetch_spot_100ppi(s))]:
+    steps = [("fx", None), ("gfex-akshare", lambda: fetch_gfex_akshare(s)),
+             ("spot-99qh", lambda: fetch_spot_100ppi(s)),
+             ("equities", lambda: fetch_equities(s))]
+    for name, fn in steps:
         try:
-            out = fn()
             if name == "fx":
-                fx = out
+                fx = fetch_fx()
                 if fx:
                     s["fx_usdcny"] = round(fx, 4)
+            else:
+                fn()
             print(f"OK   {name}")
         except Exception:
             print(f"FAIL {name}")
             traceback.print_exc()
-    try:
-        fetch_metalcharts(s, fx)
-        print("OK   metalcharts" if KEY else "SKIP metalcharts (no key)")
-    except Exception:
-        print("FAIL metalcharts")
-        traceback.print_exc()
     s["generated_at"] = datetime.now(PER).strftime("%Y-%m-%dT%H:%M:%S+08:00")
     with open(SNAP, "w", encoding="utf-8") as f:
         json.dump(s, f, indent=2, ensure_ascii=False)
     write_csv(s)
     print("written:", SNAP, CSV)
+
 
 if __name__ == "__main__":
     sys.exit(main())
