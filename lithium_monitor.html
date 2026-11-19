@@ -1,340 +1,288 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lithium Supply-Chain Monitor</title>
 <style>
-  :root{--bg:#0e1116;--panel:#161b22;--line:#2a313c;--txt:#d7dde5;--dim:#8b95a3;--accent:#4dd0e1;--warn:#e8b93e;--bad:#ef6c57;--good:#57c785}
-  *{box-sizing:border-box}
-  body{margin:0;font:14px/1.5 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt)}
-  header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between}
-  h1{font-size:19px;margin:0}
-  h2{font-size:15px;margin:0 0 10px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
-  h3{font-size:13px;margin:0 0 6px;color:var(--dim);font-weight:600}
-  section{padding:18px 24px;border-bottom:1px solid var(--line)}
-  .meta{color:var(--dim);font-size:12.5px;display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
-  .meta input{width:70px;background:var(--panel);border:1px solid var(--line);color:var(--txt);padding:2px 6px;border-radius:4px;font:inherit}
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}
-  .card .label{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
-  .card .value{font-size:20px;font-weight:600;margin:4px 0}
-  .card .sub{font-size:11.5px;color:var(--dim)}
-  .charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
-  .chart{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}
-  .note{font-size:12.5px;color:var(--dim);margin:8px 0 0}
-  table{border-collapse:collapse;width:100%;font-size:13px}
-  th,td{border:1px solid var(--line);padding:6px 9px;text-align:right}
-  th{background:var(--panel);color:var(--dim);font-weight:600;text-align:left}
-  td:first-child,th:first-child{text-align:left}
-  tr.hl td{background:rgba(77,208,225,.07)}
-  .gap{color:var(--warn)}
-  .indic{color:var(--warn);font-style:italic}
-  button{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:6px;padding:6px 12px;font:inherit;cursor:pointer}
-  button:hover{border-color:var(--accent)}
-  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;align-items:center}
-  ul.ctx{margin:0;padding-left:18px}
-  ul.ctx li{margin:6px 0;font-size:13px}
-  .status-ok{color:var(--good)} .status-partial,.status-delayed,.status-indicative,.status-proxy{color:var(--warn)} .status-gap{color:var(--bad)}
-  #msg{font-size:12.5px;margin-top:8px;color:var(--dim)}
-  svg text{fill:var(--dim);font-size:10px}
-  .legend{font-size:11.5px;color:var(--dim);margin-top:4px}
-  .legend span{margin-right:14px}
-  .swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
-</style>
-</head>
-<body>
+:root{--bg:#0e1116;--panel:#161b22;--line:#2a313c;--txt:#d7dde5;--dim:#8b95a3;--accent:#4dd0e1;--warn:#e8b93e;--bad:#ef6c57;--good:#57c785}
+*{box-sizing:border-box}body{margin:0;font:14px/1.5 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt)}
+header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between}
+h1{font-size:19px;margin:0}h2{font-size:15px;margin:0 0 10px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}h3{font-size:13px;margin:0 0 6px;color:var(--dim);font-weight:600}
+section{padding:18px 24px;border-bottom:1px solid var(--line)}
+.meta{color:var(--dim);font-size:12.5px;display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
+.meta input{width:70px;background:var(--panel);border:1px solid var(--line);color:var(--txt);padding:2px 6px;border-radius:4px;font:inherit}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}
+.card .label{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}.card .value{font-size:20px;font-weight:600;margin:4px 0}.card .sub{font-size:11.5px;color:var(--dim)}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+.chart{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}
+.note{font-size:12.5px;color:var(--dim);margin:8px 0 0}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid var(--line);padding:6px 9px;text-align:right}
+th{background:var(--panel);color:var(--dim);font-weight:600;text-align:left}td:first-child,th:first-child{text-align:left}
+table.txt td{text-align:left}tr.hl td{background:rgba(77,208,225,.07)}
+.gap{color:var(--warn)}.indic{color:var(--warn);font-style:italic}
+button{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:6px;padding:6px 12px;font:inherit;cursor:pointer}button:hover{border-color:var(--accent)}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;align-items:center}
+ul.ctx{margin:0;padding-left:18px}ul.ctx li{margin:6px 0;font-size:13px}
+.status-ok{color:var(--good)}.status-partial,.status-delayed,.status-indicative,.status-proxy,.status-manual{color:var(--warn)}.status-gap{color:var(--bad)}
+.t-bull{color:var(--good);font-weight:600}.t-bear{color:var(--bad);font-weight:600}.t-mixed{color:var(--warn);font-weight:600}.t-info,.t-na{color:var(--dim);font-weight:600}
+#msg{font-size:12.5px;margin-top:8px;color:var(--dim)}svg text{fill:var(--dim);font-size:10px}
+.legend{font-size:11.5px;color:var(--dim);margin-top:4px}.legend span{margin-right:14px}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.tally{font-size:13px;margin-bottom:10px}
+</style></head><body>
 <header>
-  <div>
-    <h1>Lithium Supply-Chain Monitor</h1>
-    <div class="meta">SMM spot &middot; GFEX futures & receipts &middot; SGX carbonate futures</div>
-  </div>
-  <div class="meta">
-    <span>Snapshot: <b id="asat"></b></span>
-    <span>FX <input id="fx" type="number" step="0.0001" title="USD/CNY, editable"> CNY/USD</span>
-    <span>VAT 13% (China domestic)</span>
-  </div>
+ <div><h1>Lithium Supply-Chain Monitor</h1><div class="meta">SMM &middot; GFEX &middot; SGX &middot; spodumene &middot; inventory &middot; LTR / PLS</div></div>
+ <div class="meta">
+  <span>Snapshot: <b id="asat"></b></span>
+  <span>FX <input id="fx" type="number" step="0.0001"> CNY/USD</span>
+  <span>SC6 per t LCE <input id="yld" type="number" step="0.1" value="8.0" title="assumption: tonnes of SC6 per tonne LCE"></span>
+  <span>VAT 13%</span>
+ </div>
 </header>
 
-<section>
-  <h2>Key readings</h2>
-  <div class="kpis" id="kpis"></div>
+<section><h2>Key readings</h2><div class="kpis" id="kpis"></div></section>
+
+<section><h2>Signals: paper vs physical</h2>
+ <div class="tally" id="tally"></div>
+ <table class="txt" id="signals"></table>
+ <p class="note">Each row is a rule-of-thumb read of the latest data, not a forecast. Low-confidence rows rest on few observations. The lean column follows the framework: bullish = physical deficit dominating, bearish = paper or converter pressure.</p>
 </section>
 
-<section>
-  <h2>Basis & regional spread</h2>
-  <div class="charts">
-    <div class="chart">
-      <h3>China: SMM battery-grade spot vs GFEX LC2701 settlement (CNY/mt)</h3>
-      <div id="chart-cn"></div>
-      <div class="legend" id="legend-cn"></div>
-      <p class="note" id="basis-note"></p>
-    </div>
-    <div class="chart">
-      <h3>Regional: SGX LICF (CIF CJK, converted) vs SMM ex-VAT (CNY/mt)</h3>
-      <div id="chart-sg"></div>
-      <div class="legend" id="legend-sg"></div>
-      <p class="note" id="spread-note"></p>
-    </div>
-  </div>
+<section><h2>Basis &amp; regional spread</h2>
+ <div class="charts">
+  <div class="chart"><h3>China: SMM spot vs GFEX LC2701 (CNY/mt)</h3><div id="chart-cn"></div><div class="legend" id="legend-cn"></div><p class="note" id="basis-note"></p></div>
+  <div class="chart"><h3>Regional: SGX LICF (converted) vs SMM ex-VAT (CNY/mt)</h3><div id="chart-sg"></div><div class="legend" id="legend-sg"></div><p class="note" id="spread-note"></p></div>
+ </div>
 </section>
 
-<section>
-  <h2>Physical vs paper</h2>
-  <table id="pvp"></table>
-  <p class="note" id="receipt-note"></p>
+<section><h2>Equities vs carbonate (rebased to 100)</h2>
+ <div class="charts"><div class="chart"><h3>Since 6 Nov: SMM spot, LTR, PLS</h3><div id="chart-eq"></div><div class="legend" id="legend-eq"></div><p class="note" id="eq-note"></p></div>
+ <div class="chart"><h3>Spodumene and conversion economics</h3><table id="spod"></table><p class="note" id="spod-note"></p></div></div>
 </section>
 
-<section>
-  <h2>Data update</h2>
-  <p class="note">Hosted on GitHub Pages, this page auto-fetches <b>market_snapshot.json</b> from the repo on load -
-  the scheduled Actions job refreshes that file every weekday, so just opening this page shows the latest data.
-  Opened as a local file, auto-fetch is blocked by the browser; use Import instead. Everything stays in your browser either way.</p>
-  <div class="btnrow">
-    <button id="btn-fetch">Fetch latest (hosted)</button>
-    <input type="file" id="filein" accept=".json,.csv">
-    <button id="btn-export">Export snapshot</button>
-    <button id="btn-reset">Reset to bundled data</button>
-  </div>
-  <p class="note">Import a <b>market_daily.csv</b> with columns
-  <code>date,smm_spot_avg,gfex_lc_settle,gfex_lc_close,gfex_oi,gfex_volume,sgx_licf_usd_kg,gfex_receipts</code>
-  (the same format the cloud job writes) or a full <b>market_snapshot.json</b>.</p>
-  <div id="msg"></div>
+<section><h2>Physical vs paper</h2><table id="pvp"></table><p class="note" id="receipt-note"></p></section>
+
+<section><h2>Inventory &amp; downstream</h2><table id="inv"></table><p class="note" id="inv-note"></p></section>
+
+<section><h2>Data update</h2>
+ <p class="note">Hosted on GitHub Pages this page fetches <b>market_snapshot.json</b> on load; the Actions job refreshes it each weekday at 17:30 AWST. As a local file, use Import. Everything stays in your browser.</p>
+ <div class="btnrow"><button id="btn-fetch">Fetch latest (hosted)</button><input type="file" id="filein" accept=".json,.csv"><button id="btn-export">Export snapshot</button><button id="btn-reset">Reset to bundled data</button></div>
+ <div id="msg"></div>
 </section>
 
-<section>
-  <h2>Data & costs (exact vs proxy vs indicative)</h2>
-  <table id="feeds"></table>
-</section>
-
-<section>
-  <h2>Market context &mdash; trader-influence watch</h2>
-  <ul class="ctx" id="ctx"></ul>
-</section>
+<section><h2>Data sources &amp; costs</h2><table class="txt" id="feeds"></table></section>
+<section><h2>Market context</h2><ul class="ctx" id="ctx"></ul></section>
 
 <script>
-const BUNDLED = {"schema": "lithium-monitor/1", "generated_at": "2026-11-19T09:02:00+08:00", "fx_usdcny": 6.6665, "feeds": {"smm_spot": {"status": "ok", "last_date": "2026-11-18", "note": "Battery-grade carbonate, CNY/mt incl 13% VAT, DDP China. SMM daily reviews (free, ~1-day delay). Cloud job replaces with 99qh spot via AKShare - flagged as a proxy for SMM."}, "gfex_futures": {"status": "partial", "last_date": "2026-11-18", "note": "LC2701 exact settle/close/OI/volume arrive via AKShare in the daily cloud job. Nov-18 bundled figure is indicative (metalcharts)."}, "gfex_receipts": {"status": "partial", "last_date": "2026-11-10", "note": "No free automated feed. Free daily prints via X transcriptions; exact per-warehouse via metalcharts Ultimate ($249/mo). Forward-filled manually."}, "sgx_licf": {"status": "delayed", "last_date": "2026-11-18", "note": "Delayed/thin; no free live feed. Update occasionally from SGX settlement reports / TradingView."}}, "series": {"smm_spot": [{"date": "2026-09-29", "avg": 118800}, {"date": "2026-11-06", "avg": 93600}, {"date": "2026-11-12", "avg": 90650, "note": "weekly avg, -3.2% w/w"}, {"date": "2026-11-16", "avg": 89550, "low": 87800, "high": 91300, "chg": -2800}, {"date": "2026-11-17", "avg": 89050, "low": 87000, "high": 91100, "chg": -500}, {"date": "2026-11-18", "avg": 91800, "chg": 2750, "note": "+3.09% DoD"}], "gfex_futures": [{"date": "2026-09-29", "contract": "LC2701", "settle": 118800, "oi_change": -8400}, {"date": "2026-11-06", "contract": "LC2701", "close": 92860, "note": "derived from Nov-9 print"}, {"date": "2026-11-09", "contract": "LC2701", "close": 87480, "volume": 352317}, {"date": "2026-11-10", "contract": "LC2701", "close": 87100, "volume": 267255}, {"date": "2026-11-12", "contract": "LC2701", "close": 90900}, {"date": "2026-11-16", "contract": "LC2701", "settle": 85380, "close": 88240, "note": "derived from Nov-17 deltas"}, {"date": "2026-11-17", "contract": "LC2701", "settle": 89980, "close": 93180, "oi": 349400, "oi_change": -24824, "volume": 424800, "note": "low 86,740; volume +74.7% DoD"}, {"date": "2026-11-18", "contract": "LC2701", "close": 89100, "note": "INDICATIVE - metalcharts live quote converted"}], "sgx_licf": [{"date": "2026-10-09", "contract": "LICF Nov-26", "price_usd_kg": 15.68}, {"date": "2026-10-13", "contract": "LICF Oct-26", "price_usd_kg": 16.79, "note": "final print before expiry"}, {"date": "2026-11-18", "contract": "LICF Nov-26", "price_usd_kg": 14.54, "note": "delayed, thin"}], "gfex_receipts": [{"date": "2026-11-08", "quantity": 21720, "note": "derived from Nov-9"}, {"date": "2026-11-09", "quantity": 23760, "change": 2040, "note": "first build after weeks of drawdown"}, {"date": "2026-11-10", "quantity": 23810, "change": 50}]}, "context": ["Q3 2026: three consecutive deficit months while prices fell stepwise; end-Sep spot ~40% below the mid-May high - deficit/price divergence is the core trader-influence watch item.", "SMM inventory methodology change added ~175,000 t to measured Chinese stockpiles - treat inventory levels and cross-change history with care.", "Inventory falling: SMM stock 122,644 mt (week to Nov 13); Mysteel expects Q4 destocking above 50,000 t.", "GFEX receipts: -17,378 t since early September, but +2,040 t on Nov 9 then +50 t on Nov 10 - watch whether the drawdown has stalled; a sustained build while spot rebounds is a bearish physical signal.", "Nov 17 session: LC2701 bottomed 86,740, closed 93,180 on reduced OI (short covering) while spot fell - classic paper/physical divergence.", "SGX Nov-26 slid 15.68 to 14.54 USD/kg (Oct 9 to Nov 18); regional premium over China ex-VAT remains ~19%.", "Demand mix shifting from NEVs to grid/energy-storage LFP; EU to cap Chinese EV imports at 350,000 units/year from next year.", "Supply restarts: Bald Hill, Finniss; Rio Tinto spending $1.4bn on Fenix 1B and Sal de Vida expansion."]};
+const BUNDLED = {"schema": "lithium-monitor/2", "generated_at": "2026-11-19T13:20:00+08:00", "fx_usdcny": 6.6665, "feeds": {}, "series": {"smm_spot": [{"date": "2026-09-29", "avg": 118800}, {"date": "2026-11-06", "avg": 93600}, {"date": "2026-11-12", "avg": 90650, "note": "weekly avg"}, {"date": "2026-11-16", "avg": 89550, "low": 87800, "high": 91300, "chg": -2800}, {"date": "2026-11-17", "avg": 89050, "low": 87000, "high": 91100, "chg": -500}, {"date": "2026-11-18", "avg": 91800, "chg": 2750, "note": "+3.09% DoD"}], "gfex_futures": [{"date": "2026-09-29", "contract": "LC2701", "settle": 118800, "oi_change": -8400}, {"date": "2026-11-06", "contract": "LC2701", "close": 92860, "note": "derived"}, {"date": "2026-11-09", "contract": "LC2701", "close": 87480, "volume": 352317}, {"date": "2026-11-10", "contract": "LC2701", "close": 87100, "volume": 267255}, {"date": "2026-11-12", "contract": "LC2701", "close": 90900}, {"date": "2026-11-16", "contract": "LC2701", "settle": 85380, "close": 88240, "note": "derived from Nov-17 deltas"}, {"date": "2026-11-17", "contract": "LC2701", "settle": 89980, "close": 93180, "oi": 349400, "oi_change": -24824, "volume": 424800, "note": "low 86,740; volume +74.7% DoD"}], "sgx_licf": [{"date": "2026-10-09", "contract": "LICF Nov-26", "price_usd_kg": 15.68}, {"date": "2026-10-13", "contract": "LICF Oct-26", "price_usd_kg": 16.79}, {"date": "2026-11-18", "contract": "LICF Nov-26", "price_usd_kg": 14.54, "note": "delayed, thin"}], "gfex_receipts": [{"date": "2026-11-08", "quantity": 21720, "note": "derived"}, {"date": "2026-11-09", "quantity": 23760, "change": 2040}, {"date": "2026-11-10", "quantity": 23810, "change": 50}], "spodumene": [{"date": "2026-11-17", "price_usd_t": 1241.5, "kind": "Albemarle auction, SC6 CIF", "volume_dmt": 16785}, {"date": "2026-11-18", "price_usd_t": 1220, "low": 1190, "high": 1250, "chg_pct": 0.41, "kind": "SMM SC6 CIF China"}], "inventory": [{"date": "2026-05-21", "scope": "SMM large-sample (pre-Sep revision)", "total": 137260, "downstream": 42729, "other": 76157, "smelter": 18374}, {"date": "2026-11-13", "scope": "SMM weekly, post-Sep revision (carried from earlier session; verify)", "total": 122644, "trend": "falling"}], "cathode": [{"date": "2026-11-18", "lfp_t_week": 141600, "ternary_t_week": 18000, "ternary_down_weeks": 9, "lce_per_t_lfp": 0.24}], "equities": [{"date": "2026-10-19", "ltr": 0.69, "pls": 2.9}, {"date": "2026-10-20", "ltr": 0.69, "pls": 2.93}, {"date": "2026-10-21", "ltr": 0.69, "pls": 2.91}, {"date": "2026-10-22", "ltr": 0.69, "pls": 2.85}, {"date": "2026-10-23", "ltr": 0.64, "pls": 2.62}, {"date": "2026-10-26", "ltr": 0.68, "pls": 2.84}, {"date": "2026-10-27", "ltr": 0.69, "pls": 2.88}, {"date": "2026-10-28", "ltr": 0.7, "pls": 2.99}, {"date": "2026-10-29", "ltr": 0.67, "pls": 2.75}, {"date": "2026-10-30", "ltr": 0.62, "pls": 2.64}, {"date": "2026-11-02", "ltr": 0.6, "pls": 2.61}, {"date": "2026-11-03", "ltr": 0.61, "pls": 2.63}, {"date": "2026-11-04", "ltr": 0.6, "pls": 2.6}, {"date": "2026-11-05", "ltr": 0.67, "pls": 2.83}, {"date": "2026-11-06", "ltr": 0.65, "pls": 2.83}, {"date": "2026-11-09", "ltr": 0.68, "pls": 2.89}, {"date": "2026-11-10", "ltr": 0.69, "pls": 2.91}, {"date": "2026-11-11", "ltr": 0.71, "pls": 3.1}, {"date": "2026-11-12", "ltr": 0.67, "pls": 2.85}, {"date": "2026-11-13", "ltr": 0.66, "pls": 2.86}, {"date": "2026-11-16", "ltr": 0.64, "pls": 2.89}, {"date": "2026-11-17", "ltr": 0.6, "pls": 2.64}, {"date": "2026-11-18", "ltr": 0.59, "pls": 2.6}, {"date": "2026-11-19", "ltr": 0.58, "pls": 2.56, "note": "intraday close at time of pull"}]}, "context": ["Q3 2026: three consecutive deficit months (about 84,000 mt LCE cumulative) while prices fell stepwise; inventory destocking of about 68,000 mt filled the deficit, so inventory acted as a buffer rather than letting the deficit clear through price.", "Destocking is downstream-led: over 13 weeks to early October total inventory fell 30%+, cathode-plant stocks nearly halved, smelter stocks fell nearly 40%, while the trader share rose from under 30% to over one-third. SMM says ownership is shifting from consumers to producers and traders - a latent supply overhang.", "SMM revised its weekly inventory scope from 4 Sep 2026 (title-based, adds trading segment and battery-cell makers), backdated to 30 Apr 2026. Do not compare levels across the break.", "Cathode output stays high: LFP about 141,600 t/week, ternary about 18,000 t/week and down nine straight weeks. LFP alone implies about 34,000 t LCE/week of carbonate use, above reported cathode-plant carbonate inventory.", "China spodumene imports were about 970,100 t in September (+7% m/m), Zimbabwe about 136,000 t (+83%). Port stocks stay high while carbonate stocks fall: the lag runs through port storage, refinery feed and conversion, and refiners can slow withdrawals when margins compress.", "GFEX receipts: down 17,378 t since early September (Mysteel) but +2,040 t on Nov 9 and +50 t on Nov 10 - watch whether the drawdown has stalled.", "Nov 17: LC2701 rallied to 93,180 on lower open interest (short covering) while spot kept falling.", "Cochilco forecasts 2026 lithium demand 2.08 Mt LCE vs supply 2.0 Mt (79,000 t deficit) and a Q4 average price near US$19,000/t - far above current spot of about US$13,700/t, so treat that forecast with caution.", "Supply restarts: Bald Hill, Finniss; Rio Tinto spending $1.4bn on Fenix 1B and Sal de Vida."]};
 let S = JSON.parse(JSON.stringify(BUNDLED));
-const VAT = 0.13;
-const fmt = (n, d=0) => (n==null || isNaN(n)) ? '\u2014' : Number(n).toLocaleString('en-AU',{maximumFractionDigits:d, minimumFractionDigits:d});
-const last = a => a && a.length ? a[a.length-1] : null;
-const $ = id => document.getElementById(id);
+const VAT=0.13;
+const fmt=(n,d=0)=>(n==null||isNaN(n))?'\u2014':Number(n).toLocaleString('en-AU',{maximumFractionDigits:d,minimumFractionDigits:d});
+const pct=(n,d=1)=>(n==null||isNaN(n))?'\u2014':(n>0?'+':'')+(n*100).toFixed(d)+'%';
+const last=a=>a&&a.length?a[a.length-1]:null;
+const $=id=>document.getElementById(id);
+const ser=k=>(S.series&&S.series[k])||[];
+const byDate=k=>{const m={};ser(k).forEach(r=>m[r.date]=r);return m;};
+const FX=()=>parseFloat($('fx').value)||S.fx_usdcny||6.6665;
+const YLD=()=>parseFloat($('yld').value)||8;
+const dayDiff=(a,b)=>(new Date(b)-new Date(a))/864e5;
 
-function smmByDate(){ const m={}; (S.series.smm_spot||[]).forEach(r=>m[r.date]=r); return m; }
-function gfexByDate(){ const m={}; (S.series.gfex_futures||[]).forEach(r=>m[r.date]=r); return m; }
+function computeSignals(){
+ const out=[],fx=FX(),smm=byDate('smm_spot');
+ const rec=ser('gfex_receipts');
+ if(rec.length>=2){const a=rec[0],b=last(rec),ch=b.quantity-a.quantity;
+  out.push({n:'GFEX receipts trend',r:fmt(a.quantity)+' \u2192 '+fmt(b.quantity)+' mt ('+(ch>0?'+':'')+fmt(ch)+') over '+rec.length+' prints',t:ch>0?'bear':ch<0?'bull':'mixed',w:'Rising receipts add deliverable supply; falling receipts tighten delivery.',c:rec.length<5?'low: needs 5+ prints':'ok'});}
+ else out.push({n:'GFEX receipts trend',r:'insufficient data',t:'na',w:'Needs at least two prints.',c:'none'});
+ const gs=ser('gfex_futures').filter(r=>r.settle!=null).sort((a,b)=>a.date<b.date?-1:1);
+ const gl=last(gs);
+ if(gl&&gs.length>=2&&gl.oi_change!=null){
+  const p=gs[gs.length-2];
+  if(dayDiff(p.date,gl.date)<=4){
+   const dp=gl.settle-p.settle,up=dp>0,oiUp=gl.oi_change>0;
+   let t,lab;
+   if(up&&oiUp){t='bull';lab='new longs entering';}else if(up&&!oiUp){t='mixed';lab='short covering, not fresh buying';}
+   else if(!up&&oiUp){t='bear';lab='new shorts building';}else{t='bear';lab='long liquidation';}
+   out.push({n:'Price vs open interest',r:gl.date+': settle '+pct(dp/p.settle)+', OI '+(gl.oi_change>0?'+':'')+fmt(gl.oi_change)+' lots \u2192 '+lab,t:t,w:'Price up with OI down is covering; price down with OI up is systematic shorting.',c:'ok (one session)'});
+  }else out.push({n:'Price vs open interest',r:'no consecutive settlements',t:'na',w:'',c:'none'});
+ }else out.push({n:'Price vs open interest',r:'no settlement with OI change',t:'na',w:'',c:'none'});
+ if(gl&&gl.volume!=null&&gl.oi){const x=gl.volume/gl.oi;
+  out.push({n:'Turnover / OI',r:gl.date+': '+x.toFixed(2)+'x ('+fmt(gl.volume)+' lots vs OI '+fmt(gl.oi)+')',t:x>1?'mixed':'info',w:'Above 1x means speculative, intraday-heavy trading; moves are less anchored to physical.',c:'ok'});}
+ let bd=null;for(const r of gs.slice().reverse()){if(smm[r.date]&&smm[r.date].avg!=null){bd=r;break;}}
+ if(bd){const sp=smm[bd.date].avg,d=sp-bd.settle,rel=d/bd.settle;
+  out.push({n:'Spot vs futures',r:bd.date+': spot '+fmt(sp)+' vs settle '+fmt(bd.settle)+' = '+(d>0?'+':'')+fmt(d)+' ('+pct(rel,2)+')',t:rel>0.005?'bull':rel<-0.005?'bear':'mixed',w:'Spot at a premium (backwardation) is bullish; spot at a discount (contango) is bearish.',c:'ok'});}
+ const sg=last(ser('sgx_licf')),sm=last(ser('smm_spot'));
+ if(sg&&sm){const sx=sg.price_usd_kg*1000*fx,ex=sm.avg/(1+VAT);
+  out.push({n:'SGX CIF CJK vs China ex-VAT',r:'SGX '+fmt(sx)+' vs SMM '+fmt(ex)+' CNY/mt = '+pct(sx/ex-1,0),t:'info',w:'Different delivery terms and benchmarks. Watch the trend of the premium: widening favours the physical-deficit view.',c:'low: delayed, thin SGX, no history'});}
+ const inv=last(ser('inventory'));
+ if(inv)out.push({n:'Inventory level',r:fmt(inv.total)+' mt ('+inv.date+'), '+(inv.trend||'trend unknown')+'; downstream drawing while producers and traders hold more',t:'mixed',w:'Falling stocks support the deficit view, but ownership shifting to traders is a latent overhang.',c:'medium: single point, scope changed Sep 2026'});
+ const ca=last(ser('cathode'));
+ if(ca){const lce=ca.lfp_t_week*ca.lce_per_t_lfp;
+  out.push({n:'Cathode demand cover',r:'LFP '+fmt(ca.lfp_t_week)+' t/wk implies ~'+fmt(lce)+' t LCE/wk, above cathode-plant carbonate stocks (<1 week of cover); ternary down '+ca.ternary_down_weeks+' weeks',t:'bull',w:'Thin downstream cover means restocking demand arrives quickly if prices stabilise.',c:'medium: SMM weekly estimate'});}
+ const sp=last(ser('spodumene'));
+ if(sp&&sm){const carb=sm.avg/(1+VAT)/fx,raw=sp.price_usd_t*YLD(),spread=carb-raw;
+  out.push({n:'Conversion spread',r:'Carbonate US$'+fmt(carb)+'/t vs SC6 feed US$'+fmt(raw)+'/t LCE (at '+YLD().toFixed(1)+'x) = US$'+fmt(spread)+' ('+pct(spread/carb,0)+') before conversion cost',t:'info',w:'A thin spread means refiners may slow spodumene withdrawals, which tightens carbonate later.',c:'low: yield is an assumption'});}
+ const eq=ser('equities').filter(r=>r.date>='2026-11-06');
+ if(eq.length>=2&&smm['2026-11-06']&&sm){const e0=eq[0],e1=last(eq);
+  out.push({n:'LTR / PLS vs spot',r:'since '+e0.date+': LTR '+pct(e1.ltr/e0.ltr-1)+', PLS '+pct(e1.pls/e0.pls-1)+', SMM spot '+pct(sm.avg/smm[e0.date].avg-1),t:'info',w:'Equities falling faster than spot means the market is discounting forward weakness; shares are not a physical price.',c:'ok (short window)'});}
+ return out;
+}
+
+function renderSignals(){
+ const sg=computeSignals();
+ const cnt=t=>sg.filter(x=>x.t===t).length;
+ $('tally').innerHTML='<span class="t-bull">'+cnt('bull')+' bullish</span> &middot; <span class="t-bear">'+cnt('bear')+' bearish</span> &middot; <span class="t-mixed">'+cnt('mixed')+' mixed</span> &middot; <span class="t-info">'+(cnt('info')+cnt('na'))+' informational / no data</span>';
+ const lab={bull:'Bullish',bear:'Bearish',mixed:'Mixed',info:'Info',na:'No data'};
+ $('signals').innerHTML='<tr><th>Signal</th><th>Reading</th><th>Lean</th><th>Why it matters</th><th>Confidence</th></tr>'+sg.map(x=>'<tr><td>'+x.n+'</td><td>'+x.r+'</td><td class="t-'+x.t+'">'+lab[x.t]+'</td><td>'+x.w+'</td><td>'+x.c+'</td></tr>').join('');
+}
 
 function renderKPIs(){
-  const fx = parseFloat($('fx').value) || S.fx_usdcny;
-  const smmL = last(S.series.smm_spot), gL = last(S.series.gfex_futures), sgL = last(S.series.sgx_licf), recL = last(S.series.gfex_receipts);
-  const basis = (gL && smmL && gL.date===smmL.date && gL.settle!=null && smmL.avg!=null) ? gL.settle - smmL.avg : null;
-  const sgxCny = sgL ? sgL.price_usd_kg*1000*fx : null;
-  const smmExVat = smmL ? smmL.avg/(1+VAT) : null;
-  const spread = (sgxCny!=null && smmExVat!=null) ? sgxCny - smmExVat : null;
-  const cards = [
-    {label:'SMM BG carbonate spot', value: smmL? fmt(smmL.avg)+' CNY/mt':'\u2014',
-     sub: smmL? (smmL.date+' &middot; '+(smmL.chg!=null? (smmL.chg>0?'+':'')+fmt(smmL.chg)+' DoD':'avg') + ' &middot; ~'+fmt(smmL.avg/fx)+' USD/t'):'no data'},
-    {label:'GFEX LC2701 settle', value: gL&&gL.settle!=null? fmt(gL.settle)+' CNY/mt':'\u2014',
-     sub: gL? (gL.date+' &middot; OI '+(gL.oi!=null? fmt(gL.oi)+' lots':'?') + (gL.oi_change!=null? ' ('+(gL.oi_change>0?'+':'')+fmt(gL.oi_change)+')':'')):'no data'},
-    {label:'SGX LICF '+ (sgL? sgL.contract.split(' ').slice(1).join(' '):''), value: sgL? sgL.price_usd_kg.toFixed(2)+' USD/kg':'\u2014',
-     sub: sgL? (sgL.date+' &middot; delayed &middot; = '+fmt(sgxCny)+' CNY/mt'):'no data'},
-    {label:'China spot-futures basis', value: basis!=null? (basis>0?'+':'')+fmt(basis)+' CNY/mt':'\u2014',
-     sub: basis!=null? (gL.date+' settle minus spot'+(basis>0?' (futures premium)':' (futures discount)')):'no same-date settle pair'},
-    {label:'SGX-SMM regional spread', value: spread!=null? (spread>0?'+':'')+fmt(spread)+' CNY/mt':'\u2014',
-     sub: spread!=null? ('SGX CIF CJK minus SMM ex-VAT &middot; '+(spread>0?'ex-China premium':'ex-China discount')):'no data'},
-    {label:'GFEX registered receipts', value: recL? fmt(recL.quantity)+' mt':'<span class="gap">gap</span>',
-     sub: recL? (recL.date+(recL.change!=null? ' &middot; '+(recL.change>0?'+':'')+fmt(recL.change)+' t DoD':'')+' &middot; manual leg, no free automated feed'):'no data'},
-    {label:'SMM-measured inventory', value:'122,644 mt',
-     sub:'week to 2026-11-13, declining &middot; methodology changed Oct (adds ~175k t)'}
-  ];
-  $('kpis').innerHTML = cards.map(c=>'<div class="card"><div class="label">'+c.label+'</div><div class="value">'+c.value+'</div><div class="sub">'+c.sub+'</div></div>').join('');
-  $('asat').textContent = S.generated_at;
+ const fx=FX(),smmL=last(ser('smm_spot')),gs=ser('gfex_futures'),gSet=last(gs.filter(r=>r.settle!=null)),gL=last(gs),sgL=last(ser('sgx_licf')),recL=last(ser('gfex_receipts')),sp=last(ser('spodumene')),inv=last(ser('inventory')),eq=last(ser('equities'));
+ const smm=byDate('smm_spot');
+ const bd=gSet&&smm[gSet.date]?smm[gSet.date].avg-gSet.settle:null;
+ const sx=sgL?sgL.price_usd_kg*1000*fx:null,ex=smmL?smmL.avg/(1+VAT):null,spr=(sx!=null&&ex!=null)?sx-ex:null;
+ const cards=[
+ {l:'SMM BG carbonate spot',v:smmL?fmt(smmL.avg)+' CNY/mt':'\u2014',s:smmL?smmL.date+(smmL.chg!=null?' \u00b7 '+(smmL.chg>0?'+':'')+fmt(smmL.chg)+' DoD':'')+' \u00b7 ~'+fmt(smmL.avg/fx)+' USD/t':'no data'},
+ {l:'GFEX LC2701 settle',v:gSet?fmt(gSet.settle)+' CNY/mt':'\u2014',s:gSet?gSet.date+(gSet.oi!=null?' \u00b7 OI '+fmt(gSet.oi)+' lots':''):'no data'},
+ {l:'Spot \u2212 futures (same date)',v:bd!=null?(bd>0?'+':'')+fmt(bd)+' CNY/mt':'\u2014',s:bd!=null?gSet.date+(bd>0?' \u00b7 spot premium (backwardation)':' \u00b7 spot discount (contango)'):'no same-date pair'},
+ {l:'SGX LICF',v:sgL?sgL.price_usd_kg.toFixed(2)+' USD/kg':'\u2014',s:sgL?sgL.date+' \u00b7 delayed \u00b7 '+(spr!=null?(spr>0?'+':'')+fmt(spr)+' vs SMM ex-VAT':''):'no data'},
+ {l:'Spodumene SC6 CIF China',v:sp?fmt(sp.price_usd_t,1)+' USD/t':'\u2014',s:sp?sp.date+' \u00b7 '+sp.kind:'manual feed'},
+ {l:'GFEX receipts',v:recL?fmt(recL.quantity)+' mt':'<span class="gap">gap</span>',s:recL?recL.date+(recL.change!=null?' \u00b7 '+(recL.change>0?'+':'')+fmt(recL.change)+' t':'')+' \u00b7 manual':'no data'},
+ {l:'SMM weekly inventory',v:inv?fmt(inv.total)+' mt':'\u2014',s:inv?inv.date+' \u00b7 '+(inv.trend||''):'no data'},
+ {l:'LTR / PLS',v:eq?'A$'+eq.ltr.toFixed(2)+' / A$'+eq.pls.toFixed(2):'\u2014',s:eq?eq.date+(eq.note?' \u00b7 '+eq.note:''):'no data'}];
+ $('kpis').innerHTML=cards.map(c=>'<div class="card"><div class="label">'+c.l+'</div><div class="value">'+c.v+'</div><div class="sub">'+c.s+'</div></div>').join('');
+ $('asat').textContent=S.generated_at;
 }
 
-function chartSVG(series, h){
-  const dates = [...new Set(series.flatMap(s=>s.data.map(p=>p[0])))].sort();
-  if(!dates.length) return '<p class="note gap">No data.</p>';
-  const W=640, H=h||250, P={l:56,r:12,t:12,b:26};
-  const vals = series.flatMap(s=>s.data.map(p=>p[1])).filter(v=>v!=null);
-  let lo=Math.min(...vals), hi=Math.max(...vals);
-  if(hi===lo){hi+=1;lo-=1}
-  const pad=(hi-lo)*0.08; lo-=pad; hi+=pad;
-  const x = d => P.l + (dates.indexOf(d)/(dates.length-1||1))*(W-P.l-P.r);
-  const y = v => P.t + (1-(v-lo)/(hi-lo))*(H-P.t-P.b);
-  let g='';
-  for(let i=0;i<=4;i++){const vv=lo+(hi-lo)*i/4, yy=y(vv);
-    g+='<line x1="'+P.l+'" y1="'+yy+'" x2="'+(W-P.r)+'" y2="'+yy+'" stroke="#2a313c" stroke-width="1"/>';
-    g+='<text x="'+(P.l-6)+'" y="'+(yy+3)+'" text-anchor="end">'+fmt(vv)+'</text>';}
-  const step=Math.max(1,Math.floor(dates.length/5));
-  dates.forEach((d,i)=>{ if(i%step===0||i===dates.length-1) g+='<text x="'+x(d)+'" y="'+(H-6)+'" text-anchor="middle">'+d.slice(5)+'</text>'; });
-  series.forEach(s=>{
-    const pts=s.data.filter(p=>p[1]!=null);
-    if(pts.length>1) g+='<polyline fill="none" stroke="'+s.color+'" stroke-width="2" points="'+pts.map(p=>x(p[0])+','+y(p[1])).join(' ')+'"/>';
-    pts.forEach(p=>{ g+='<circle cx="'+x(p[0])+'" cy="'+y(p[1])+'" r="3" fill="'+s.color+'"/>'; });
-  });
-  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+g+'</svg>';
+function chartSVG(series,h){
+ const dates=[...new Set(series.flatMap(s=>s.data.map(p=>p[0])))].sort();
+ if(!dates.length)return '<p class="note gap">No data.</p>';
+ const W=640,H=h||250,P={l:56,r:12,t:12,b:26};
+ const vals=series.flatMap(s=>s.data.map(p=>p[1])).filter(v=>v!=null);
+ let lo=Math.min(...vals),hi=Math.max(...vals);if(hi===lo){hi+=1;lo-=1}
+ const pad=(hi-lo)*0.08;lo-=pad;hi+=pad;
+ const x=d=>P.l+(dates.indexOf(d)/(dates.length-1||1))*(W-P.l-P.r),y=v=>P.t+(1-(v-lo)/(hi-lo))*(H-P.t-P.b);
+ let g='';
+ for(let i=0;i<=4;i++){const vv=lo+(hi-lo)*i/4,yy=y(vv);g+='<line x1="'+P.l+'" y1="'+yy+'" x2="'+(W-P.r)+'" y2="'+yy+'" stroke="#2a313c"/>';g+='<text x="'+(P.l-6)+'" y="'+(yy+3)+'" text-anchor="end">'+fmt(vv,hi-lo<20?1:0)+'</text>';}
+ const step=Math.max(1,Math.floor(dates.length/5));
+ dates.forEach((d,i)=>{if(i%step===0||i===dates.length-1)g+='<text x="'+x(d)+'" y="'+(H-6)+'" text-anchor="middle">'+d.slice(5)+'</text>';});
+ series.forEach(s=>{const pts=s.data.filter(p=>p[1]!=null);
+  if(pts.length>1)g+='<polyline fill="none" stroke="'+s.color+'" stroke-width="2" points="'+pts.map(p=>x(p[0])+','+y(p[1])).join(' ')+'"/>';
+  pts.forEach(p=>{g+='<circle cx="'+x(p[0])+'" cy="'+y(p[1])+'" r="3" fill="'+s.color+'"/>';});});
+ return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+g+'</svg>';
 }
+const sw=(c,t)=>'<span><span class="swatch" style="background:'+c+'"></span>'+t+'</span>';
 
 function renderCharts(){
-  const smm=smmByDate(), gf=gfexByDate();
-  const cnDates=[...new Set([...Object.keys(smm),...Object.keys(gf)])].sort();
-  const spotPts=cnDates.filter(d=>smm[d]&&smm[d].avg!=null).map(d=>[d,smm[d].avg]);
-  const settlePts=cnDates.filter(d=>gf[d]&&gf[d].settle!=null).map(d=>[d,gf[d].settle]);
-  const closePts=cnDates.filter(d=>gf[d]&&gf[d].settle==null&&gf[d].close!=null).map(d=>[d,gf[d].close]);
-  $('chart-cn').innerHTML=chartSVG([
-    {name:'SMM BG spot avg',color:'#57c785',data:spotPts},
-    {name:'GFEX LC2701 settle',color:'#4dd0e1',data:settlePts},
-    {name:'closes (incl. indicative)',color:'#e8b93e',data:closePts}
-  ]);
-  $('legend-cn').innerHTML='<span><span class="swatch" style="background:#57c785"></span>SMM spot</span><span><span class="swatch" style="background:#4dd0e1"></span>LC2701 settle</span><span><span class="swatch" style="background:#e8b93e"></span>LC2701 close (incl. indicative)</span>';
-  const b=spotPts.length&&settlePts.length? (gf[last(settlePts)[0]].settle - smm[last(spotPts)[0]].avg):null;
-  $('basis-note').textContent = b==null? 'No same-date spot/settlement pair yet - closes include indicative prints in amber.' :
-    'Latest same-date basis '+last(settlePts)[0]+': '+(b>0?'+':'')+fmt(b)+' CNY/mt '+(b>0?'(futures premium - paper leaning bid vs physical)':'(futures discount - paper leaning offered vs physical)')+'. Amber points are closes / indicative quotes, not official settlements.';
-
-  const fx=parseFloat($('fx').value)||S.fx_usdcny;
-  const sgPts=(S.series.sgx_licf||[]).filter(r=>r.price_usd_kg!=null).map(r=>[r.date, r.price_usd_kg*1000*fx]);
-  const exPts=Object.values(smm).filter(r=>r.avg!=null).map(r=>[r.date, r.avg/(1+VAT)]);
-  $('chart-sg').innerHTML=chartSVG([
-    {name:'SGX LICF (CNY/mt)',color:'#e8b93e',data:sgPts},
-    {name:'SMM ex-VAT (CNY/mt)',color:'#57c785',data:exPts}
-  ]);
-  $('legend-sg').innerHTML='<span><span class="swatch" style="background:#e8b93e"></span>SGX LICF CIF CJK</span><span><span class="swatch" style="background:#57c785"></span>SMM ex-VAT DDP China</span>';
-  const sgL=last(sgPts), exL=last(exPts);
-  const sp=(sgL&&exL)? sgL[1]-exL[1]:null;
-  $('spread-note').textContent = sp==null? 'Regional spread needs both legs.' :
-    'Spread (SGX minus SMM ex-VAT): '+(sp>0?'+':'')+fmt(sp)+' CNY/mt \u2248 '+(100*sp/exL[1]).toFixed(0)+'% vs domestic. Note: this mixes CIF CJK vs DDP China delivery terms and different benchmarks - it signals regional price formation, not an arb. SGX leg is delayed/thin.';
+ const smm=byDate('smm_spot'),gf=byDate('gfex_futures'),fx=FX();
+ const ds=[...new Set([...Object.keys(smm),...Object.keys(gf)])].sort();
+ const spot=ds.filter(d=>smm[d]&&smm[d].avg!=null).map(d=>[d,smm[d].avg]);
+ const set=ds.filter(d=>gf[d]&&gf[d].settle!=null).map(d=>[d,gf[d].settle]);
+ const cl=ds.filter(d=>gf[d]&&gf[d].settle==null&&gf[d].close!=null).map(d=>[d,gf[d].close]);
+ $('chart-cn').innerHTML=chartSVG([{color:'#57c785',data:spot},{color:'#4dd0e1',data:set},{color:'#e8b93e',data:cl}]);
+ $('legend-cn').innerHTML=sw('#57c785','SMM spot')+sw('#4dd0e1','LC2701 settle')+sw('#e8b93e','LC2701 close (no settle)');
+ const bd=set.length?smm[last(set)[0]]:null;
+ $('basis-note').textContent=(bd&&bd.avg!=null)?'Latest same-date spot minus settle ('+last(set)[0]+'): '+fmt(bd.avg-gf[last(set)[0]].settle)+' CNY/mt. Negative = spot at a discount.':'No same-date spot and settlement pair yet.';
+ const sgp=ser('sgx_licf').filter(r=>r.price_usd_kg!=null).map(r=>[r.date,r.price_usd_kg*1000*fx]);
+ const exp=Object.values(smm).filter(r=>r.avg!=null).map(r=>[r.date,r.avg/(1+VAT)]);
+ $('chart-sg').innerHTML=chartSVG([{color:'#e8b93e',data:sgp},{color:'#57c785',data:exp}]);
+ $('legend-sg').innerHTML=sw('#e8b93e','SGX LICF CIF CJK')+sw('#57c785','SMM ex-VAT DDP China');
+ const a=last(sgp),b=last(exp);
+ $('spread-note').textContent=(a&&b)?'Spread '+(a[1]-b[1]>0?'+':'')+fmt(a[1]-b[1])+' CNY/mt ('+pct(a[1]/b[1]-1,0)+'). Different terms and benchmarks; SGX leg is delayed and thin.':'Needs both legs.';
+ const eq=ser('equities').filter(r=>r.date>='2026-11-06');
+ if(eq.length){
+  const e0=eq[0],s0=smm[e0.date]?smm[e0.date].avg:null;
+  const spotI=s0?Object.values(smm).filter(r=>r.date>=e0.date&&r.avg!=null).map(r=>[r.date,100*r.avg/s0]):[];
+  $('chart-eq').innerHTML=chartSVG([{color:'#57c785',data:spotI},{color:'#4dd0e1',data:eq.map(r=>[r.date,100*r.ltr/e0.ltr])},{color:'#e8b93e',data:eq.map(r=>[r.date,100*r.pls/e0.pls])}]);
+  $('legend-eq').innerHTML=sw('#57c785','SMM spot')+sw('#4dd0e1','LTR')+sw('#e8b93e','PLS');
+  const e1=last(eq);$('eq-note').textContent='Rebased to '+e0.date+'. LTR '+pct(e1.ltr/e0.ltr-1)+', PLS '+pct(e1.pls/e0.pls-1)+' to '+e1.date+(e1.note?' ('+e1.note+')':'')+'. Share prices reflect expected future prices, so they can lead or lag spot.';
+ }
+ const sp=ser('spodumene'),sm=last(ser('smm_spot'));
+ let h='<tr><th>Date</th><th>US$/t SC6</th><th>Basis</th></tr>'+sp.map(r=>'<tr><td>'+r.date+'</td><td>'+fmt(r.price_usd_t,1)+(r.low?' ('+fmt(r.low)+'\u2013'+fmt(r.high)+')':'')+'</td><td>'+r.kind+'</td></tr>').join('');
+ if(sm&&sp.length){const c=sm.avg/(1+VAT)/fx,raw=last(sp).price_usd_t*YLD();
+  h+='<tr class="hl"><td>Carbonate ex-VAT</td><td>'+fmt(c)+'</td><td>US$/t from SMM spot at FX '+fx+'</td></tr><tr class="hl"><td>SC6 feed per t LCE</td><td>'+fmt(raw)+'</td><td>at '+YLD().toFixed(1)+' t SC6 per t LCE (assumption)</td></tr><tr class="hl"><td>Gross spread</td><td>'+fmt(c-raw)+'</td><td>'+pct((c-raw)/c,0)+' of carbonate, before conversion cost and recovery</td></tr>';}
+ $('spod').innerHTML=h;
+ $('spod-note').textContent='SMM publishes the daily SC6 price free but its history is login-gated, so this series grows only as it is added. Adjust the SC6 yield box in the header.';
 }
 
 function renderPvP(){
-  const smm=smmByDate(), gf=gfexByDate();
-  const rec={}; (S.series.gfex_receipts||[]).forEach(r=>rec[r.date]=r);
-  const dates=[...new Set([...Object.keys(smm),...Object.keys(gf),...Object.keys(rec)])].sort().reverse();
-  let html='<tr><th>Date</th><th>SMM BG spot</th><th>GFEX LC2701 settle</th><th>Basis</th><th>Open interest</th><th>OI change</th><th>Volume</th><th>Receipts (mt)</th></tr>';
-  dates.forEach(d=>{
-    const s=smm[d], g=gf[d], r=rec[d];
-    const basis=(g&&g.settle!=null&&s&&s.avg!=null)? g.settle-s.avg:null;
-    const indicative=(g&&!g.settle&&g.close);
-    html+='<tr'+(d===dates[0]?' class="hl"':'')+'><td>'+d+'</td><td>'+(s&&s.avg!=null?fmt(s.avg)+(s.chg!=null?' ('+(s.chg>0?'+':'')+fmt(s.chg)+')':''):'\u2014')+'</td><td'+
-      (indicative?' class="indic" title="indicative close, not official settlement"':'')+'>'+
-      (g&&g.settle!=null?fmt(g.settle):(indicative? '~'+fmt(g.close)+'*':'\u2014'))+'</td><td>'+(basis!=null?(basis>0?'+':'')+fmt(basis):'\u2014')+'</td><td>'+
-      (g&&g.oi!=null?fmt(g.oi):'\u2014')+'</td><td>'+(g&&g.oi_change!=null?(g.oi_change>0?'+':'')+fmt(g.oi_change):'\u2014')+'</td><td>'+
-      (g&&g.volume!=null?fmt(g.volume):'\u2014')+'</td><td>'+
-      (r&&r.quantity!=null?fmt(r.quantity)+(r.change!=null?' ('+(r.change>0?'+':'')+fmt(r.change)+')':''):'\u2014')+'</td></tr>';
-  });
-  $('pvp').innerHTML=html;
-  const recs=S.series.gfex_receipts||[];
-  $('receipt-note').innerHTML = recs.length?
-    'Receipts: latest print '+recs[recs.length-1].date+' at '+fmt(recs[recs.length-1].quantity)+' mt ('+recs.length+' points loaded; five-report move needs 5). No free automated feed exists - update from X transcriptions or the GFEX bulletin. * = indicative close, not an official settlement.' :
-    'Registered receipts: no data loaded. Import the GFEX receipt series - gaps stay visible rather than being filled with a proxy.';
+ const smm=byDate('smm_spot'),gf=byDate('gfex_futures'),rec=byDate('gfex_receipts');
+ const ds=[...new Set([...Object.keys(smm),...Object.keys(gf),...Object.keys(rec)])].sort().reverse();
+ let html='<tr><th>Date</th><th>SMM spot</th><th>GFEX LC2701 settle</th><th>Spot \u2212 settle</th><th>OI</th><th>OI change</th><th>Volume</th><th>Receipts (mt)</th></tr>';
+ ds.forEach(d=>{const s=smm[d],g=gf[d],r=rec[d],b=(g&&g.settle!=null&&s&&s.avg!=null)?s.avg-g.settle:null,ind=g&&g.settle==null&&g.close;
+  html+='<tr'+(d===ds[0]?' class="hl"':'')+'><td>'+d+'</td><td>'+(s&&s.avg!=null?fmt(s.avg)+(s.chg!=null?' ('+(s.chg>0?'+':'')+fmt(s.chg)+')':''):'\u2014')+'</td><td'+(ind?' class="indic"':'')+'>'+(g&&g.settle!=null?fmt(g.settle):(ind?'~'+fmt(g.close)+'*':'\u2014'))+'</td><td>'+(b!=null?(b>0?'+':'')+fmt(b):'\u2014')+'</td><td>'+(g&&g.oi!=null?fmt(g.oi):'\u2014')+'</td><td>'+(g&&g.oi_change!=null?(g.oi_change>0?'+':'')+fmt(g.oi_change):'\u2014')+'</td><td>'+(g&&g.volume!=null?fmt(g.volume):'\u2014')+'</td><td>'+(r&&r.quantity!=null?fmt(r.quantity)+(r.change!=null?' ('+(r.change>0?'+':'')+fmt(r.change)+')':''):'\u2014')+'</td></tr>';});
+ $('pvp').innerHTML=html;
+ const rc=ser('gfex_receipts');
+ $('receipt-note').textContent=rc.length?'Latest receipts print '+last(rc).date+' ('+rc.length+' points). No free automated feed exists; update manually. * = close, not an official settlement.':'No receipts loaded.';
+}
+
+function renderInv(){
+ const inv=ser('inventory'),ca=ser('cathode');
+ let h='<tr><th>Date</th><th>Scope</th><th>Total (mt)</th><th>Downstream</th><th>Other (traders etc.)</th><th>Smelter</th></tr>'+inv.map(r=>'<tr><td>'+r.date+'</td><td style="text-align:left">'+r.scope+'</td><td>'+fmt(r.total)+'</td><td>'+fmt(r.downstream)+'</td><td>'+fmt(r.other)+'</td><td>'+fmt(r.smelter)+'</td></tr>').join('');
+ ca.forEach(c=>{h+='<tr class="hl"><td>'+c.date+'</td><td style="text-align:left">Weekly cathode output: LFP '+fmt(c.lfp_t_week)+' t, ternary '+fmt(c.ternary_t_week)+' t (down '+c.ternary_down_weeks+' weeks)</td><td colspan="4" style="text-align:left">Implied LFP carbonate use ~'+fmt(c.lfp_t_week*c.lce_per_t_lfp)+' t LCE/week at '+c.lce_per_t_lfp+' t per t LFP</td></tr>';});
+ $('inv').innerHTML=h;
+ $('inv-note').textContent='Rows on different scopes are not comparable: SMM revised its weekly inventory method from 4 Sep 2026 and backdated it to 30 Apr 2026, so the May row uses the earlier scope.';
 }
 
 function renderStatic(){
-  const rows=[
-    ['GFEX LC futures daily bar (close, volume, OI)','AKShare futures_zh_daily_sina - runs in the daily cloud job','Free','<span class="status-ok">Exact</span>','Sina-sourced EOD bar; official settlement via GFEX site'],
-    ['Spot (99qh trend, CNY/mt)','AKShare spot_price_qh symbol 碳酸锂 - runs in the daily cloud job','Free','<span class="status-proxy">Proxy</span>','Stand-in for SMM BG carbonate; flagged, never labelled SMM'],
-    ['GFEX live futures price (USD-converted)','MetalCharts free API /v1/prices, ~30 of 200 free calls/month','Free','<span class="status-indicative">Indicative</span>','Optional key; fill-in until the EOD bar lands'],
-    ['USD/CNY FX','frankfurter.app ECB reference, keyless','Free','<span class="status-ok">Exact</span>','Settles once daily (ECB), not intraday'],
-    ['GFEX registered warehouse receipts','X transcriptions / GFEX Chinese bulletin (manual); MetalCharts API /v1/gfex/receipts ($249/mo)','Free manual / paid','<span class="status-ok">Exact</span>','No free automated feed - update by hand'],
-    ['SGX LICF (USD/kg, CIF CJK)','SGX delayed quotes / dated SGX settlement reports','Free','<span class="status-ok">Exact</span>','Delayed and thin - update occasionally'],
-    ['Fastmarkets MB-LI-0029 CIF CJK','Fastmarkets API','Subscription','<span class="status-delayed">Proxy</span>','Regional cross-check only - never blended into the SMM leg'],
-    ['ICE / CME carbonate futures (Fastmarkets-settled)','Exchange data','Free/subscription','<span class="status-delayed">Proxy</span>','Cross-check for the SGX leg, not a substitute']
-  ];
-  $('feeds').innerHTML='<tr><th>Feed</th><th>Best route</th><th>Cost</th><th>Exact / proxy</th><th>Notes</th></tr>'+
-    rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td></tr>').join('');
-  $('ctx').innerHTML=(S.context||[]).map(c=>'<li>'+c+'</li>').join('');
+ const rows=[
+ ['GFEX LC daily bar (close, volume, OI)','AKShare (cloud job)','Free','ok','Exact EOD; official settlement via 100ppi dominant contract'],
+ ['Spot (100ppi battery-grade)','AKShare futures_spot_price (cloud job)','Free','proxy','Proxy for SMM; never overwrites exact SMM rows'],
+ ['SMM spot ranges','news.metal.com daily reviews','Free','ok','Manual or semi-manual'],
+ ['USD/CNY','frankfurter.app (cloud job)','Free','ok','ECB daily reference'],
+ ['LTR, PLS closes','Yahoo Finance via yfinance (cloud job), or the finance connector','Free','ok','Unofficial endpoint; can rate-limit cloud IPs'],
+ ['SMM spodumene SC6 CIF China','metal.com latest value; Albemarle auction notices','Free (latest only)','manual','History is login-gated; enter daily'],
+ ['SMM weekly carbonate inventory','SMM weekly articles','Free (headline totals)','manual','Scope break Sep 2026; component split only partly published'],
+ ['Cathode output, imports, port stocks','SMM and Mysteel analysis articles','Free (prose)','manual','Enter figures as published'],
+ ['GFEX receipts','GFEX Chinese bulletin; X transcriptions','Free manual','manual','MetalCharts per-warehouse API is US$249/month'],
+ ['SGX LICF','SGX / TradingView delayed','Free','delayed','Thin; no free live feed'],
+ ['Fastmarkets CJK, MB-LI-0012; Benchmark Minerals','Vendor portals','Subscription','gap','No free equivalent; not modelled']];
+ const cls={ok:'Exact',proxy:'Proxy',manual:'Manual',delayed:'Delayed',gap:'Not available free'};
+ $('feeds').innerHTML='<tr><th>Feed</th><th>Route</th><th>Cost</th><th>Status</th><th>Notes</th></tr>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="status-'+(r[3]==='ok'?'ok':r[3]==='gap'?'gap':'proxy')+'">'+cls[r[3]]+'</td><td>'+r[4]+'</td></tr>').join('');
+ $('ctx').innerHTML=(S.context||[]).map(c=>'<li>'+c+'</li>').join('');
 }
 
-function renderAll(){ renderKPIs(); renderCharts(); renderPvP(); renderStatic(); save(); }
-function save(){ try{ localStorage.setItem('lithium-monitor', JSON.stringify(S)); }catch(e){} }
-function loadLocal(){ try{ const t=localStorage.getItem('lithium-monitor'); if(t){ const j=JSON.parse(t); if(j && j.series && j.series.smm_spot){ S=j; return true; } } }catch(e){} return false; }
+function renderAll(){renderKPIs();renderSignals();renderCharts();renderPvP();renderInv();renderStatic();save();}
+function save(){try{localStorage.setItem('lithium-monitor-v2',JSON.stringify(S));}catch(e){}}
+function loadLocal(){try{const t=localStorage.getItem('lithium-monitor-v2');if(t){const j=JSON.parse(t);if(j&&j.series&&j.series.smm_spot){S=j;return true;}}}catch(e){}return false;}
 
 async function fetchLatest(silent){
-  if(!/^https?:$/.test(location.protocol)){
-    if(!silent) $('msg').textContent='Auto-fetch needs the page hosted over http(s) - e.g. GitHub Pages. Opened as a local file, use Import instead.';
-    return false;
-  }
-  try{
-    const r = await fetch('market_snapshot.json', {cache:'no-store'});
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const j = await r.json();
-    if(!j || !j.series || !j.series.smm_spot) throw new Error('snapshot has no series');
-    S = j;
-    $('fx').value = S.fx_usdcny || $('fx').value;
-    renderAll();
-    $('msg').textContent = 'Fetched published snapshot '+S.generated_at+' (cloud job updates it every weekday 17:30 AWST).';
-    return true;
-  }catch(e){
-    if(!silent) $('msg').textContent = 'Fetch failed: '+e.message+' - showing bundled/saved data.';
-    return false;
-  }
+ if(!/^https?:$/.test(location.protocol)){if(!silent)$('msg').textContent='Auto-fetch needs the page hosted over http(s), e.g. GitHub Pages. Use Import for local files.';return false;}
+ try{const r=await fetch('market_snapshot.json',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);
+  const j=await r.json();if(!j||!j.series||!j.series.smm_spot)throw new Error('snapshot has no series');
+  S=j;$('fx').value=S.fx_usdcny||$('fx').value;renderAll();
+  $('msg').textContent='Fetched published snapshot '+S.generated_at+' (cloud job runs weekdays 17:30 AWST).';return true;
+ }catch(e){if(!silent)$('msg').textContent='Fetch failed: '+e.message+' - showing bundled or saved data.';return false;}
 }
 
-$('fx').value = S.fx_usdcny;
-$('fx').addEventListener('change', ()=>{ S.fx_usdcny=parseFloat($('fx').value)||S.fx_usdcny; renderCharts(); renderKPIs(); save(); });
+$('fx').value=S.fx_usdcny;
+$('fx').addEventListener('change',()=>{S.fx_usdcny=parseFloat($('fx').value)||S.fx_usdcny;renderAll();});
+$('yld').addEventListener('change',renderAll);
+$('btn-fetch').addEventListener('click',()=>fetchLatest(false));
 
-$('btn-fetch').addEventListener('click', ()=>fetchLatest(false));
-
-$('filein').addEventListener('change', ev=>{
-  const file=ev.target.files[0]; if(!file) return;
-  const rd=new FileReader();
-  rd.onload=()=>{
-    let ok=false, msg='';
-    try{
-      if(/\.json$/i.test(file.name)){
-        const j=JSON.parse(rd.result);
-        if(j && j.series){ S=j; ok=true; msg='Imported JSON snapshot ('+(j.generated_at||'undated')+').'; }
-        else msg='JSON did not contain a "series" object - expected market_snapshot.json format.';
-      } else {
-        const lines=rd.result.trim().split(/\r?\n/);
-        const hdr=lines[0].split(',').map(s=>s.trim());
-        const idx=n=>hdr.indexOf(n);
-        const cols=['smm_spot_avg','gfex_lc_settle','gfex_lc_close','gfex_oi','gfex_oi_change','gfex_volume','sgx_licf_usd_kg','gfex_receipts'];
-        const num=s=>s===''?null:Number(s);
-        const maps={smm_spot_avg:'smm_spot',gfex_lc_settle:'gfex_futures',gfex_lc_close:'gfex_futures',gfex_oi:'gfex_futures',gfex_oi_change:'gfex_futures',gfex_volume:'gfex_futures',sgx_licf_usd_kg:'sgx_licf',gfex_receipts:'gfex_receipts'};
-        const key={smm_spot_avg:'avg',gfex_lc_settle:'settle',gfex_lc_close:'close',gfex_oi:'oi',gfex_oi_change:'oi_change',gfex_volume:'volume',sgx_licf_usd_kg:'price_usd_kg',gfex_receipts:'quantity'};
-        for(const s of Object.keys(maps)) S.series[maps[s]]=S.series[maps[s]]||[];
-        let n=0;
-        for(let i=1;i<lines.length;i++){
-          const c=lines[i].split(','); const d=c[0]; if(!d) continue;
-          for(const col of cols){ const p=idx(col); if(p>=0 && c[p]!=='' && c[p]!=null){
-            let arr=S.series[maps[col]];
-            let rec=arr.find(r=>r.date===d);
-            if(!rec){ rec={date:d}; arr.push(rec); }
-            rec[key[col]]=num(c[p]); n++;
-          }}
-        }
-        ['smm_spot','gfex_futures','sgx_licf','gfex_receipts'].forEach(k=>S.series[k].sort((a,b)=>a.date<b.date?-1:1));
-        ok=true; msg='Merged CSV: '+n+' values across '+(lines.length-1)+' rows.';
-      }
-    }catch(e){ msg='Parse failed: '+e.message; }
-    if(ok){ $('fx').value=S.fx_usdcny||$('fx').value; renderAll(); }
-    $('msg').textContent=msg;
-  };
-  rd.readAsText(file);
+$('filein').addEventListener('change',ev=>{
+ const file=ev.target.files[0];if(!file)return;const rd=new FileReader();
+ rd.onload=()=>{let ok=false,msg='';
+  try{
+   if(/\.json$/i.test(file.name)){const j=JSON.parse(rd.result);
+    if(j&&j.series){S=j;ok=true;msg='Imported JSON snapshot ('+(j.generated_at||'undated')+').';}else msg='JSON has no "series" object.';}
+   else{
+    const lines=rd.result.trim().split(/\r?\n/),hdr=lines[0].split(',').map(s=>s.trim()),idx=n=>hdr.indexOf(n);
+    const maps={smm_spot_avg:['smm_spot','avg'],gfex_lc_settle:['gfex_futures','settle'],gfex_lc_close:['gfex_futures','close'],gfex_oi:['gfex_futures','oi'],gfex_oi_change:['gfex_futures','oi_change'],gfex_volume:['gfex_futures','volume'],sgx_licf_usd_kg:['sgx_licf','price_usd_kg'],gfex_receipts:['gfex_receipts','quantity'],ltr_close:['equities','ltr'],pls_close:['equities','pls'],spodumene_sc6_usd_t:['spodumene','price_usd_t']};
+    Object.values(maps).forEach(m=>{S.series[m[0]]=S.series[m[0]]||[];});
+    let n=0;
+    for(let i=1;i<lines.length;i++){const c=lines[i].split(',');const d=c[0];if(!d)continue;
+     for(const col in maps){const p=idx(col);if(p>=0&&c[p]!==''&&c[p]!=null){const arr=S.series[maps[col][0]];let r=arr.find(x=>x.date===d);if(!r){r={date:d};arr.push(r);}r[maps[col][1]]=Number(c[p]);n++;}}}
+    Object.keys(S.series).forEach(k=>S.series[k].sort((a,b)=>a.date<b.date?-1:1));
+    ok=true;msg='Merged CSV: '+n+' values across '+(lines.length-1)+' rows.';}
+  }catch(e){msg='Parse failed: '+e.message;}
+  if(ok){$('fx').value=S.fx_usdcny||$('fx').value;renderAll();}$('msg').textContent=msg;};
+ rd.readAsText(file);
 });
+$('btn-export').addEventListener('click',()=>{const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='market_snapshot.json';a.click();URL.revokeObjectURL(a.href);});
+$('btn-reset').addEventListener('click',()=>{S=JSON.parse(JSON.stringify(BUNDLED));$('fx').value=S.fx_usdcny;renderAll();$('msg').textContent='Reset to bundled snapshot '+S.generated_at+'.';});
 
-$('btn-export').addEventListener('click', ()=>{
-  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='market_snapshot.json';
-  a.click(); URL.revokeObjectURL(a.href);
-  $('msg').textContent='Exported market_snapshot.json ('+new Date().toISOString()+').';
-});
-
-$('btn-reset').addEventListener('click', ()=>{
-  S=JSON.parse(JSON.stringify(BUNDLED));
-  $('fx').value=S.fx_usdcny;
-  renderAll();
-  $('msg').textContent='Reset to bundled snapshot '+S.generated_at+'.';
-});
-
-(async function init(){
-  const hosted = await fetchLatest(true);
-  if(!hosted){
-    if(loadLocal()){ $('fx').value = S.fx_usdcny || 6.6665; renderAll(); $('msg').textContent='Loaded saved local snapshot '+S.generated_at+' (auto-fetch only works hosted, e.g. GitHub Pages).'; }
-    else { renderAll(); $('msg').textContent='Showing bundled snapshot '+S.generated_at+'. Host on GitHub Pages for automatic updates.'; }
-  }
+(async function(){
+ const hosted=await fetchLatest(true);
+ if(!hosted){if(loadLocal()){$('fx').value=S.fx_usdcny||6.6665;renderAll();$('msg').textContent='Loaded saved local snapshot '+S.generated_at+'.';}
+  else{renderAll();$('msg').textContent='Showing bundled snapshot '+S.generated_at+'. Host on GitHub Pages for automatic updates.';}}
 })();
-</script>
-</body>
-</html>
+</script></body></html>
