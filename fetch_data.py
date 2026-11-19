@@ -63,18 +63,39 @@ def fetch_gfex_akshare(s):
                oi=tofloat(row.get("hold")) or None,
                note="sina daily via AKShare; settlement replaces close when GFEX EOD is loaded")
 
-def fetch_spot_99qh(s):
+def fetch_spot_100ppi(s):
     import akshare as ak
-    df = ak.spot_price_qh(symbol="碳酸锂")
-    cols = list(df.columns)
-    date_col = cols[0]
-    spot_col = next((c for c in cols if "现货" in c), None)
-    for _, row in df.tail(5).iterrows():
-        d = str(row[date_col])[:10]
-        upsert(s["series"]["smm_spot"], d, avg=tofloat(row[spot_col]),
-               note="99qh spot via AKShare - proxy for SMM BG carbonate")
-    s["feeds"]["smm_spot"] = {"status": "proxy", "last_date": str(df.iloc[-1][date_col])[:10],
-        "note": "Automated leg is 99qh spot (AKShare) - a proxy for SMM BG carbonate. Replace with exact SMM figures where your access permits retention."}
+    from datetime import timedelta
+    smm = s["series"]["smm_spot"]
+    got, d = 0, datetime.now(PER).date()
+    for _ in range(12):
+        if got >= 5:
+            break
+        if d.weekday() < 5:
+            try:
+                df = ak.futures_spot_price(date=d.strftime("%Y%m%d"), vars_list=["LC"])
+            except Exception as e:
+                print("  100ppi", d, "skipped:", type(e).__name__)
+                df = None
+            if df is not None and len(df):
+                row = df.iloc[0]
+                pick = lambda *n: next((row[c] for c in n if c in df.columns), None)
+                iso = d.isoformat()
+                sp = tofloat(pick("spot_price", "sp", "现货价格"))
+                dom_sym = str(pick("dom_symbol", "主力合约代码") or "").lower()
+                dom_px = tofloat(pick("dom_price", "主力合约价格"))
+                if sp:
+                    got += 1
+                    if not any(r["date"] == iso and r.get("avg") for r in smm):
+                        upsert(smm, iso, avg=sp, note="100ppi battery-grade spot via AKShare - proxy for SMM")
+                if dom_px and dom_sym.endswith(CONTRACT.lower()[-4:]):
+                    upsert(s["series"]["gfex_futures"], iso, contract=CONTRACT,
+                           settle=dom_px, note="dominant-contract settlement via 100ppi/AKShare")
+        d -= timedelta(days=1)
+    if not got:
+        raise RuntimeError("no 100ppi spot rows returned")
+    s["feeds"]["smm_spot"] = {"status": "proxy", "last_date": smm[-1]["date"],
+        "note": "Automated leg is 100ppi (生意社) battery-grade spot via AKShare - a proxy for SMM. Existing exact SMM rows are never overwritten."}
 
 def fetch_metalcharts(s, fx):
     if not KEY or not fx:
@@ -115,7 +136,7 @@ def main():
     s = load()
     fx = None
     for name, fn in [("fx", fetch_fx), ("gfex-akshare", lambda: fetch_gfex_akshare(s)),
-                     ("spot-99qh", lambda: fetch_spot_99qh(s))]:
+                     ("spot-99qh", lambda: fetch_spot_100ppi(s))]:
         try:
             out = fn()
             if name == "fx":
