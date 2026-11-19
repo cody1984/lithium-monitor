@@ -1,7 +1,7 @@
 {
   "schema": "lithium-monitor/1",
-  "generated_at": "2026-11-19T09:02:00+08:00",
-  "fx_usdcny": 6.6665,
+  "generated_at": "2026-11-19T09:44:30+08:00",
+  "fx_usdcny": 6.6672,
   "feeds": {
     "smm_spot": {
       "status": "ok",
@@ -94,24 +94,34 @@
         "date": "2026-11-16",
         "contract": "LC2701",
         "settle": 85380,
-        "close": 88240,
-        "note": "derived from Nov-17 deltas"
+        "close": 88240.0,
+        "note": "sina daily via AKShare; settlement replaces close when GFEX EOD is loaded",
+        "volume": 243195.0,
+        "oi": 374250.0
       },
       {
         "date": "2026-11-17",
         "contract": "LC2701",
         "settle": 89980,
-        "close": 93180,
-        "oi": 349400,
+        "close": 93180.0,
+        "oi": 349426.0,
         "oi_change": -24824,
-        "volume": 424800,
-        "note": "low 86,740; volume +74.7% DoD"
+        "volume": 424783.0,
+        "note": "sina daily via AKShare; settlement replaces close when GFEX EOD is loaded"
       },
       {
         "date": "2026-11-18",
         "contract": "LC2701",
-        "close": 89100,
-        "note": "INDICATIVE - metalcharts live quote converted"
+        "close": 91520.0,
+        "note": "sina daily via AKShare; settlement replaces close when GFEX EOD is loaded",
+        "volume": 383415.0,
+        "oi": 343103.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2701",
+        "close": 91835,
+        "note": "INDICATIVE - metalcharts live quote converted at ECB FX"
       }
     ],
     "sgx_licf": [
