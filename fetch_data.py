@@ -72,18 +72,21 @@ def fetch_spot_100ppi(s):
         if got >= 5:
             break
         if d.weekday() < 5:
+            df = None
             try:
-                df = ak.futures_spot_price(date=d.strftime("%Y%m%d"), vars_list=["LC"])
+                df = ak.futures_spot_price(date=d.strftime("%Y%m%d"), symbols="LC")
             except Exception as e:
-                print("  100ppi", d, "skipped:", type(e).__name__)
-                df = None
+                print("  100ppi", d, "skipped:", type(e).__name__, str(e)[:120])
             if df is not None and len(df):
+                if "symbol" in df.columns:
+                    m = df[df["symbol"].astype(str).str.upper().str.startswith("LC")]
+                    df = m if len(m) else df
                 row = df.iloc[0]
                 pick = lambda *n: next((row[c] for c in n if c in df.columns), None)
                 iso = d.isoformat()
                 sp = tofloat(pick("spot_price", "sp", "现货价格"))
-                dom_sym = str(pick("dom_symbol", "主力合约代码") or "").lower()
-                dom_px = tofloat(pick("dom_price", "主力合约价格"))
+                dom_sym = str(pick("dominant_contract", "dom_symbol", "主力合约代码") or "").lower()
+                dom_px = tofloat(pick("dominant_contract_price", "dom_price", "主力合约价格"))
                 if sp:
                     got += 1
                     if not any(r["date"] == iso and r.get("avg") for r in smm):
@@ -91,11 +94,13 @@ def fetch_spot_100ppi(s):
                 if dom_px and dom_sym.endswith(CONTRACT.lower()[-4:]):
                     upsert(s["series"]["gfex_futures"], iso, contract=CONTRACT,
                            settle=dom_px, note="dominant-contract settlement via 100ppi/AKShare")
+            elif df is not None:
+                print("  100ppi", d, "empty (non-trading day or no data)")
         d -= timedelta(days=1)
     if not got:
         raise RuntimeError("no 100ppi spot rows returned")
     s["feeds"]["smm_spot"] = {"status": "proxy", "last_date": smm[-1]["date"],
-        "note": "Automated leg is 100ppi (生意社) battery-grade spot via AKShare - a proxy for SMM. Existing exact SMM rows are never overwritten."}
+        "note": "Automated leg is 100ppi battery-grade spot via AKShare - a proxy for SMM. Existing exact SMM rows are never overwritten."}
 
 def fetch_metalcharts(s, fx):
     if not KEY or not fx:
