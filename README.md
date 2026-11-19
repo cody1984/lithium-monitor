@@ -24,7 +24,7 @@ Actions job, not by anything running locally.
 
 ## What runs automatically
 
-Weekdays 20:30 AWST (17:30 Beijing, after GFEX settlement), the job:
+Weekdays 17:30 AWST (= 17:30 Beijing, after the GFEX close), the job:
 
 - pulls the LC contract daily bar (close, volume, OI) via AKShare
 - pulls the 99qh lithium carbonate spot trend via AKShare (flagged PROXY for SMM)
