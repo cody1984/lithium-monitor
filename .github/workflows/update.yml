@@ -2,8 +2,8 @@ name: Update lithium data
 
 on:
   schedule:
-        - cron: '30 11 * * 1-5'   # 09:30 UTC = 17:30 AWST / 17:30 Beijing, Mon-Fri, after GFEX close
-  workflow_dispatch:           # manual run button in the Actions tab
+    - cron: '30 9 * * 1-5'   # 09:30 UTC = 17:30 AWST / 17:30 Beijing, Mon-Fri, after GFEX close
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,24 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Install dependencies
-        run: pip install akshare requests
-
+        run: pip install akshare requests yfinance
       - name: Fetch data
         env:
-          METALCHARTS_KEY: ${{ secrets.METALCHARTS_KEY }}
           GFEX_CONTRACT: 'LC2701'
         run: python fetch_data.py
-
       - name: Commit outputs
         run: |
           git config user.name "data-bot"
           git config user.email "actions@github.com"
           git add market_daily.csv market_snapshot.json
           git diff --cached --quiet || (git commit -m "data update $(date -u +%F)" && git push)
-          
