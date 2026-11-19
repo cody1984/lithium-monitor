@@ -1,7 +1,7 @@
 {
   "schema": "lithium-monitor/2",
-  "generated_at": "2026-11-19T21:16:51+08:00",
-  "fx_usdcny": 6.6672,
+  "generated_at": "2026-11-20T02:27:18+08:00",
+  "fx_usdcny": 6.6667,
   "feeds": {
     "smm_spot": {
       "status": "proxy",
@@ -331,7 +331,7 @@
       {
         "date": "2026-11-19",
         "ltr": 0.5799999833106995,
-        "pls": 2.555000066757202,
+        "pls": 2.559999942779541,
         "note": "intraday close at time of pull"
       }
     ]
