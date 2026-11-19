@@ -1,0 +1,165 @@
+{
+  "schema": "lithium-monitor/1",
+  "generated_at": "2026-11-19T09:02:00+08:00",
+  "fx_usdcny": 6.6665,
+  "feeds": {
+    "smm_spot": {
+      "status": "ok",
+      "last_date": "2026-11-18",
+      "note": "Battery-grade carbonate, CNY/mt incl 13% VAT, DDP China. SMM daily reviews (free, ~1-day delay). Cloud job replaces with 99qh spot via AKShare - flagged as a proxy for SMM."
+    },
+    "gfex_futures": {
+      "status": "partial",
+      "last_date": "2026-11-18",
+      "note": "LC2701 exact settle/close/OI/volume arrive via AKShare in the daily cloud job. Nov-18 bundled figure is indicative (metalcharts)."
+    },
+    "gfex_receipts": {
+      "status": "partial",
+      "last_date": "2026-11-10",
+      "note": "No free automated feed. Free daily prints via X transcriptions; exact per-warehouse via metalcharts Ultimate ($249/mo). Forward-filled manually."
+    },
+    "sgx_licf": {
+      "status": "delayed",
+      "last_date": "2026-11-18",
+      "note": "Delayed/thin; no free live feed. Update occasionally from SGX settlement reports / TradingView."
+    }
+  },
+  "series": {
+    "smm_spot": [
+      {
+        "date": "2026-09-29",
+        "avg": 118800
+      },
+      {
+        "date": "2026-11-06",
+        "avg": 93600
+      },
+      {
+        "date": "2026-11-12",
+        "avg": 90650,
+        "note": "weekly avg, -3.2% w/w"
+      },
+      {
+        "date": "2026-11-16",
+        "avg": 89550,
+        "low": 87800,
+        "high": 91300,
+        "chg": -2800
+      },
+      {
+        "date": "2026-11-17",
+        "avg": 89050,
+        "low": 87000,
+        "high": 91100,
+        "chg": -500
+      },
+      {
+        "date": "2026-11-18",
+        "avg": 91800,
+        "chg": 2750,
+        "note": "+3.09% DoD"
+      }
+    ],
+    "gfex_futures": [
+      {
+        "date": "2026-09-29",
+        "contract": "LC2701",
+        "settle": 118800,
+        "oi_change": -8400
+      },
+      {
+        "date": "2026-11-06",
+        "contract": "LC2701",
+        "close": 92860,
+        "note": "derived from Nov-9 print"
+      },
+      {
+        "date": "2026-11-09",
+        "contract": "LC2701",
+        "close": 87480,
+        "volume": 352317
+      },
+      {
+        "date": "2026-11-10",
+        "contract": "LC2701",
+        "close": 87100,
+        "volume": 267255
+      },
+      {
+        "date": "2026-11-12",
+        "contract": "LC2701",
+        "close": 90900
+      },
+      {
+        "date": "2026-11-16",
+        "contract": "LC2701",
+        "settle": 85380,
+        "close": 88240,
+        "note": "derived from Nov-17 deltas"
+      },
+      {
+        "date": "2026-11-17",
+        "contract": "LC2701",
+        "settle": 89980,
+        "close": 93180,
+        "oi": 349400,
+        "oi_change": -24824,
+        "volume": 424800,
+        "note": "low 86,740; volume +74.7% DoD"
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LC2701",
+        "close": 89100,
+        "note": "INDICATIVE - metalcharts live quote converted"
+      }
+    ],
+    "sgx_licf": [
+      {
+        "date": "2026-10-09",
+        "contract": "LICF Nov-26",
+        "price_usd_kg": 15.68
+      },
+      {
+        "date": "2026-10-13",
+        "contract": "LICF Oct-26",
+        "price_usd_kg": 16.79,
+        "note": "final print before expiry"
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LICF Nov-26",
+        "price_usd_kg": 14.54,
+        "note": "delayed, thin"
+      }
+    ],
+    "gfex_receipts": [
+      {
+        "date": "2026-11-08",
+        "quantity": 21720,
+        "note": "derived from Nov-9"
+      },
+      {
+        "date": "2026-11-09",
+        "quantity": 23760,
+        "change": 2040,
+        "note": "first build after weeks of drawdown"
+      },
+      {
+        "date": "2026-11-10",
+        "quantity": 23810,
+        "change": 50
+      }
+    ]
+  },
+  "context": [
+    "Q3 2026: three consecutive deficit months while prices fell stepwise; end-Sep spot ~40% below the mid-May high - deficit/price divergence is the core trader-influence watch item.",
+    "SMM inventory methodology change added ~175,000 t to measured Chinese stockpiles - treat inventory levels and cross-change history with care.",
+    "Inventory falling: SMM stock 122,644 mt (week to Nov 13); Mysteel expects Q4 destocking above 50,000 t.",
+    "GFEX receipts: -17,378 t since early September, but +2,040 t on Nov 9 then +50 t on Nov 10 - watch whether the drawdown has stalled; a sustained build while spot rebounds is a bearish physical signal.",
+    "Nov 17 session: LC2701 bottomed 86,740, closed 93,180 on reduced OI (short covering) while spot fell - classic paper/physical divergence.",
+    "SGX Nov-26 slid 15.68 to 14.54 USD/kg (Oct 9 to Nov 18); regional premium over China ex-VAT remains ~19%.",
+    "Demand mix shifting from NEVs to grid/energy-storage LFP; EU to cap Chinese EV imports at 350,000 units/year from next year.",
+    "Supply restarts: Bald Hill, Finniss; Rio Tinto spending $1.4bn on Fenix 1B and Sal de Vida expansion."
+  ]
+}
