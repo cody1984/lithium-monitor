@@ -1,11 +1,11 @@
 {
   "schema": "lithium-monitor/2",
-  "generated_at": "2026-11-19T13:23:37+08:00",
+  "generated_at": "2026-11-19T21:16:51+08:00",
   "fx_usdcny": 6.6672,
   "feeds": {
     "smm_spot": {
       "status": "proxy",
-      "last_date": "2026-11-18",
+      "last_date": "2026-11-19",
       "note": "Automated leg is 100ppi battery-grade spot via AKShare - a proxy for SMM. Existing exact SMM rows are never overwritten."
     },
     "equities": {
@@ -53,6 +53,11 @@
         "avg": 91800,
         "chg": 2750,
         "note": "+3.09% DoD"
+      },
+      {
+        "date": "2026-11-19",
+        "avg": 91500.0,
+        "note": "100ppi battery-grade spot via AKShare - proxy for SMM"
       }
     ],
     "gfex_futures": [
@@ -120,6 +125,15 @@
         "oi": 343103.0,
         "note": "dominant-contract settlement via 100ppi/AKShare",
         "settle": 91520.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2701",
+        "close": 91500.0,
+        "volume": 330709.0,
+        "oi": 342568.0,
+        "note": "dominant-contract settlement via 100ppi/AKShare",
+        "settle": 91500.0
       }
     ],
     "sgx_licf": [
