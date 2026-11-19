@@ -2,7 +2,7 @@ name: Update lithium data
 
 on:
   schedule:
-        - cron: '30 9 * * 1-5'   # 09:30 UTC = 17:30 AWST / 17:30 Beijing, Mon-Fri, after GFEX close
+        - cron: '30 11 * * 1-5'   # 09:30 UTC = 17:30 AWST / 17:30 Beijing, Mon-Fri, after GFEX close
   workflow_dispatch:           # manual run button in the Actions tab
 
 permissions:
