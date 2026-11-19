@@ -260,7 +260,7 @@ async function fetchLatest(silent){
     S = j;
     $('fx').value = S.fx_usdcny || $('fx').value;
     renderAll();
-    $('msg').textContent = 'Fetched published snapshot '+S.generated_at+' (cloud job updates it every weekday 20:30 AWST).';
+    $('msg').textContent = 'Fetched published snapshot '+S.generated_at+' (cloud job updates it every weekday 17:30 AWST).';
     return true;
   }catch(e){
     if(!silent) $('msg').textContent = 'Fetch failed: '+e.message+' - showing bundled/saved data.';
