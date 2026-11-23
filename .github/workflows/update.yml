@@ -2,7 +2,7 @@ name: Update lithium data
 
 on:
   schedule:
-    - cron: '30 9 * * 1-5'   # 09:30 UTC = 17:30 AWST / 17:30 Beijing, Mon-Fri, after GFEX close
+    - cron: '37 9 * * 1-6'   # 09:37 UTC = 17:37 AWST, Mon-Sat, after the GFEX close
   workflow_dispatch:
 
 permissions:
@@ -26,5 +26,5 @@ jobs:
         run: |
           git config user.name "data-bot"
           git config user.email "actions@github.com"
-          git add market_daily.csv market_snapshot.json
+          git add market_daily.csv market_snapshot.json futures_curve.csv
           git diff --cached --quiet || (git commit -m "data update $(date -u +%F)" && git push)
