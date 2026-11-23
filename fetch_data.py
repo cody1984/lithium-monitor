@@ -5,8 +5,8 @@ Feeds (each isolated: a failure keeps last values, is logged in run_log, and the
   gfex-akshare  selected-contract daily bar via AKShare (Sina): close, volume, OI, OI change
   curve         every listed LC contract (next ~13 delivery months) via AKShare (Sina), last 8 sessions
   receipts      GFEX registered warehouse receipts via AKShare futures_receipt
-                (fallback: AKShare futures_warehouse_receipt_gfex, the post-1.20.44 name;
-                 older name futures_gfex_warehouse_receipt also tried)
+                (fallback: AKShare futures_warehouse_receipt_gfex bulletin, walking back up to
+                 8 days so runs before the daily publication still find the prior session)
   spot-99qh     100ppi spot + dominant-contract settlement via AKShare (label kept for log continuity)
   equities      LTR.AX and PLS.AX closes via yfinance; bars still trading are flagged intraday
 Manual inputs (SGX, SC6, SMM inventory, GWh, evidence ...) live in the Google Sheet, not here.
@@ -242,16 +242,34 @@ def fetch_receipts(s):
     if not n:
         # Fallback: GFEX bulletin interface. Renamed in AKShare 1.20.44
         # (futures_gfex_warehouse_receipt -> futures_warehouse_receipt_gfex); try both.
+        # Walks back up to 8 days because bulletins only exist after the close:
+        # a run before publication finds today empty and must use the prior session(s).
         try:
             fn = getattr(ak, "futures_warehouse_receipt_gfex", None) \
                 or getattr(ak, "futures_gfex_warehouse_receipt", None)
             if fn is None:
                 raise RuntimeError("no GFEX warehouse receipt interface in this AKShare version")
-            try:
-                res = fn(date=end)
-            except TypeError:
-                res = fn(end)
-            n = _receipts_from_bulletin(res, rc, t.isoformat())
+            d = t
+            for _ in range(8):
+                if n >= 3:
+                    break
+                if d.weekday() < 5:
+                    ds = d.strftime("%Y%m%d")
+                    try:
+                        try:
+                            res = fn(date=ds)
+                        except TypeError:
+                            res = fn(ds)
+                    except Exception as e:
+                        print("  gfex bulletin", ds, "failed:", type(e).__name__, str(e)[:100])
+                        res = None
+                    if res is not None:
+                        got = _receipts_from_bulletin(res, rc, d.isoformat())
+                        if got:
+                            n += got
+                        else:
+                            print("  gfex bulletin", ds, "empty (before publication or holiday)")
+                d -= timedelta(days=1)
         except Exception as e:
             print("  gfex bulletin fallback failed:", type(e).__name__, str(e)[:160])
     if not n:
