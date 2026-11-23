@@ -4,12 +4,14 @@ Feeds (each isolated: a failure keeps last values, is logged in run_log, and the
   fx            USD/CNY ECB reference series via Frankfurter (dated, 45-day backfill)
   gfex-akshare  selected-contract daily bar via AKShare (Sina): close, volume, OI, OI change
   curve         every listed LC contract (next ~13 delivery months) via AKShare (Sina), last 8 sessions
-  receipts      GFEX registered warehouse receipts via AKShare futures_receipt (fallback: GFEX bulletin function)
+  receipts      GFEX registered warehouse receipts via AKShare futures_receipt
+                (fallback: AKShare futures_warehouse_receipt_gfex, the post-1.20.44 name;
+                 older name futures_gfex_warehouse_receipt also tried)
   spot-99qh     100ppi spot + dominant-contract settlement via AKShare (label kept for log continuity)
   equities      LTR.AX and PLS.AX closes via yfinance; bars still trading are flagged intraday
 Manual inputs (SGX, SC6, SMM inventory, GWh, evidence ...) live in the Google Sheet, not here.
 """
-import csv, json, os, sys, traceback
+import csv, json, os, sys, time, traceback
 from datetime import datetime, timezone, timedelta
 
 SNAP, CSV = "market_snapshot.json", "market_daily.csv"
@@ -131,15 +133,21 @@ def contract_codes(n_months=13):
 
 
 def fetch_curve(s):
-    """One daily series per listed LC contract. Unlisted codes simply fail and are skipped."""
+    """One daily series per listed LC contract, one retry per contract. Unlisted codes are skipped."""
     import akshare as ak
     cur, got = s["series"]["futures_curve"], 0
     for code in contract_codes():
-        try:
-            df = ak.futures_zh_daily_sina(symbol=code)
-        except Exception as e:
-            print("  curve", code, "skipped:", type(e).__name__)
-            continue
+        df = None
+        for attempt in (1, 2):
+            try:
+                df = ak.futures_zh_daily_sina(symbol=code)
+                break
+            except Exception as e:
+                if attempt == 1:
+                    print("  curve", code, "retrying after", type(e).__name__)
+                    time.sleep(3)
+                else:
+                    print("  curve", code, "skipped:", type(e).__name__)
         if df is None or not len(df):
             continue
         got += 1
@@ -153,42 +161,99 @@ def fetch_curve(s):
         "note": f"{got} contracts. Uses the Sina settle column when present, else close. Expiry dates are not modelled."}
 
 
+def _qty_sum(df, col):
+    return sum(v for v in (tofloat(x) for x in df[col]) if v is not None)
+
+
+def _split_totals(df):
+    """Returns (detail_rows, total_rows). Handles AKShare's "行类型" column if present."""
+    if "行类型" in df.columns:
+        k = df["行类型"].astype(str)
+        return df[k.str.contains("明细", na=False)], df[k.str.contains("合计|总计", na=False, regex=True)]
+    mask = df.apply(lambda r: any(str(x).strip() in ("合计", "总计") for x in r.values), axis=1)
+    return df[~mask], df[mask]
+
+
+def _receipts_from_bulletin(res, rc, iso_date):
+    """Parse either shape of the GFEX warehouse-receipt bulletin: old dict of per-variety
+    frames or new merged DataFrame with a 品种 column. Returns number of rows stored."""
+    frames = list(res.items()) if isinstance(res, dict) else ([("", res)] if res is not None else [])
+    n = 0
+    for key, df in frames:
+        if df is None or not len(df):
+            continue
+        if str(key) and "碳酸锂" not in str(key) and "LC" not in str(key).upper():
+            continue
+        print("  gfex bulletin columns:", list(df.columns))
+        if "品种" in df.columns:
+            m = df[df["品种"].astype(str).str.contains("碳酸锂|LC", na=False, regex=True)]
+            if len(m):
+                df = m
+        col = next((c for c in df.columns if "今日" in str(c) and "仓单" in str(c)), None) \
+            or next((c for c in df.columns if "仓单" in str(c)
+                     and "增减" not in str(c) and "变化" not in str(c)), None)
+        if col is None:
+            continue
+        detail, totrows = _split_totals(df)
+        tot = None
+        if len(detail):
+            tot = _qty_sum(detail, col)
+        elif len(totrows):
+            vals = [tofloat(x) for x in totrows[col]]
+            vals = [v for v in vals if v is not None]
+            tot = max(vals) if vals else None  # 合计 and 总计 may both exist: never add them
+        else:
+            tot = _qty_sum(df, col)
+        if tot is None or tot <= 0 or tot > 1e6:
+            continue
+        upsert(rc, iso_date, quantity=tot, derived=False,
+               source="AKShare GFEX warehouse receipt bulletin (column shape unverified)")
+        n += 1
+    return n
+
+
 def fetch_receipts(s):
     import akshare as ak
     rc = s["series"]["gfex_receipts"]
     t = datetime.now(PER).date()
     start, end = (t - timedelta(days=20)).strftime("%Y%m%d"), t.strftime("%Y%m%d")
     n = 0
-    try:
-        df = ak.futures_receipt(start_date=start, end_date=end, symbols="LC")
-        if df is not None and len(df):
-            for _, row in df.iterrows():
-                if str(row.get("var", "")).upper() != "LC":
-                    continue
-                q = tofloat(row.get("receipt"))
-                if q is None or q < 0 or q > 1e6:
-                    continue
-                ds = str(row.get("date"))
-                iso = f"{ds[:4]}-{ds[4:6]}-{ds[6:8]}" if len(ds) == 8 and ds.isdigit() else ds[:10]
-                upsert(rc, iso, quantity=q, change=tofloat(row.get("receipt_chg")), derived=False,
-                       source="AKShare futures_receipt (exchange daily report)")
-                n += 1
-    except Exception as e:
-        print("  futures_receipt failed:", type(e).__name__, str(e)[:120])
-    if not n:
-        res = ak.futures_gfex_warehouse_receipt(date=end)
-        frames = res.items() if isinstance(res, dict) else [("", res)]
-        for key, df in frames:
-            if "碳酸锂" not in str(key) and "LC" not in str(key).upper():
+    df = None
+    for attempt in (1, 2):
+        try:
+            df = ak.futures_receipt(start_date=start, end_date=end, symbols="LC")
+            break
+        except Exception as e:
+            print("  futures_receipt attempt %d failed: %s %s" % (attempt, type(e).__name__, str(e)[:120]))
+            if attempt == 1:
+                time.sleep(6)
+    if df is not None and len(df):
+        for _, row in df.iterrows():
+            if str(row.get("var", "")).upper() != "LC":
                 continue
-            print("  gfex bulletin columns:", list(df.columns))
-            col = next((c for c in df.columns if "今日" in str(c) and "仓单" in str(c)), None)
-            if col is None:
+            q = tofloat(row.get("receipt"))
+            if q is None or q < 0 or q > 1e6:
                 continue
-            tot = sum(v for v in (tofloat(x) for x in df[col]) if v is not None)
-            upsert(rc, t.isoformat(), quantity=tot, derived=False,
-                   source="AKShare GFEX bulletin function (shape unverified)")
+            ds = str(row.get("date"))
+            iso = f"{ds[:4]}-{ds[4:6]}-{ds[6:8]}" if len(ds) == 8 and ds.isdigit() else ds[:10]
+            upsert(rc, iso, quantity=q, change=tofloat(row.get("receipt_chg")), derived=False,
+                   source="AKShare futures_receipt (exchange daily report)")
             n += 1
+    if not n:
+        # Fallback: GFEX bulletin interface. Renamed in AKShare 1.20.44
+        # (futures_gfex_warehouse_receipt -> futures_warehouse_receipt_gfex); try both.
+        try:
+            fn = getattr(ak, "futures_warehouse_receipt_gfex", None) \
+                or getattr(ak, "futures_gfex_warehouse_receipt", None)
+            if fn is None:
+                raise RuntimeError("no GFEX warehouse receipt interface in this AKShare version")
+            try:
+                res = fn(date=end)
+            except TypeError:
+                res = fn(end)
+            n = _receipts_from_bulletin(res, rc, t.isoformat())
+        except Exception as e:
+            print("  gfex bulletin fallback failed:", type(e).__name__, str(e)[:160])
     if not n:
         raise RuntimeError("no receipt rows returned")
     s["feeds"]["receipts"] = {"status": "ok", "last_date": rc[-1]["date"],
