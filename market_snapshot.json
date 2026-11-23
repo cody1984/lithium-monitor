@@ -1,6 +1,6 @@
 {
   "schema": "lithium-monitor/6",
-  "generated_at": "2026-11-23T09:51:26+08:00",
+  "generated_at": "2026-11-23T10:02:46+08:00",
   "fx_usdcny": 6.6777,
   "fx_date": "2026-11-20",
   "params": {
@@ -37,38 +37,42 @@
       "status": "ok",
       "last_date": "2026-11-23",
       "note": "LTR.AX / PLS.AX via yfinance (unofficial). Bars dated today before 16:30 Sydney are flagged intraday and excluded from comparisons."
+    },
+    "receipts": {
+      "status": "ok",
+      "last_date": "2026-11-20",
+      "note": "Automated from exchange daily report; units assumed tonnes, confirm against a GFEX bulletin once."
     }
   },
   "run_log": {
     "fx": {
       "status": "ok",
-      "time": "2026-11-23T09:49:48+08:00",
+      "time": "2026-11-23T10:02:09+08:00",
       "error": ""
     },
     "gfex-akshare": {
       "status": "ok",
-      "time": "2026-11-23T09:49:49+08:00",
+      "time": "2026-11-23T10:02:11+08:00",
       "error": ""
     },
     "curve": {
       "status": "ok",
-      "time": "2026-11-23T09:49:59+08:00",
+      "time": "2026-11-23T10:02:20+08:00",
       "error": ""
     },
     "receipts": {
-      "status": "fail",
-      "time": "2026-11-23T09:51:18+08:00",
-      "error": "RuntimeError: no receipt rows returned",
-      "last_ok": ""
+      "status": "ok",
+      "time": "2026-11-23T10:02:39+08:00",
+      "error": ""
     },
     "spot-99qh": {
       "status": "ok",
-      "time": "2026-11-23T09:51:25+08:00",
+      "time": "2026-11-23T10:02:45+08:00",
       "error": ""
     },
     "equities": {
       "status": "ok",
-      "time": "2026-11-23T09:51:26+08:00",
+      "time": "2026-11-23T10:02:46+08:00",
       "error": ""
     }
   },
@@ -1277,6 +1281,34 @@
     ],
     "gfex_receipts": [
       {
+        "date": "2026-11-03",
+        "quantity": 19537.0,
+        "change": 1236.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
+      },
+      {
+        "date": "2026-11-04",
+        "quantity": 21555.0,
+        "change": 2018.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
+      },
+      {
+        "date": "2026-11-05",
+        "quantity": 21041.0,
+        "change": -514.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
+      },
+      {
+        "date": "2026-11-06",
+        "quantity": 21720.0,
+        "change": 679.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
+      },
+      {
         "date": "2026-11-08",
         "quantity": 21720,
         "derived": true,
@@ -1285,15 +1317,73 @@
       },
       {
         "date": "2026-11-09",
-        "quantity": 23760,
-        "change": 2040,
-        "source": "manual (X transcription)"
+        "quantity": 23760.0,
+        "change": 2040.0,
+        "source": "AKShare futures_receipt (exchange daily report)",
+        "derived": false
       },
       {
         "date": "2026-11-10",
-        "quantity": 23810,
-        "change": 50,
-        "source": "manual (X transcription)"
+        "quantity": 23810.0,
+        "change": 50.0,
+        "source": "AKShare futures_receipt (exchange daily report)",
+        "derived": false
+      },
+      {
+        "date": "2026-11-11",
+        "quantity": 23296.0,
+        "change": -514.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
+      },
+      {
+        "date": "2026-11-12",
+        "quantity": 21745.0,
+        "change": -1551.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
+      },
+      {
+        "date": "2026-11-13",
+        "quantity": 20285.0,
+        "change": -1460.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
+      },
+      {
+        "date": "2026-11-16",
+        "quantity": 19650.0,
+        "change": -635.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
+      },
+      {
+        "date": "2026-11-17",
+        "quantity": 19498.0,
+        "change": -152.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
+      },
+      {
+        "date": "2026-11-18",
+        "quantity": 19108.0,
+        "change": -390.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
+      },
+      {
+        "date": "2026-11-19",
+        "quantity": 18674.0,
+        "change": -434.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
+      },
+      {
+        "date": "2026-11-20",
+        "quantity": 19174.0,
+        "change": 500.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
       }
     ],
     "spodumene": [
@@ -1475,7 +1565,7 @@
       {
         "date": "2026-11-23",
         "ltr": 0.5600000023841858,
-        "pls": 2.6500000953674316,
+        "pls": 2.6449999809265137,
         "intraday": true
       }
     ],
