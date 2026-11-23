@@ -1,8 +1,8 @@
 {
   "schema": "lithium-monitor/6",
-  "generated_at": "2026-11-22T17:00:00+08:00",
-  "fx_usdcny": 6.6667,
-  "fx_date": "2026-11-19",
+  "generated_at": "2026-11-23T09:36:51+08:00",
+  "fx_usdcny": 6.6777,
+  "fx_date": "2026-11-20",
   "params": {
     "li2o_to_lce": 2.473,
     "sc6_grade_pct": 6.0,
@@ -17,24 +17,217 @@
       "t_per_lot": 1
     }
   },
-  "feeds": {},
-  "run_log": {},
+  "feeds": {
+    "fx": {
+      "status": "ok",
+      "last_date": "2026-11-20",
+      "note": "ECB reference rate, published ~16:00 CET: the 17:37 AWST job normally sees the previous ECB business day. Reference rate, not a live quote."
+    },
+    "curve": {
+      "status": "ok",
+      "last_date": "2026-11-20",
+      "note": "11 contracts. Uses the Sina settle column when present, else close. Expiry dates are not modelled."
+    },
+    "smm_spot": {
+      "status": "proxy",
+      "last_date": "2026-11-20",
+      "note": "Automated leg is 100ppi battery-grade spot - a proxy for SMM. Existing SMM rows are never overwritten."
+    },
+    "equities": {
+      "status": "ok",
+      "last_date": "2026-11-23",
+      "note": "LTR.AX / PLS.AX via yfinance (unofficial). Bars dated today before 16:30 Sydney are flagged intraday and excluded from comparisons."
+    }
+  },
+  "run_log": {
+    "fx": {
+      "status": "ok",
+      "time": "2026-11-23T09:35:18+08:00",
+      "error": ""
+    },
+    "gfex-akshare": {
+      "status": "ok",
+      "time": "2026-11-23T09:35:20+08:00",
+      "error": ""
+    },
+    "curve": {
+      "status": "ok",
+      "time": "2026-11-23T09:36:13+08:00",
+      "error": ""
+    },
+    "receipts": {
+      "status": "fail",
+      "time": "2026-11-23T09:36:40+08:00",
+      "error": "AttributeError: futures_gfex_warehouse_receipt 已在 1.20.44 更名为 futures_warehouse_receipt_gfex，请改用 ak.futures_warehouse_receipt_gfex；参数与返回的列也可能有调整，用 ak.interface_info(\"futures_wa",
+      "last_ok": ""
+    },
+    "spot-99qh": {
+      "status": "ok",
+      "time": "2026-11-23T09:36:51+08:00",
+      "error": ""
+    },
+    "equities": {
+      "status": "ok",
+      "time": "2026-11-23T09:36:51+08:00",
+      "error": ""
+    }
+  },
   "series": {
     "fx": [
       {
+        "date": "2026-10-09",
+        "usdcny": 6.6921,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-12",
+        "usdcny": 6.6928,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-13",
+        "usdcny": 6.6938,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-14",
+        "usdcny": 6.6927,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-15",
+        "usdcny": 6.691,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-16",
+        "usdcny": 6.6862,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-19",
+        "usdcny": 6.6807,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-20",
+        "usdcny": 6.678,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-21",
+        "usdcny": 6.6761,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-22",
+        "usdcny": 6.6743,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-23",
+        "usdcny": 6.6702,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-26",
+        "usdcny": 6.6681,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-27",
+        "usdcny": 6.6675,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-28",
+        "usdcny": 6.6664,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-29",
+        "usdcny": 6.6616,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-10-30",
+        "usdcny": 6.6529,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-02",
+        "usdcny": 6.6483,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-03",
+        "usdcny": 6.6723,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-04",
+        "usdcny": 6.6723,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-05",
+        "usdcny": 6.6684,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-06",
+        "usdcny": 6.6713,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-09",
+        "usdcny": 6.6728,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-10",
+        "usdcny": 6.6703,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-11",
+        "usdcny": 6.6707,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-12",
+        "usdcny": 6.6683,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-13",
+        "usdcny": 6.6719,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
         "date": "2026-11-16",
-        "usdcny": 6.6645,
-        "source": "Bloomberg Linea market quote (approx; job replaces with ECB)"
+        "usdcny": 6.6665,
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-17",
+        "usdcny": 6.6661,
+        "source": "ECB reference via Frankfurter v1"
       },
       {
         "date": "2026-11-18",
-        "usdcny": 6.6665,
-        "source": "market quotes 6.6657-6.6671 (approx; job replaces with ECB)"
+        "usdcny": 6.6672,
+        "source": "ECB reference via Frankfurter v1"
       },
       {
         "date": "2026-11-19",
         "usdcny": 6.6667,
-        "source": "ECB cross: CNY/EUR 7.3280 / USD/EUR 1.0992"
+        "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-20",
+        "usdcny": 6.6777,
+        "source": "ECB reference via Frankfurter v1"
       }
     ],
     "smm_spot": [
@@ -84,6 +277,20 @@
         "verified": true,
         "source": "SMM",
         "note": "+3.09% DoD"
+      },
+      {
+        "date": "2026-11-19",
+        "avg": 91500.0,
+        "verified": false,
+        "source": "100ppi",
+        "note": "100ppi battery-grade spot via AKShare - proxy for SMM"
+      },
+      {
+        "date": "2026-11-20",
+        "avg": 91500.0,
+        "verified": false,
+        "source": "100ppi",
+        "note": "100ppi battery-grade spot via AKShare - proxy for SMM"
       }
     ],
     "gfex_futures": [
@@ -114,23 +321,799 @@
       {
         "date": "2026-11-16",
         "contract": "LC2701",
-        "settle": 85380,
+        "settle": 88240.0,
         "close": 88240,
         "derived": true,
-        "note": "derived from Nov-17 deltas"
+        "note": "dominant-contract settlement via 100ppi/AKShare"
       },
       {
         "date": "2026-11-17",
         "contract": "LC2701",
-        "settle": 89980,
-        "close": 93180,
-        "oi": 349400,
+        "settle": 93180.0,
+        "close": 93180.0,
+        "oi": 349426.0,
         "oi_change": -24824,
-        "volume": 424800,
-        "note": "low 86,740"
+        "volume": 424783.0,
+        "note": "dominant-contract settlement via 100ppi/AKShare"
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LC2701",
+        "close": 91520.0,
+        "volume": 383415.0,
+        "oi": 343103.0,
+        "oi_change": -6323.0,
+        "note": "dominant-contract settlement via 100ppi/AKShare",
+        "settle": 91520.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2701",
+        "close": 91500.0,
+        "volume": 330709.0,
+        "oi": 342568.0,
+        "oi_change": -535.0,
+        "note": "dominant-contract settlement via 100ppi/AKShare",
+        "settle": 91500.0
+      },
+      {
+        "date": "2026-11-20",
+        "contract": "LC2701",
+        "close": 90040.0,
+        "volume": 387210.0,
+        "oi": 326054.0,
+        "oi_change": -16514.0,
+        "note": "dominant-contract settlement via 100ppi/AKShare",
+        "settle": 90040.0
       }
     ],
-    "futures_curve": [],
+    "futures_curve": [
+      {
+        "date": "2026-11-04",
+        "contract": "LC2611",
+        "close": 89060.0,
+        "settle": 90920.0,
+        "volume": 469.0,
+        "oi": 9328.0
+      },
+      {
+        "date": "2026-11-05",
+        "contract": "LC2611",
+        "close": 93400.0,
+        "settle": 93000.0,
+        "volume": 595.0,
+        "oi": 6176.0,
+        "oi_change": -3152.0
+      },
+      {
+        "date": "2026-11-06",
+        "contract": "LC2611",
+        "close": 93500.0,
+        "settle": 93500.0,
+        "volume": 249.0,
+        "oi": 4985.0,
+        "oi_change": -1191.0
+      },
+      {
+        "date": "2026-11-06",
+        "contract": "LC2710",
+        "close": 92100.0,
+        "settle": 92100.0,
+        "volume": 2.0,
+        "oi": 12.0
+      },
+      {
+        "date": "2026-11-09",
+        "contract": "LC2611",
+        "close": 92100.0,
+        "settle": 92300.0,
+        "volume": 84.0,
+        "oi": 4030.0,
+        "oi_change": -955.0
+      },
+      {
+        "date": "2026-11-09",
+        "contract": "LC2710",
+        "close": 87260.0,
+        "settle": 87780.0,
+        "volume": 4.0,
+        "oi": 12.0,
+        "oi_change": 0.0
+      },
+      {
+        "date": "2026-11-10",
+        "contract": "LC2611",
+        "close": 86000.0,
+        "settle": 88260.0,
+        "volume": 350.0,
+        "oi": 1245.0,
+        "oi_change": -2785.0
+      },
+      {
+        "date": "2026-11-11",
+        "contract": "LC2611",
+        "close": 88320.0,
+        "settle": 87560.0,
+        "volume": 150.0,
+        "oi": 543.0,
+        "oi_change": -702.0
+      },
+      {
+        "date": "2026-11-11",
+        "contract": "LC2612",
+        "close": 89380.0,
+        "settle": 88760.0,
+        "volume": 12062.0,
+        "oi": 25956.0
+      },
+      {
+        "date": "2026-11-11",
+        "contract": "LC2701",
+        "close": 88900.0,
+        "settle": 88460.0,
+        "volume": 308947.0,
+        "oi": 390621.0
+      },
+      {
+        "date": "2026-11-11",
+        "contract": "LC2703",
+        "close": 87860.0,
+        "settle": 87540.0,
+        "volume": 4079.0,
+        "oi": 17887.0
+      },
+      {
+        "date": "2026-11-11",
+        "contract": "LC2705",
+        "close": 88640.0,
+        "settle": 88240.0,
+        "volume": 58804.0,
+        "oi": 192624.0
+      },
+      {
+        "date": "2026-11-11",
+        "contract": "LC2706",
+        "close": 88500.0,
+        "settle": 88300.0,
+        "volume": 6296.0,
+        "oi": 20973.0
+      },
+      {
+        "date": "2026-11-11",
+        "contract": "LC2707",
+        "close": 88580.0,
+        "settle": 88220.0,
+        "volume": 329.0,
+        "oi": 9576.0
+      },
+      {
+        "date": "2026-11-11",
+        "contract": "LC2708",
+        "close": 88580.0,
+        "settle": 87980.0,
+        "volume": 21.0,
+        "oi": 500.0
+      },
+      {
+        "date": "2026-11-11",
+        "contract": "LC2709",
+        "close": 88280.0,
+        "settle": 88140.0,
+        "volume": 203.0,
+        "oi": 722.0
+      },
+      {
+        "date": "2026-11-11",
+        "contract": "LC2710",
+        "close": 88800.0,
+        "settle": 88520.0,
+        "volume": 8.0,
+        "oi": 20.0,
+        "oi_change": 8.0
+      },
+      {
+        "date": "2026-11-12",
+        "contract": "LC2611",
+        "close": 88840.0,
+        "settle": 88440.0,
+        "volume": 24.0,
+        "oi": 191.0,
+        "oi_change": -352.0
+      },
+      {
+        "date": "2026-11-12",
+        "contract": "LC2612",
+        "close": 91300.0,
+        "settle": 89480.0,
+        "volume": 5016.0,
+        "oi": 25293.0,
+        "oi_change": -663.0
+      },
+      {
+        "date": "2026-11-12",
+        "contract": "LC2701",
+        "close": 90900.0,
+        "settle": 89080.0,
+        "volume": 296657.0,
+        "oi": 384249.0,
+        "oi_change": -6372.0
+      },
+      {
+        "date": "2026-11-12",
+        "contract": "LC2703",
+        "close": 89840.0,
+        "settle": 88340.0,
+        "volume": 1882.0,
+        "oi": 17908.0,
+        "oi_change": 21.0
+      },
+      {
+        "date": "2026-11-12",
+        "contract": "LC2705",
+        "close": 90660.0,
+        "settle": 88820.0,
+        "volume": 56163.0,
+        "oi": 195519.0,
+        "oi_change": 2895.0
+      },
+      {
+        "date": "2026-11-12",
+        "contract": "LC2706",
+        "close": 90560.0,
+        "settle": 88320.0,
+        "volume": 6672.0,
+        "oi": 22614.0,
+        "oi_change": 1641.0
+      },
+      {
+        "date": "2026-11-12",
+        "contract": "LC2707",
+        "close": 90420.0,
+        "settle": 88740.0,
+        "volume": 481.0,
+        "oi": 9761.0,
+        "oi_change": 185.0
+      },
+      {
+        "date": "2026-11-12",
+        "contract": "LC2708",
+        "close": 90340.0,
+        "settle": 88900.0,
+        "volume": 186.0,
+        "oi": 445.0,
+        "oi_change": -55.0
+      },
+      {
+        "date": "2026-11-12",
+        "contract": "LC2709",
+        "close": 90700.0,
+        "settle": 88660.0,
+        "volume": 372.0,
+        "oi": 833.0,
+        "oi_change": 111.0
+      },
+      {
+        "date": "2026-11-13",
+        "contract": "LC2611",
+        "close": 90800.0,
+        "settle": 92400.0,
+        "volume": 59.0,
+        "oi": 0.0,
+        "oi_change": -191.0
+      },
+      {
+        "date": "2026-11-13",
+        "contract": "LC2612",
+        "close": 91200.0,
+        "settle": 92260.0,
+        "volume": 4686.0,
+        "oi": 25529.0,
+        "oi_change": 236.0
+      },
+      {
+        "date": "2026-11-13",
+        "contract": "LC2701",
+        "close": 90580.0,
+        "settle": 91580.0,
+        "volume": 314472.0,
+        "oi": 367672.0,
+        "oi_change": -16577.0
+      },
+      {
+        "date": "2026-11-13",
+        "contract": "LC2703",
+        "close": 89340.0,
+        "settle": 90580.0,
+        "volume": 1462.0,
+        "oi": 18056.0,
+        "oi_change": 148.0
+      },
+      {
+        "date": "2026-11-13",
+        "contract": "LC2705",
+        "close": 90500.0,
+        "settle": 91320.0,
+        "volume": 68149.0,
+        "oi": 194363.0,
+        "oi_change": -1156.0
+      },
+      {
+        "date": "2026-11-13",
+        "contract": "LC2706",
+        "close": 90340.0,
+        "settle": 91260.0,
+        "volume": 9357.0,
+        "oi": 23987.0,
+        "oi_change": 1373.0
+      },
+      {
+        "date": "2026-11-13",
+        "contract": "LC2707",
+        "close": 90300.0,
+        "settle": 91900.0,
+        "volume": 2869.0,
+        "oi": 11192.0,
+        "oi_change": 1431.0
+      },
+      {
+        "date": "2026-11-13",
+        "contract": "LC2708",
+        "close": 90400.0,
+        "settle": 90620.0,
+        "volume": 51.0,
+        "oi": 407.0,
+        "oi_change": -38.0
+      },
+      {
+        "date": "2026-11-13",
+        "contract": "LC2709",
+        "close": 90540.0,
+        "settle": 91600.0,
+        "volume": 617.0,
+        "oi": 1018.0,
+        "oi_change": 185.0
+      },
+      {
+        "date": "2026-11-13",
+        "contract": "LC2710",
+        "close": 91540.0,
+        "settle": 89860.0,
+        "volume": 16.0,
+        "oi": 27.0,
+        "oi_change": 7.0
+      },
+      {
+        "date": "2026-11-16",
+        "contract": "LC2612",
+        "close": 88760.0,
+        "settle": 89080.0,
+        "volume": 2777.0,
+        "oi": 25238.0,
+        "oi_change": -291.0
+      },
+      {
+        "date": "2026-11-16",
+        "contract": "LC2701",
+        "close": 88240.0,
+        "settle": 88580.0,
+        "volume": 243195.0,
+        "oi": 374250.0,
+        "oi_change": 6578.0
+      },
+      {
+        "date": "2026-11-16",
+        "contract": "LC2703",
+        "close": 87440.0,
+        "settle": 87800.0,
+        "volume": 2367.0,
+        "oi": 18266.0,
+        "oi_change": 210.0
+      },
+      {
+        "date": "2026-11-16",
+        "contract": "LC2705",
+        "close": 87700.0,
+        "settle": 88460.0,
+        "volume": 52168.0,
+        "oi": 199258.0,
+        "oi_change": 4895.0
+      },
+      {
+        "date": "2026-11-16",
+        "contract": "LC2706",
+        "close": 87540.0,
+        "settle": 87900.0,
+        "volume": 7052.0,
+        "oi": 24436.0,
+        "oi_change": 449.0
+      },
+      {
+        "date": "2026-11-16",
+        "contract": "LC2707",
+        "close": 87580.0,
+        "settle": 88400.0,
+        "volume": 1506.0,
+        "oi": 11558.0,
+        "oi_change": 366.0
+      },
+      {
+        "date": "2026-11-16",
+        "contract": "LC2708",
+        "close": 87740.0,
+        "settle": 87500.0,
+        "volume": 154.0,
+        "oi": 502.0,
+        "oi_change": 95.0
+      },
+      {
+        "date": "2026-11-16",
+        "contract": "LC2709",
+        "close": 87600.0,
+        "settle": 87960.0,
+        "volume": 421.0,
+        "oi": 1153.0,
+        "oi_change": 135.0
+      },
+      {
+        "date": "2026-11-16",
+        "contract": "LC2710",
+        "close": 86920.0,
+        "settle": 87680.0,
+        "volume": 16.0,
+        "oi": 31.0,
+        "oi_change": 4.0
+      },
+      {
+        "date": "2026-11-17",
+        "contract": "LC2612",
+        "close": 93720.0,
+        "settle": 91560.0,
+        "volume": 6325.0,
+        "oi": 23724.0,
+        "oi_change": -1514.0
+      },
+      {
+        "date": "2026-11-17",
+        "contract": "LC2701",
+        "close": 93180.0,
+        "settle": 89980.0,
+        "volume": 424783.0,
+        "oi": 349426.0,
+        "oi_change": -24824.0
+      },
+      {
+        "date": "2026-11-17",
+        "contract": "LC2703",
+        "close": 92100.0,
+        "settle": 89240.0,
+        "volume": 5372.0,
+        "oi": 18136.0,
+        "oi_change": -130.0
+      },
+      {
+        "date": "2026-11-17",
+        "contract": "LC2705",
+        "close": 92680.0,
+        "settle": 89800.0,
+        "volume": 86676.0,
+        "oi": 197252.0,
+        "oi_change": -2006.0
+      },
+      {
+        "date": "2026-11-17",
+        "contract": "LC2706",
+        "close": 92560.0,
+        "settle": 89240.0,
+        "volume": 7291.0,
+        "oi": 24595.0,
+        "oi_change": 159.0
+      },
+      {
+        "date": "2026-11-17",
+        "contract": "LC2707",
+        "close": 92400.0,
+        "settle": 88840.0,
+        "volume": 1292.0,
+        "oi": 11727.0,
+        "oi_change": 169.0
+      },
+      {
+        "date": "2026-11-17",
+        "contract": "LC2708",
+        "close": 89700.0,
+        "settle": 88780.0,
+        "volume": 16.0,
+        "oi": 512.0,
+        "oi_change": 10.0
+      },
+      {
+        "date": "2026-11-17",
+        "contract": "LC2709",
+        "close": 92400.0,
+        "settle": 90400.0,
+        "volume": 454.0,
+        "oi": 1174.0,
+        "oi_change": 21.0
+      },
+      {
+        "date": "2026-11-17",
+        "contract": "LC2710",
+        "close": 92380.0,
+        "settle": 90000.0,
+        "volume": 19.0,
+        "oi": 38.0,
+        "oi_change": 7.0
+      },
+      {
+        "date": "2026-11-17",
+        "contract": "LC2711",
+        "close": 85980.0,
+        "settle": 87780.0,
+        "volume": 4.0,
+        "oi": 2.0
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LC2612",
+        "close": 92120.0,
+        "settle": 91560.0,
+        "volume": 4219.0,
+        "oi": 23076.0,
+        "oi_change": -648.0
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LC2701",
+        "close": 91520.0,
+        "settle": 91000.0,
+        "volume": 383415.0,
+        "oi": 343103.0,
+        "oi_change": -6323.0
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LC2703",
+        "close": 89680.0,
+        "settle": 90140.0,
+        "volume": 10079.0,
+        "oi": 21602.0,
+        "oi_change": 3466.0
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LC2705",
+        "close": 90500.0,
+        "settle": 90320.0,
+        "volume": 88734.0,
+        "oi": 203924.0,
+        "oi_change": 6672.0
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LC2706",
+        "close": 90040.0,
+        "settle": 89980.0,
+        "volume": 9772.0,
+        "oi": 25949.0,
+        "oi_change": 1354.0
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LC2707",
+        "close": 89880.0,
+        "settle": 90460.0,
+        "volume": 3146.0,
+        "oi": 12230.0,
+        "oi_change": 503.0
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LC2708",
+        "close": 89940.0,
+        "settle": 90220.0,
+        "volume": 505.0,
+        "oi": 658.0,
+        "oi_change": 146.0
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LC2709",
+        "close": 89640.0,
+        "settle": 90020.0,
+        "volume": 965.0,
+        "oi": 1450.0,
+        "oi_change": 276.0
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LC2710",
+        "close": 89800.0,
+        "settle": 89200.0,
+        "volume": 30.0,
+        "oi": 64.0,
+        "oi_change": 26.0
+      },
+      {
+        "date": "2026-11-18",
+        "contract": "LC2711",
+        "close": 89400.0,
+        "settle": 89640.0,
+        "volume": 14.0,
+        "oi": 10.0,
+        "oi_change": 8.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2612",
+        "close": 92300.0,
+        "settle": 91660.0,
+        "volume": 2183.0,
+        "oi": 23004.0,
+        "oi_change": -72.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2701",
+        "close": 91500.0,
+        "settle": 90840.0,
+        "volume": 330709.0,
+        "oi": 342568.0,
+        "oi_change": -535.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2703",
+        "close": 90100.0,
+        "settle": 88940.0,
+        "volume": 9071.0,
+        "oi": 21762.0,
+        "oi_change": 160.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2705",
+        "close": 90620.0,
+        "settle": 89420.0,
+        "volume": 70078.0,
+        "oi": 208296.0,
+        "oi_change": 4372.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2706",
+        "close": 90020.0,
+        "settle": 88580.0,
+        "volume": 4571.0,
+        "oi": 26550.0,
+        "oi_change": 601.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2707",
+        "close": 90080.0,
+        "settle": 88580.0,
+        "volume": 2201.0,
+        "oi": 12748.0,
+        "oi_change": 518.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2708",
+        "close": 90200.0,
+        "settle": 88500.0,
+        "volume": 148.0,
+        "oi": 558.0,
+        "oi_change": -100.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2709",
+        "close": 90380.0,
+        "settle": 88840.0,
+        "volume": 678.0,
+        "oi": 1425.0,
+        "oi_change": -25.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2710",
+        "close": 89860.0,
+        "settle": 88940.0,
+        "volume": 14.0,
+        "oi": 68.0,
+        "oi_change": 4.0
+      },
+      {
+        "date": "2026-11-19",
+        "contract": "LC2711",
+        "close": 88100.0,
+        "settle": 88100.0,
+        "volume": 1.0,
+        "oi": 10.0,
+        "oi_change": 0.0
+      },
+      {
+        "date": "2026-11-20",
+        "contract": "LC2612",
+        "close": 90980.0,
+        "settle": 91820.0,
+        "volume": 2839.0,
+        "oi": 22037.0,
+        "oi_change": -967.0
+      },
+      {
+        "date": "2026-11-20",
+        "contract": "LC2701",
+        "close": 90040.0,
+        "settle": 90760.0,
+        "volume": 387210.0,
+        "oi": 326054.0,
+        "oi_change": -16514.0
+      },
+      {
+        "date": "2026-11-20",
+        "contract": "LC2703",
+        "close": 88580.0,
+        "settle": 89180.0,
+        "volume": 10591.0,
+        "oi": 22676.0,
+        "oi_change": 914.0
+      },
+      {
+        "date": "2026-11-20",
+        "contract": "LC2705",
+        "close": 89100.0,
+        "settle": 89440.0,
+        "volume": 90565.0,
+        "oi": 214109.0,
+        "oi_change": 5813.0
+      },
+      {
+        "date": "2026-11-20",
+        "contract": "LC2706",
+        "close": 88600.0,
+        "settle": 88800.0,
+        "volume": 6507.0,
+        "oi": 27337.0,
+        "oi_change": 787.0
+      },
+      {
+        "date": "2026-11-20",
+        "contract": "LC2707",
+        "close": 88400.0,
+        "settle": 88920.0,
+        "volume": 885.0,
+        "oi": 12651.0,
+        "oi_change": -97.0
+      },
+      {
+        "date": "2026-11-20",
+        "contract": "LC2708",
+        "close": 88420.0,
+        "settle": 89560.0,
+        "volume": 104.0,
+        "oi": 488.0,
+        "oi_change": -70.0
+      },
+      {
+        "date": "2026-11-20",
+        "contract": "LC2709",
+        "close": 89320.0,
+        "settle": 89440.0,
+        "volume": 357.0,
+        "oi": 1440.0,
+        "oi_change": 15.0
+      },
+      {
+        "date": "2026-11-20",
+        "contract": "LC2711",
+        "close": 88500.0,
+        "settle": 88320.0,
+        "volume": 8.0,
+        "oi": 16.0,
+        "oi_change": 6.0
+      }
+    ],
     "sgx_licf": [
       {
         "date": "2026-10-09",
@@ -295,51 +1278,63 @@
       },
       {
         "date": "2026-11-10",
-        "ltr": 0.69,
-        "pls": 2.91,
+        "ltr": 0.6899999976158142,
+        "pls": 2.9100000858306885,
         "intraday": false
       },
       {
         "date": "2026-11-11",
-        "ltr": 0.71,
-        "pls": 3.1,
+        "ltr": 0.7149999737739563,
+        "pls": 3.0999999046325684,
         "intraday": false
       },
       {
         "date": "2026-11-12",
-        "ltr": 0.67,
-        "pls": 2.85,
+        "ltr": 0.6650000214576721,
+        "pls": 2.8499999046325684,
         "intraday": false
       },
       {
         "date": "2026-11-13",
-        "ltr": 0.66,
-        "pls": 2.86,
+        "ltr": 0.6600000262260437,
+        "pls": 2.859999895095825,
         "intraday": false
       },
       {
         "date": "2026-11-16",
-        "ltr": 0.64,
-        "pls": 2.89,
+        "ltr": 0.6399999856948853,
+        "pls": 2.890000104904175,
         "intraday": false
       },
       {
         "date": "2026-11-17",
-        "ltr": 0.6,
-        "pls": 2.64,
+        "ltr": 0.6000000238418579,
+        "pls": 2.640000104904175,
         "intraday": false
       },
       {
         "date": "2026-11-18",
-        "ltr": 0.59,
-        "pls": 2.6,
+        "ltr": 0.5899999737739563,
+        "pls": 2.5999999046325684,
         "intraday": false
       },
       {
         "date": "2026-11-19",
-        "ltr": 0.58,
-        "pls": 2.56,
+        "ltr": 0.5799999833106995,
+        "pls": 2.559999942779541,
         "intraday": false
+      },
+      {
+        "date": "2026-11-20",
+        "ltr": 0.5550000071525574,
+        "pls": 2.619999885559082,
+        "intraday": false
+      },
+      {
+        "date": "2026-11-23",
+        "ltr": 0.5669999718666077,
+        "pls": 2.674999952316284,
+        "intraday": true
       }
     ],
     "evidence": [
