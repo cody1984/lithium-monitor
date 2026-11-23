@@ -1,0 +1,428 @@
+{
+  "schema": "lithium-inventory/3",
+  "updated": "2026-11-22",
+  "config": {
+    "usable_share_pct": 100,
+    "divergence_threshold_pct": 1.0,
+    "stale_days": 8
+  },
+  "scope_note": "SMM weekly carbonate inventory under the method adopted 4 Sep 2026 (four segments: upstream, cathode plant, trade, battery-cell plant and other). Do not splice rows from the earlier methods.",
+  "weekly": [
+    {
+      "date": "2026-09-04",
+      "total": 175000,
+      "approx": true,
+      "segments": {
+        "upstream": "down",
+        "cathode": "up",
+        "trade": "down"
+      },
+      "method_break": true,
+      "source": "Bloomberg via Mining.com (11 Sep); SMM announcement 4 Sep",
+      "note": "first reading under the new method, rounded; the old method showed 78,800 t the week before. Weekly levels from 11 Sep to 15 Oct are not loaded"
+    },
+    {
+      "date": "2026-10-22",
+      "total": 130279,
+      "derived": true,
+      "segments": {},
+      "source": "derived: 128,385 + 1,894",
+      "note": ""
+    },
+    {
+      "date": "2026-10-29",
+      "total": 128385,
+      "change": -1894,
+      "spot": 96100,
+      "segments": {
+        "upstream": "up",
+        "cathode": "down"
+      },
+      "source": "SMM morning meeting summary, 30 Oct",
+      "note": "smelter stocks kept building; downstream drew on long-term and customer-supplied material"
+    },
+    {
+      "date": "2026-11-05",
+      "total": 125391,
+      "change": -2994,
+      "spot": 91700,
+      "segments": {
+        "upstream": "down",
+        "cathode": "down",
+        "trade": "down"
+      },
+      "source": "SMM analysis, 5 Nov",
+      "note": "synchronized destocking across segments; cathode plants held no excess stock"
+    },
+    {
+      "date": "2026-11-12",
+      "total": 122644,
+      "change": -2747,
+      "spot": 90650,
+      "segments": {
+        "upstream": "up",
+        "cathode": "down"
+      },
+      "source": "SMM weekly comment, 12 Nov",
+      "note": "slight upstream build; downstream material plants and cell makers kept falling"
+    },
+    {
+      "date": "2026-11-19",
+      "direction": "down",
+      "consecutive_decline_weeks": 7,
+      "spot": 91300,
+      "segments": {
+        "upstream": "down",
+        "cathode": "down",
+        "trade": "up"
+      },
+      "source": "SMM weekly comment, 19 Nov",
+      "note": "level not in free text. Smelters switched from building to destocking as futures rebounded; traders built slightly on weak transactions"
+    }
+  ],
+  "mysteel": [
+    {
+      "date": "2026-06-05",
+      "total": 203000,
+      "approx": true,
+      "segments": {},
+      "source": "Mysteel, 9 Oct analysis",
+      "note": "'early June', start of the 207-sample decline"
+    },
+    {
+      "date": "2026-07-29",
+      "total": 162450,
+      "change": -6950,
+      "segments": {},
+      "source": "Mysteel, 30 Jul",
+      "note": "first week of the 207-sample series: converters 74, traders 61, cathode makers and end-users 72"
+    },
+    {
+      "date": "2026-09-30",
+      "total": 113600,
+      "approx": true,
+      "segments": {},
+      "source": "Mysteel, 9 Oct analysis",
+      "note": "end-September; traders 47,000 t; -44% in total since June"
+    },
+    {
+      "date": "2026-10-09",
+      "total": 113560,
+      "derived": true,
+      "segments": {},
+      "source": "derived: 103,330 + 10,230",
+      "note": ""
+    },
+    {
+      "date": "2026-10-16",
+      "total": 103330,
+      "change": -10230,
+      "segments": {
+        "upstream": "up",
+        "trade": "down",
+        "cathode": "down"
+      },
+      "source": "CME / Voltaire newsletter, 16 Oct (citing Mysteel)",
+      "note": "traders -20%, end-users -9%, smelters +30% WoW. Date is the newsletter date"
+    },
+    {
+      "date": "2026-10-23",
+      "total": 99280,
+      "change": -4050,
+      "segments": {
+        "upstream": "up",
+        "trade": "down",
+        "cathode": "down"
+      },
+      "source": "CME / Voltaire newsletter, 23 Oct (citing Mysteel)",
+      "note": "traders -28% and end-users -15.5% over two weeks, smelters +50%; end-users hold 44,100 t (44%)"
+    },
+    {
+      "date": "2026-11-04",
+      "change_pct": -0.63,
+      "segments": {
+        "upstream": "down",
+        "trade": "up",
+        "cathode": "down"
+      },
+      "aligns": "2026-11-05",
+      "source": "Mysteel, 5 and 9 Nov",
+      "note": "traders rebuilt for a second week; rising warrants early in the week ended the destocking trend seen since October"
+    },
+    {
+      "date": "2026-11-13",
+      "direction": "down",
+      "segments": {
+        "upstream": "up",
+        "trade": "down",
+        "cathode": "up"
+      },
+      "aligns": "2026-11-12",
+      "source": "Mysteel inventory alert, 16 Nov",
+      "note": "destocking pace widened slightly and levels hit new yearly lows, yet converters built stock (low spot selling), traders drew down and cathode plants and end-users built mildly. Survey covers about 80% of samples"
+    }
+  ],
+  "receipts_history": [
+    {
+      "date": "2026-07-03",
+      "quantity": 48578,
+      "source": "CME / Voltaire newsletter, 3 Jul",
+      "note": "after falling 7.5 kt from a 56,045 t peak"
+    },
+    {
+      "date": "2026-10-09",
+      "quantity": 30680,
+      "source": "CME / Voltaire newsletter, 16 Oct"
+    },
+    {
+      "date": "2026-10-12",
+      "quantity": 30677,
+      "source": "CME / Voltaire newsletter, 16 Oct"
+    },
+    {
+      "date": "2026-10-13",
+      "quantity": 29643,
+      "source": "CME / Voltaire newsletter, 16 Oct"
+    },
+    {
+      "date": "2026-10-14",
+      "quantity": 28461,
+      "source": "CME / Voltaire newsletter, 16 Oct"
+    },
+    {
+      "date": "2026-10-15",
+      "quantity": 26730,
+      "source": "CME / Voltaire newsletter, 16 Oct"
+    },
+    {
+      "date": "2026-10-16",
+      "quantity": 25640,
+      "source": "CME / Voltaire newsletter, 23 Oct",
+      "note": "the 16 Oct edition showed 26,730 for this date"
+    },
+    {
+      "date": "2026-10-19",
+      "quantity": 23552,
+      "source": "CME / Voltaire newsletter, 23 Oct"
+    },
+    {
+      "date": "2026-10-20",
+      "quantity": 23172,
+      "source": "CME / Voltaire newsletter, 23 Oct"
+    },
+    {
+      "date": "2026-10-21",
+      "quantity": 21695,
+      "source": "CME / Voltaire newsletter, 23 Oct"
+    },
+    {
+      "date": "2026-10-22",
+      "quantity": 20952,
+      "source": "CME / Voltaire newsletter, 23 Oct"
+    },
+    {
+      "date": "2026-10-23",
+      "quantity": 20952,
+      "source": "CME / Voltaire newsletter, 23 Oct",
+      "note": "unchanged from the prior day"
+    }
+  ],
+  "benchmarks": [
+    {
+      "date": "2026-07-17",
+      "fm_spod6": 2215,
+      "fm_carb": 19.5,
+      "note": "Mysteel battery-grade 152,450 CNY/t that day",
+      "source": "CME / Voltaire newsletter, 17 Jul"
+    },
+    {
+      "date": "2026-10-16",
+      "fm_spod6": 1363,
+      "fm_carb": 13.75,
+      "smm_carb_cny": 102150,
+      "note": "week of the EU hybrid-quota shock",
+      "source": "CME / Voltaire newsletter, 16 Oct"
+    },
+    {
+      "date": "2026-10-23",
+      "fm_spod6": 1300,
+      "fm_carb": 13.7,
+      "smm_carb_cny": 97000,
+      "fm_vs_smm_exvat": 0.42,
+      "note": "Fastmarkets carbonate sat US$0.42/kg above SMM ex-VAT",
+      "source": "CME / Voltaire newsletter, 23 Oct"
+    },
+    {
+      "date": "2026-10-27",
+      "fm_carb": 13.9,
+      "fm_carb_range": "12.80-15.00",
+      "note": "daily CIF China-Japan-Korea assessment, midpoint of range; the 2026 high was 24.50-25.80 on 11 May",
+      "source": "Fastmarkets, 28 Oct"
+    }
+  ],
+  "supply_demand": [
+    {
+      "period": "2026-06",
+      "item": "China carbonate consumption",
+      "value_t": 151000,
+      "kind": "estimate",
+      "note": "up from about 124,700 t in January",
+      "source": "CME / Voltaire (citing Mysteel), 17 Jul"
+    },
+    {
+      "period": "2026-08",
+      "item": "Expected inventory drawdown",
+      "value_t": -22000,
+      "kind": "forecast",
+      "note": "Mysteel's August expectation",
+      "source": "Mysteel, 12 Aug"
+    },
+    {
+      "period": "2026-09",
+      "item": "Carbonate production",
+      "value_t": 114700,
+      "kind": "actual",
+      "note": "+7.7% m/m, below guidance as lepidolite ramp-up lagged",
+      "source": "Mysteel, 8 Oct"
+    },
+    {
+      "period": "2026-09",
+      "item": "LFP cathode output",
+      "value_t": 603200,
+      "kind": "actual",
+      "note": "+4.78% m/m",
+      "source": "Mysteel, 8 Oct"
+    },
+    {
+      "period": "2026-09",
+      "item": "China lithium imports, all forms",
+      "value_t": 122000,
+      "kind": "actual",
+      "note": "t LCE, +5.3% m/m; spodumene 87 kt LCE; Jan-Sep 942 kt LCE, +38% y/y",
+      "source": "CME / Voltaire, 23 Oct"
+    },
+    {
+      "period": "2026-10",
+      "item": "Monthly supply-demand balance",
+      "value_t": -29000,
+      "kind": "forecast",
+      "note": "Mysteel's 8 Oct expectation of a widening deficit",
+      "source": "Mysteel, 8 Oct"
+    },
+    {
+      "period": "2026-10",
+      "item": "Carbonate production",
+      "value_t": 117700,
+      "kind": "actual",
+      "note": "+2.7% m/m; schedule had been 115,900 t",
+      "source": "Mysteel, 3 Nov"
+    },
+    {
+      "period": "2026-10",
+      "item": "China spodumene imports",
+      "value_t": 1004300,
+      "kind": "actual",
+      "note": "record; about 80,200 t LCE (-1.45% m/m). Concentrate 673,100 t (-2.28%), raw ore 331,200 t (+17.75%); Australian concentrate -32% to 303,400 t; Mali 95,700 t and Canada 27,200 t from zero; Zimbabwe 137,900 t; Nigeria 92,800 t",
+      "source": "SMM, 20 Nov (customs data)"
+    },
+    {
+      "period": "2026-11",
+      "item": "Carbonate production",
+      "kind": "forecast",
+      "note": "expected +3.5% m/m (about 121,800 t implied)",
+      "source": "Mysteel, 3 and 13 Nov"
+    },
+    {
+      "period": "2026-11",
+      "item": "LFP cathode output",
+      "kind": "forecast",
+      "note": "expected -1.15% m/m, reversing the upward Q4 revisions seen on 9 Oct",
+      "source": "Mysteel, 13 Nov"
+    },
+    {
+      "period": "2026-11",
+      "item": "Expected inventory drawdown",
+      "value_t": -15600,
+      "kind": "forecast",
+      "note": "narrowing; no proactive restocking seen near 90,000 yuan/t",
+      "source": "Mysteel, 12 Nov"
+    },
+    {
+      "period": "2026-11",
+      "item": "Chile lithium salt shipments to China",
+      "value_t": 19800,
+      "kind": "actual",
+      "note": "t LCE, rebound; sulphate arrivals rising fast",
+      "source": "Mysteel, 13 Nov"
+    }
+  ],
+  "sources": [
+    {
+      "name": "SMM weekly carbonate inventory",
+      "scope": "four segments since 4 Sep 2026; backdated to 30 Apr",
+      "method": "estimates from public information, market communication and SMM's internal model",
+      "issues": "Scope changed 4 Sep: headline jumped from 78,800 t to about 175,000 t, prices fell over 14% in three days, and an SMM official said the impact may have been underestimated. SMM also says customs timing and sample verification can cause deviations",
+      "cadence": "weekly, Thursday",
+      "cost": "headline free, detail paywalled"
+    },
+    {
+      "name": "Mysteel weekly carbonate inventory",
+      "scope": "207 samples: converters 74, traders 61-62, cathode makers and end-users 72",
+      "method": "survey",
+      "issues": "About 80% of samples responded as of 16 Nov, so absolute levels carry deviation. Levels are lower than SMM's, and the two surveys can disagree on segment direction",
+      "cadence": "weekly, Monday alert",
+      "cost": "alerts free, data paywalled"
+    },
+    {
+      "name": "Benchmark monthly chemicals inventory",
+      "scope": "carbonate and hydroxide, China",
+      "method": "analyst tracking",
+      "issues": "Reports -2.8% m/m in August and -10.0% year to date, with no usual H1 build and H2 drawdown",
+      "cadence": "monthly",
+      "cost": "summary free"
+    },
+    {
+      "name": "GFEX registered receipts",
+      "scope": "exchange-registered stock only",
+      "method": "exchange daily report",
+      "issues": "Registered stock moves when holders cancel or re-register receipts, so a rise can be hidden stock becoming visible, not new supply. Units appear as tonnes in some reports and lots in others. Two newsletter editions disagreed on 16 Oct",
+      "cadence": "daily",
+      "cost": "free"
+    },
+    {
+      "name": "Fastmarkets benchmarks via CME / Voltaire newsletter",
+      "scope": "spodumene 6% CIF Asia, carbonate CIF Asia",
+      "method": "price assessment, reproduced by a third party",
+      "issues": "Secondary source; weekly points only, and the newsletter files for 30 Oct to 20 Nov could not be retrieved",
+      "cadence": "weekly",
+      "cost": "free"
+    }
+  ],
+  "notes": [
+    "Mysteel (12 Aug) on the destocking-with-falling-prices paradox: the market shifted its pricing focus from the monthly inventory drawdown to expectations of weaker demand and more supply in 2027, and would keep pricing that until drawdowns turn into spot tightness.",
+    "Mysteel (12 Nov): warrants fell to a yearly low after concentrated cancellations at end-October, then rose each day in November as a weak basis and wide near-far spreads reopened delivery; some stock is moving from hidden inventory into visible warrants."
+  ],
+  "grade_spread": [
+    {
+      "date": "2026-10-26",
+      "bg": 96400,
+      "ig": 93000,
+      "unit": "CNY/t low-end quotes, VAT incl.",
+      "source": "SMM daily review 26 Oct"
+    },
+    {
+      "date": "2026-11-16",
+      "bg": 89550,
+      "ig": 84600,
+      "unit": "CNY/t, VAT incl.",
+      "source": "SMM daily review 16 Nov"
+    },
+    {
+      "date": "2026-11-20",
+      "bg": 12115.51,
+      "ig": 11718.07,
+      "unit": "USD/t, SMM-converted",
+      "source": "SMM price table 20 Nov"
+    }
+  ]
+}

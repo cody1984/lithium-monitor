@@ -1,288 +1,818 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lithium Supply-Chain Monitor</title>
+<title>Lithium Market Monitor</title>
 <style>
 :root{--bg:#0e1116;--panel:#161b22;--line:#2a313c;--txt:#d7dde5;--dim:#8b95a3;--accent:#4dd0e1;--warn:#e8b93e;--bad:#ef6c57;--good:#57c785}
 *{box-sizing:border-box}body{margin:0;font:14px/1.5 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt)}
 header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between}
 h1{font-size:19px;margin:0}h2{font-size:15px;margin:0 0 10px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}h3{font-size:13px;margin:0 0 6px;color:var(--dim);font-weight:600}
-section{padding:18px 24px;border-bottom:1px solid var(--line)}
-.meta{color:var(--dim);font-size:12.5px;display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
-.meta input{width:70px;background:var(--panel);border:1px solid var(--line);color:var(--txt);padding:2px 6px;border-radius:4px;font:inherit}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+section{padding:18px 24px;border-bottom:1px solid var(--line);overflow-x:auto}
+.meta{color:var(--dim);font-size:12.5px;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+.meta input,.inputs input,.inputs select{width:70px;background:var(--panel);border:1px solid var(--line);color:var(--txt);padding:2px 6px;border-radius:4px;font:inherit}
+.inputs select{width:auto}
+.inputs{display:flex;gap:14px;flex-wrap:wrap;align-items:baseline;font-size:12.5px;color:var(--dim);margin-bottom:8px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:10px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}
 .card .label{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}.card .value{font-size:20px;font-weight:600;margin:4px 0}.card .sub{font-size:11.5px;color:var(--dim)}
 .charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
-.chart{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}
+.chart{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto}
 .note{font-size:12.5px;color:var(--dim);margin:8px 0 0}
 table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid var(--line);padding:6px 9px;text-align:right}
 th{background:var(--panel);color:var(--dim);font-weight:600;text-align:left}td:first-child,th:first-child{text-align:left}
 table.txt td{text-align:left}tr.hl td{background:rgba(77,208,225,.07)}
+.cell-good{background:rgba(87,199,133,.18)}.cell-bad{background:rgba(239,108,87,.16)}
 .gap{color:var(--warn)}.indic{color:var(--warn);font-style:italic}
 button{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:6px;padding:6px 12px;font:inherit;cursor:pointer}button:hover{border-color:var(--accent)}
 .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;align-items:center}
 ul.ctx{margin:0;padding-left:18px}ul.ctx li{margin:6px 0;font-size:13px}
-.status-ok{color:var(--good)}.status-partial,.status-delayed,.status-indicative,.status-proxy,.status-manual{color:var(--warn)}.status-gap{color:var(--bad)}
-.t-bull{color:var(--good);font-weight:600}.t-bear{color:var(--bad);font-weight:600}.t-mixed{color:var(--warn);font-weight:600}.t-info,.t-na{color:var(--dim);font-weight:600}
+.status-ok{color:var(--good)}.status-proxy{color:var(--warn)}.status-gap{color:var(--bad)}
+.t-bull,.s-fresh{color:var(--good);font-weight:600}.t-bear,.s-stale,.s-fail{color:var(--bad);font-weight:600}.t-mixed,.s-due{color:var(--warn);font-weight:600}.t-info,.t-na,.s-na{color:var(--dim);font-weight:600}
 #msg{font-size:12.5px;margin-top:8px;color:var(--dim)}svg text{fill:var(--dim);font-size:10px}
 .legend{font-size:11.5px;color:var(--dim);margin-top:4px}.legend span{margin-right:14px}
 .swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
 .tally{font-size:13px;margin-bottom:10px}
+ul.flags{margin:8px 0 0;padding-left:18px;font-size:12.5px}ul.flags li{margin:3px 0}
 </style></head><body>
 <header>
- <div><h1>Lithium Supply-Chain Monitor</h1><div class="meta">SMM &middot; GFEX &middot; SGX &middot; spodumene &middot; inventory &middot; LTR / PLS</div></div>
+ <div><h1>Lithium Market Monitor</h1><div class="meta">Paper vs physical &middot; regional spreads &middot; converter economics &middot; inventory &middot; demand (GWh) &middot; source reliability</div></div>
  <div class="meta">
-  <span>Snapshot: <b id="asat"></b></span>
-  <span>FX <input id="fx" type="number" step="0.0001"> CNY/USD</span>
-  <span>SC6 per t LCE <input id="yld" type="number" step="0.1" value="8.0" title="assumption: tonnes of SC6 per tonne LCE"></span>
-  <span>VAT 13%</span>
+  <span>As of: <b id="asat"></b></span>
+  <span>FX <input id="fx" type="number" step="0.0001" title="override: applies one rate to every conversion"> <span id="fxinfo"></span></span>
+  <button id="btn-fxclear">dated FX</button>
+  <span>Grade % Li&#8322;O <input id="grade" type="number" step="0.1"></span>
+  <span>Recovery % <input id="rec" type="number" step="1"></span>
  </div>
 </header>
 
+<section id="inconsistency-strip"></section>
+
 <section><h2>Key readings</h2><div class="kpis" id="kpis"></div></section>
 
-<section><h2>Signals: paper vs physical</h2>
- <div class="tally" id="tally"></div>
- <table class="txt" id="signals"></table>
- <p class="note">Each row is a rule-of-thumb read of the latest data, not a forecast. Low-confidence rows rest on few observations. The lean column follows the framework: bullish = physical deficit dominating, bearish = paper or converter pressure.</p>
+<section><h2>Data confidence</h2>
+ <table class="txt" id="conf"></table>
+ <ul class="flags" id="flags"></ul>
+ <h3 style="margin-top:14px">Google Sheet load report</h3><table class="txt" id="sheet-report"></table>
+ <h3 style="margin-top:14px">Job health (last cloud run)</h3><table class="txt" id="health"></table>
+ <p class="note">Freshness limits: spot, settlement and curve 5 days; receipts 3 days; SGX, inventory and spodumene 7&ndash;10 days; battery data 45 days. A stale stream is excluded from the signals it feeds.</p>
 </section>
+
+<section><h2>Signals: paper vs physical</h2>
+ <div class="tally" id="tally"></div><table class="txt" id="signals"></table>
+ <p class="note">Rule-of-thumb reads, not forecasts. Aggregate open interest cannot identify who initiated trades, so OI patterns are described as consistent with a behaviour, not proof of it. Lean follows the framework: bullish = physical deficit dominating, bearish = paper or converter pressure.</p>
+</section>
+
+<section><h2>Futures curve &amp; calendar spreads</h2>
+ <div class="charts"><div class="chart"><h3>Latest settle (or close) by delivery month, CNY/mt</h3><div id="chart-curve"></div><p class="note" id="curve-note"></p></div>
+ <div class="chart"><table id="curve"></table></div></div>
+</section>
+
+<section><h2>Cost-adjusted carry screen</h2>
+ <div class="inputs">
+  <span>Financing % p.a. <input id="sc-fin" type="number" step="0.1"></span>
+  <span>Storage CNY/t/month <input id="sc-sto" type="number"></span>
+  <span>Handling, test, registration CNY/t <input id="sc-hnd" type="number"></span>
+  <span>Futures fee % per side <input id="sc-fee" type="number" step="0.001"></span>
+  <span>Margin % <input id="sc-mrg" type="number" step="0.5"></span>
+  <span>Adverse move % <input id="sc-adv" type="number" step="1"></span>
+  <span>t per lot <input id="sc-tpl" type="number" step="0.1"></span>
+ </div>
+ <table id="carry"></table><p class="note" id="carry-note"></p>
+ <p class="note">Margin 15% and fee 0.008% per side are GFEX parameters for 18 Nov as compiled by a third party: verify with your broker. Financing, storage, handling and tonnes per lot are placeholders, not sourced.</p>
+</section>
+
+<section><h2>Delivery pressure</h2><table id="deliv"></table><p class="note" id="deliv-note"></p></section>
 
 <section><h2>Basis &amp; regional spread</h2>
  <div class="charts">
-  <div class="chart"><h3>China: SMM spot vs GFEX LC2701 (CNY/mt)</h3><div id="chart-cn"></div><div class="legend" id="legend-cn"></div><p class="note" id="basis-note"></p></div>
-  <div class="chart"><h3>Regional: SGX LICF (converted) vs SMM ex-VAT (CNY/mt)</h3><div id="chart-sg"></div><div class="legend" id="legend-sg"></div><p class="note" id="spread-note"></p></div>
+  <div class="chart"><h3>China: SMM daily spot vs selected GFEX contract (CNY/mt)</h3><div id="chart-cn"></div><div class="legend" id="legend-cn"></div><p class="note" id="basis-note"></p></div>
+  <div class="chart"><h3>Regional: SGX LICF by contract (dated FX) vs SMM ex-VAT (CNY/mt)</h3><div id="chart-sg"></div><div class="legend" id="legend-sg"></div><p class="note" id="spread-note"></p></div>
  </div>
 </section>
 
-<section><h2>Equities vs carbonate (rebased to 100)</h2>
- <div class="charts"><div class="chart"><h3>Since 6 Nov: SMM spot, LTR, PLS</h3><div id="chart-eq"></div><div class="legend" id="legend-eq"></div><p class="note" id="eq-note"></p></div>
- <div class="chart"><h3>Spodumene and conversion economics</h3><table id="spod"></table><p class="note" id="spod-note"></p></div></div>
+<section><h2>Converter break-even</h2>
+ <div class="inputs"><span>Feedstock price used <select id="sel-feed"></select></span></div>
+ <div class="charts"><div class="chart"><h3>Break-even SC6 price, US$/t (green = observed SC6 is affordable)</h3><table id="conv1"></table></div>
+ <div class="chart"><h3>Break-even carbonate price, US$/t (green = observed carbonate covers it)</h3><table id="conv2"></table></div></div>
+ <p class="note" id="conv-note"></p>
 </section>
 
-<section><h2>Physical vs paper</h2><table id="pvp"></table><p class="note" id="receipt-note"></p></section>
+<section><h2>Equities &amp; spodumene</h2>
+ <div class="charts"><div class="chart"><h3>SMM spot (verified rows), LTR, PLS, rebased to 100</h3><div id="chart-eq"></div><div class="legend" id="legend-eq"></div><p class="note" id="eq-note"></p></div>
+ <div class="chart"><h3>Feedstock spread (before conversion costs)</h3><table id="spod"></table><p class="note" id="spod-note"></p></div></div>
+</section>
 
-<section><h2>Inventory &amp; downstream</h2><table id="inv"></table><p class="note" id="inv-note"></p></section>
+<section id="inv-module"></section>
+<section id="demand-gwh-module"></section>
+
+<section><h2>Historical disconnect statistics</h2><table id="pct"></table><p class="note" id="pct-note"></p></section>
+<section><h2>Physical vs paper</h2><table id="pvp"></table><p class="note" id="receipt-note"></p></section>
+<section><h2>Physical-market evidence ledger</h2><table class="txt" id="ledger"></table><p class="note">Add entries on the evidence tab of your Google Sheet. A manual number belongs there with its scope, source and next-due date.</p></section>
 
 <section><h2>Data update</h2>
- <p class="note">Hosted on GitHub Pages this page fetches <b>market_snapshot.json</b> on load; the Actions job refreshes it each weekday at 17:30 AWST. As a local file, use Import. Everything stays in your browser.</p>
- <div class="btnrow"><button id="btn-fetch">Fetch latest (hosted)</button><input type="file" id="filein" accept=".json,.csv"><button id="btn-export">Export snapshot</button><button id="btn-reset">Reset to bundled data</button></div>
+ <p class="note">Manual inputs live in your Google Sheet; the daily job writes market data to the repo. This page reads both on open. Any value typed into the sheet replaces the repo copy of that table, so keep each tab complete. Without a sheet, the repo JSON files and the embedded copies are used.</p>
+ <div class="inputs" style="margin-top:8px"><span>Google Sheet ID or URL <input id="sheet-id" type="text" style="width:360px" placeholder="paste the sheet URL or its ID"></span><button id="btn-sheet">Load sheet</button><span id="sheet-state"></span></div>
+ <div class="btnrow"><button id="btn-fetch">Reload everything</button><input type="file" id="filein" accept=".json,.csv"><button id="btn-export">Export snapshot</button><button id="btn-reset">Reset to bundled data</button></div>
  <div id="msg"></div>
 </section>
-
 <section><h2>Data sources &amp; costs</h2><table class="txt" id="feeds"></table></section>
 <section><h2>Market context</h2><ul class="ctx" id="ctx"></ul></section>
 
 <script>
-const BUNDLED = {"schema": "lithium-monitor/2", "generated_at": "2026-11-19T13:20:00+08:00", "fx_usdcny": 6.6665, "feeds": {}, "series": {"smm_spot": [{"date": "2026-09-29", "avg": 118800}, {"date": "2026-11-06", "avg": 93600}, {"date": "2026-11-12", "avg": 90650, "note": "weekly avg"}, {"date": "2026-11-16", "avg": 89550, "low": 87800, "high": 91300, "chg": -2800}, {"date": "2026-11-17", "avg": 89050, "low": 87000, "high": 91100, "chg": -500}, {"date": "2026-11-18", "avg": 91800, "chg": 2750, "note": "+3.09% DoD"}], "gfex_futures": [{"date": "2026-09-29", "contract": "LC2701", "settle": 118800, "oi_change": -8400}, {"date": "2026-11-06", "contract": "LC2701", "close": 92860, "note": "derived"}, {"date": "2026-11-09", "contract": "LC2701", "close": 87480, "volume": 352317}, {"date": "2026-11-10", "contract": "LC2701", "close": 87100, "volume": 267255}, {"date": "2026-11-12", "contract": "LC2701", "close": 90900}, {"date": "2026-11-16", "contract": "LC2701", "settle": 85380, "close": 88240, "note": "derived from Nov-17 deltas"}, {"date": "2026-11-17", "contract": "LC2701", "settle": 89980, "close": 93180, "oi": 349400, "oi_change": -24824, "volume": 424800, "note": "low 86,740; volume +74.7% DoD"}], "sgx_licf": [{"date": "2026-10-09", "contract": "LICF Nov-26", "price_usd_kg": 15.68}, {"date": "2026-10-13", "contract": "LICF Oct-26", "price_usd_kg": 16.79}, {"date": "2026-11-18", "contract": "LICF Nov-26", "price_usd_kg": 14.54, "note": "delayed, thin"}], "gfex_receipts": [{"date": "2026-11-08", "quantity": 21720, "note": "derived"}, {"date": "2026-11-09", "quantity": 23760, "change": 2040}, {"date": "2026-11-10", "quantity": 23810, "change": 50}], "spodumene": [{"date": "2026-11-17", "price_usd_t": 1241.5, "kind": "Albemarle auction, SC6 CIF", "volume_dmt": 16785}, {"date": "2026-11-18", "price_usd_t": 1220, "low": 1190, "high": 1250, "chg_pct": 0.41, "kind": "SMM SC6 CIF China"}], "inventory": [{"date": "2026-05-21", "scope": "SMM large-sample (pre-Sep revision)", "total": 137260, "downstream": 42729, "other": 76157, "smelter": 18374}, {"date": "2026-11-13", "scope": "SMM weekly, post-Sep revision (carried from earlier session; verify)", "total": 122644, "trend": "falling"}], "cathode": [{"date": "2026-11-18", "lfp_t_week": 141600, "ternary_t_week": 18000, "ternary_down_weeks": 9, "lce_per_t_lfp": 0.24}], "equities": [{"date": "2026-10-19", "ltr": 0.69, "pls": 2.9}, {"date": "2026-10-20", "ltr": 0.69, "pls": 2.93}, {"date": "2026-10-21", "ltr": 0.69, "pls": 2.91}, {"date": "2026-10-22", "ltr": 0.69, "pls": 2.85}, {"date": "2026-10-23", "ltr": 0.64, "pls": 2.62}, {"date": "2026-10-26", "ltr": 0.68, "pls": 2.84}, {"date": "2026-10-27", "ltr": 0.69, "pls": 2.88}, {"date": "2026-10-28", "ltr": 0.7, "pls": 2.99}, {"date": "2026-10-29", "ltr": 0.67, "pls": 2.75}, {"date": "2026-10-30", "ltr": 0.62, "pls": 2.64}, {"date": "2026-11-02", "ltr": 0.6, "pls": 2.61}, {"date": "2026-11-03", "ltr": 0.61, "pls": 2.63}, {"date": "2026-11-04", "ltr": 0.6, "pls": 2.6}, {"date": "2026-11-05", "ltr": 0.67, "pls": 2.83}, {"date": "2026-11-06", "ltr": 0.65, "pls": 2.83}, {"date": "2026-11-09", "ltr": 0.68, "pls": 2.89}, {"date": "2026-11-10", "ltr": 0.69, "pls": 2.91}, {"date": "2026-11-11", "ltr": 0.71, "pls": 3.1}, {"date": "2026-11-12", "ltr": 0.67, "pls": 2.85}, {"date": "2026-11-13", "ltr": 0.66, "pls": 2.86}, {"date": "2026-11-16", "ltr": 0.64, "pls": 2.89}, {"date": "2026-11-17", "ltr": 0.6, "pls": 2.64}, {"date": "2026-11-18", "ltr": 0.59, "pls": 2.6}, {"date": "2026-11-19", "ltr": 0.58, "pls": 2.56, "note": "intraday close at time of pull"}]}, "context": ["Q3 2026: three consecutive deficit months (about 84,000 mt LCE cumulative) while prices fell stepwise; inventory destocking of about 68,000 mt filled the deficit, so inventory acted as a buffer rather than letting the deficit clear through price.", "Destocking is downstream-led: over 13 weeks to early October total inventory fell 30%+, cathode-plant stocks nearly halved, smelter stocks fell nearly 40%, while the trader share rose from under 30% to over one-third. SMM says ownership is shifting from consumers to producers and traders - a latent supply overhang.", "SMM revised its weekly inventory scope from 4 Sep 2026 (title-based, adds trading segment and battery-cell makers), backdated to 30 Apr 2026. Do not compare levels across the break.", "Cathode output stays high: LFP about 141,600 t/week, ternary about 18,000 t/week and down nine straight weeks. LFP alone implies about 34,000 t LCE/week of carbonate use, above reported cathode-plant carbonate inventory.", "China spodumene imports were about 970,100 t in September (+7% m/m), Zimbabwe about 136,000 t (+83%). Port stocks stay high while carbonate stocks fall: the lag runs through port storage, refinery feed and conversion, and refiners can slow withdrawals when margins compress.", "GFEX receipts: down 17,378 t since early September (Mysteel) but +2,040 t on Nov 9 and +50 t on Nov 10 - watch whether the drawdown has stalled.", "Nov 17: LC2701 rallied to 93,180 on lower open interest (short covering) while spot kept falling.", "Cochilco forecasts 2026 lithium demand 2.08 Mt LCE vs supply 2.0 Mt (79,000 t deficit) and a Q4 average price near US$19,000/t - far above current spot of about US$13,700/t, so treat that forecast with caution.", "Supply restarts: Bald Hill, Finniss; Rio Tinto spending $1.4bn on Fenix 1B and Sal de Vida."]};
-let S = JSON.parse(JSON.stringify(BUNDLED));
-const VAT=0.13;
+
+const BUNDLED_S = {"schema": "lithium-monitor/6", "generated_at": "2026-11-22T17:00:00+08:00", "fx_usdcny": 6.6667, "fx_date": "2026-11-19", "params": {"li2o_to_lce": 2.473, "sc6_grade_pct": 6.0, "conversion_recovery_pct": 85.0, "scanner": {"financing_pct": 4.0, "storage_cny_t_month": 20, "handling_cny_t": 300, "fee_pct_side": 0.008, "margin_pct": 15, "adverse_pct": 10, "t_per_lot": 1}}, "feeds": {}, "run_log": {}, "series": {"fx": [{"date": "2026-11-16", "usdcny": 6.6645, "source": "Bloomberg Linea market quote (approx; job replaces with ECB)"}, {"date": "2026-11-18", "usdcny": 6.6665, "source": "market quotes 6.6657-6.6671 (approx; job replaces with ECB)"}, {"date": "2026-11-19", "usdcny": 6.6667, "source": "ECB cross: CNY/EUR 7.3280 / USD/EUR 1.0992"}], "smm_spot": [{"date": "2026-09-29", "avg": 118800, "verified": false, "note": "earlier session; unverified"}, {"date": "2026-11-06", "avg": 93600, "kind": "friday", "verified": true, "source": "SMM", "note": "Friday average, implied by SMM weekly comment"}, {"date": "2026-11-12", "avg": 90650, "verified": true, "source": "SMM", "note": "Thursday average (SMM weekly comment)"}, {"date": "2026-11-16", "avg": 89550, "low": 87800, "high": 91300, "chg": -2800, "verified": true, "source": "SMM"}, {"date": "2026-11-17", "avg": 89050, "low": 87000, "high": 91100, "chg": -500, "verified": true, "source": "SMM"}, {"date": "2026-11-18", "avg": 91800, "chg": 2750, "verified": true, "source": "SMM", "note": "+3.09% DoD"}], "gfex_futures": [{"date": "2026-11-06", "contract": "LC2701", "close": 92860, "derived": true, "note": "derived from Nov-9 print"}, {"date": "2026-11-09", "contract": "LC2701", "close": 87480, "volume": 352317}, {"date": "2026-11-10", "contract": "LC2701", "close": 87100, "volume": 267255}, {"date": "2026-11-12", "contract": "LC2701", "close": 90900}, {"date": "2026-11-16", "contract": "LC2701", "settle": 85380, "close": 88240, "derived": true, "note": "derived from Nov-17 deltas"}, {"date": "2026-11-17", "contract": "LC2701", "settle": 89980, "close": 93180, "oi": 349400, "oi_change": -24824, "volume": 424800, "note": "low 86,740"}], "futures_curve": [], "sgx_licf": [{"date": "2026-10-09", "contract": "LICF Nov-26", "price_usd_kg": 15.68}, {"date": "2026-10-13", "contract": "LICF Oct-26", "price_usd_kg": 16.79, "note": "final print before expiry"}, {"date": "2026-11-18", "contract": "LICF Nov-26", "price_usd_kg": 14.54, "note": "delayed, thin"}], "gfex_receipts": [{"date": "2026-11-08", "quantity": 21720, "derived": true, "note": "derived from Nov-9 change", "source": "manual"}, {"date": "2026-11-09", "quantity": 23760, "change": 2040, "source": "manual (X transcription)"}, {"date": "2026-11-10", "quantity": 23810, "change": 50, "source": "manual (X transcription)"}], "spodumene": [{"date": "2026-11-17", "price_usd_t": 1241.5, "kind": "Albemarle auction, SC6 CIF", "volume_dmt": 16785}, {"date": "2026-11-18", "price_usd_t": 1220, "low": 1190, "high": 1250, "chg_pct": 0.41, "kind": "SMM SC6 CIF China"}], "cathode": [{"date": "2026-11-18", "lfp_t_week": 141600, "ternary_t_week": 18000, "ternary_down_weeks": 9, "lce_per_t_lfp": 0.24}], "equities": [{"date": "2026-10-19", "ltr": 0.69, "pls": 2.9, "intraday": false}, {"date": "2026-10-20", "ltr": 0.69, "pls": 2.93, "intraday": false}, {"date": "2026-10-21", "ltr": 0.69, "pls": 2.91, "intraday": false}, {"date": "2026-10-22", "ltr": 0.69, "pls": 2.85, "intraday": false}, {"date": "2026-10-23", "ltr": 0.64, "pls": 2.62, "intraday": false}, {"date": "2026-10-26", "ltr": 0.68, "pls": 2.84, "intraday": false}, {"date": "2026-10-27", "ltr": 0.69, "pls": 2.88, "intraday": false}, {"date": "2026-10-28", "ltr": 0.7, "pls": 2.99, "intraday": false}, {"date": "2026-10-29", "ltr": 0.67, "pls": 2.75, "intraday": false}, {"date": "2026-10-30", "ltr": 0.62, "pls": 2.64, "intraday": false}, {"date": "2026-11-02", "ltr": 0.6, "pls": 2.61, "intraday": false}, {"date": "2026-11-03", "ltr": 0.61, "pls": 2.63, "intraday": false}, {"date": "2026-11-04", "ltr": 0.6, "pls": 2.6, "intraday": false}, {"date": "2026-11-05", "ltr": 0.67, "pls": 2.83, "intraday": false}, {"date": "2026-11-06", "ltr": 0.65, "pls": 2.83, "intraday": false}, {"date": "2026-11-09", "ltr": 0.68, "pls": 2.89, "intraday": false}, {"date": "2026-11-10", "ltr": 0.69, "pls": 2.91, "intraday": false}, {"date": "2026-11-11", "ltr": 0.71, "pls": 3.1, "intraday": false}, {"date": "2026-11-12", "ltr": 0.67, "pls": 2.85, "intraday": false}, {"date": "2026-11-13", "ltr": 0.66, "pls": 2.86, "intraday": false}, {"date": "2026-11-16", "ltr": 0.64, "pls": 2.89, "intraday": false}, {"date": "2026-11-17", "ltr": 0.6, "pls": 2.64, "intraday": false}, {"date": "2026-11-18", "ltr": 0.59, "pls": 2.6, "intraday": false}, {"date": "2026-11-19", "ltr": 0.58, "pls": 2.56, "intraday": false}], "evidence": [{"observed": "2026-11-13", "published": "2026-11-13", "metric": "SMM weekly carbonate inventory", "value": 122644, "unit": "mt", "scope": "SMM weekly, post-Sep revision", "source": "SMM", "method": "weekly estimate", "confidence": "medium", "next_due": "2026-11-27"}, {"observed": "2026-11-18", "published": "2026-11-18", "metric": "LFP cathode output", "value": 141600, "unit": "t/week", "scope": "China, SMM estimate", "source": "SMM", "method": "weekly estimate", "confidence": "medium", "next_due": "2026-11-25"}, {"observed": "2026-11-18", "published": "2026-11-18", "metric": "Ternary cathode output", "value": 18000, "unit": "t/week", "scope": "China, SMM estimate; down 9 straight weeks", "source": "SMM", "method": "weekly estimate", "confidence": "medium", "next_due": "2026-11-25"}, {"observed": "2026-10-31", "published": "2026-11-20", "metric": "China spodumene imports", "value": 1004300, "unit": "t", "scope": "October, record; about 80,200 t LCE", "source": "SMM (customs data)", "method": "monthly", "confidence": "medium", "next_due": "2026-12-20"}, {"observed": "2026-11-17", "published": "2026-11-17", "metric": "Albemarle spodumene auction", "value": 1241.5, "unit": "USD/dmt SC6 CIF", "scope": "16,785 dmt", "source": "SMM flash", "method": "auction result", "confidence": "medium"}, {"observed": "2026-10-15", "published": "2026-10-15", "metric": "GFEX receipts change since early Sep", "value": -17378, "unit": "t", "scope": "GFEX LC registered receipts", "source": "Mysteel", "method": "analysis", "confidence": "medium"}, {"observed": "2026-11-17", "published": "2026-11-17", "metric": "Cochilco 2026 balance forecast", "value": -79000, "unit": "t LCE (deficit)", "scope": "demand 2.08 Mt vs supply 2.0 Mt; Q4 price near US$19,000/t", "source": "Cochilco via IndustrialInfo", "method": "forecast", "confidence": "low"}]}, "context": ["Q3 2026: three consecutive deficit months (about 84,000 mt LCE) while prices fell; destocking of about 68,000 mt filled the deficit, so inventory acted as a buffer.", "SMM revised its weekly inventory scope on 4 Sep 2026: the headline jumped from 78,800 t to about 175,000 t. Do not compare levels across the break.", "Per SMM, LFP output implies roughly 34,000 t LCE/week of carbonate use. No dated days-of-inventory series is loaded, so the dashboard does not score cover. Mysteel projects inventory days near 15 in November.", "Nov 17: LC2701 rallied to a 93,180 close on lower open interest while spot kept falling. That is consistent with short covering, but aggregate OI cannot identify who initiated trades.", "GFEX parameters 18 Nov (third-party compile): speculative margin 15%, price limit 13%, fee 0.008% of turnover. Exchange notices also cap daily opening volume: check contract-level limits before treating any spread as tradable.", "Cochilco's Q4 price near US$19,000/t is far above current spot of about US$13,700/t: treat with caution."]};
+const BUNDLED_INV = {"schema": "lithium-inventory/3", "updated": "2026-11-22", "config": {"usable_share_pct": 100, "divergence_threshold_pct": 1.0, "stale_days": 8}, "scope_note": "SMM weekly carbonate inventory under the method adopted 4 Sep 2026 (four segments: upstream, cathode plant, trade, battery-cell plant and other). Do not splice rows from the earlier methods.", "weekly": [{"date": "2026-09-04", "total": 175000, "approx": true, "segments": {"upstream": "down", "cathode": "up", "trade": "down"}, "method_break": true, "source": "Bloomberg via Mining.com (11 Sep); SMM announcement 4 Sep", "note": "first reading under the new method, rounded; the old method showed 78,800 t the week before. Weekly levels from 11 Sep to 15 Oct are not loaded"}, {"date": "2026-10-22", "total": 130279, "derived": true, "segments": {}, "source": "derived: 128,385 + 1,894", "note": ""}, {"date": "2026-10-29", "total": 128385, "change": -1894, "spot": 96100, "segments": {"upstream": "up", "cathode": "down"}, "source": "SMM morning meeting summary, 30 Oct", "note": "smelter stocks kept building; downstream drew on long-term and customer-supplied material"}, {"date": "2026-11-05", "total": 125391, "change": -2994, "spot": 91700, "segments": {"upstream": "down", "cathode": "down", "trade": "down"}, "source": "SMM analysis, 5 Nov", "note": "synchronized destocking across segments; cathode plants held no excess stock"}, {"date": "2026-11-12", "total": 122644, "change": -2747, "spot": 90650, "segments": {"upstream": "up", "cathode": "down"}, "source": "SMM weekly comment, 12 Nov", "note": "slight upstream build; downstream material plants and cell makers kept falling"}, {"date": "2026-11-19", "direction": "down", "consecutive_decline_weeks": 7, "spot": 91300, "segments": {"upstream": "down", "cathode": "down", "trade": "up"}, "source": "SMM weekly comment, 19 Nov", "note": "level not in free text. Smelters switched from building to destocking as futures rebounded; traders built slightly on weak transactions"}], "mysteel": [{"date": "2026-06-05", "total": 203000, "approx": true, "segments": {}, "source": "Mysteel, 9 Oct analysis", "note": "'early June', start of the 207-sample decline"}, {"date": "2026-07-29", "total": 162450, "change": -6950, "segments": {}, "source": "Mysteel, 30 Jul", "note": "first week of the 207-sample series: converters 74, traders 61, cathode makers and end-users 72"}, {"date": "2026-09-30", "total": 113600, "approx": true, "segments": {}, "source": "Mysteel, 9 Oct analysis", "note": "end-September; traders 47,000 t; -44% in total since June"}, {"date": "2026-10-09", "total": 113560, "derived": true, "segments": {}, "source": "derived: 103,330 + 10,230", "note": ""}, {"date": "2026-10-16", "total": 103330, "change": -10230, "segments": {"upstream": "up", "trade": "down", "cathode": "down"}, "source": "CME / Voltaire newsletter, 16 Oct (citing Mysteel)", "note": "traders -20%, end-users -9%, smelters +30% WoW. Date is the newsletter date"}, {"date": "2026-10-23", "total": 99280, "change": -4050, "segments": {"upstream": "up", "trade": "down", "cathode": "down"}, "source": "CME / Voltaire newsletter, 23 Oct (citing Mysteel)", "note": "traders -28% and end-users -15.5% over two weeks, smelters +50%; end-users hold 44,100 t (44%)"}, {"date": "2026-11-04", "change_pct": -0.63, "segments": {"upstream": "down", "trade": "up", "cathode": "down"}, "aligns": "2026-11-05", "source": "Mysteel, 5 and 9 Nov", "note": "traders rebuilt for a second week; rising warrants early in the week ended the destocking trend seen since October"}, {"date": "2026-11-13", "direction": "down", "segments": {"upstream": "up", "trade": "down", "cathode": "up"}, "aligns": "2026-11-12", "source": "Mysteel inventory alert, 16 Nov", "note": "destocking pace widened slightly and levels hit new yearly lows, yet converters built stock (low spot selling), traders drew down and cathode plants and end-users built mildly. Survey covers about 80% of samples"}], "receipts_history": [{"date": "2026-07-03", "quantity": 48578, "source": "CME / Voltaire newsletter, 3 Jul", "note": "after falling 7.5 kt from a 56,045 t peak"}, {"date": "2026-10-09", "quantity": 30680, "source": "CME / Voltaire newsletter, 16 Oct"}, {"date": "2026-10-12", "quantity": 30677, "source": "CME / Voltaire newsletter, 16 Oct"}, {"date": "2026-10-13", "quantity": 29643, "source": "CME / Voltaire newsletter, 16 Oct"}, {"date": "2026-10-14", "quantity": 28461, "source": "CME / Voltaire newsletter, 16 Oct"}, {"date": "2026-10-15", "quantity": 26730, "source": "CME / Voltaire newsletter, 16 Oct"}, {"date": "2026-10-16", "quantity": 25640, "source": "CME / Voltaire newsletter, 23 Oct", "note": "the 16 Oct edition showed 26,730 for this date"}, {"date": "2026-10-19", "quantity": 23552, "source": "CME / Voltaire newsletter, 23 Oct"}, {"date": "2026-10-20", "quantity": 23172, "source": "CME / Voltaire newsletter, 23 Oct"}, {"date": "2026-10-21", "quantity": 21695, "source": "CME / Voltaire newsletter, 23 Oct"}, {"date": "2026-10-22", "quantity": 20952, "source": "CME / Voltaire newsletter, 23 Oct"}, {"date": "2026-10-23", "quantity": 20952, "source": "CME / Voltaire newsletter, 23 Oct", "note": "unchanged from the prior day"}], "benchmarks": [{"date": "2026-07-17", "fm_spod6": 2215, "fm_carb": 19.5, "note": "Mysteel battery-grade 152,450 CNY/t that day", "source": "CME / Voltaire newsletter, 17 Jul"}, {"date": "2026-10-16", "fm_spod6": 1363, "fm_carb": 13.75, "smm_carb_cny": 102150, "note": "week of the EU hybrid-quota shock", "source": "CME / Voltaire newsletter, 16 Oct"}, {"date": "2026-10-23", "fm_spod6": 1300, "fm_carb": 13.7, "smm_carb_cny": 97000, "fm_vs_smm_exvat": 0.42, "note": "Fastmarkets carbonate sat US$0.42/kg above SMM ex-VAT", "source": "CME / Voltaire newsletter, 23 Oct"}, {"date": "2026-10-27", "fm_carb": 13.9, "fm_carb_range": "12.80-15.00", "note": "daily CIF China-Japan-Korea assessment, midpoint of range; the 2026 high was 24.50-25.80 on 11 May", "source": "Fastmarkets, 28 Oct"}], "supply_demand": [{"period": "2026-06", "item": "China carbonate consumption", "value_t": 151000, "kind": "estimate", "note": "up from about 124,700 t in January", "source": "CME / Voltaire (citing Mysteel), 17 Jul"}, {"period": "2026-08", "item": "Expected inventory drawdown", "value_t": -22000, "kind": "forecast", "note": "Mysteel's August expectation", "source": "Mysteel, 12 Aug"}, {"period": "2026-09", "item": "Carbonate production", "value_t": 114700, "kind": "actual", "note": "+7.7% m/m, below guidance as lepidolite ramp-up lagged", "source": "Mysteel, 8 Oct"}, {"period": "2026-09", "item": "LFP cathode output", "value_t": 603200, "kind": "actual", "note": "+4.78% m/m", "source": "Mysteel, 8 Oct"}, {"period": "2026-09", "item": "China lithium imports, all forms", "value_t": 122000, "kind": "actual", "note": "t LCE, +5.3% m/m; spodumene 87 kt LCE; Jan-Sep 942 kt LCE, +38% y/y", "source": "CME / Voltaire, 23 Oct"}, {"period": "2026-10", "item": "Monthly supply-demand balance", "value_t": -29000, "kind": "forecast", "note": "Mysteel's 8 Oct expectation of a widening deficit", "source": "Mysteel, 8 Oct"}, {"period": "2026-10", "item": "Carbonate production", "value_t": 117700, "kind": "actual", "note": "+2.7% m/m; schedule had been 115,900 t", "source": "Mysteel, 3 Nov"}, {"period": "2026-10", "item": "China spodumene imports", "value_t": 1004300, "kind": "actual", "note": "record; about 80,200 t LCE (-1.45% m/m). Concentrate 673,100 t (-2.28%), raw ore 331,200 t (+17.75%); Australian concentrate -32% to 303,400 t; Mali 95,700 t and Canada 27,200 t from zero; Zimbabwe 137,900 t; Nigeria 92,800 t", "source": "SMM, 20 Nov (customs data)"}, {"period": "2026-11", "item": "Carbonate production", "kind": "forecast", "note": "expected +3.5% m/m (about 121,800 t implied)", "source": "Mysteel, 3 and 13 Nov"}, {"period": "2026-11", "item": "LFP cathode output", "kind": "forecast", "note": "expected -1.15% m/m, reversing the upward Q4 revisions seen on 9 Oct", "source": "Mysteel, 13 Nov"}, {"period": "2026-11", "item": "Expected inventory drawdown", "value_t": -15600, "kind": "forecast", "note": "narrowing; no proactive restocking seen near 90,000 yuan/t", "source": "Mysteel, 12 Nov"}, {"period": "2026-11", "item": "Chile lithium salt shipments to China", "value_t": 19800, "kind": "actual", "note": "t LCE, rebound; sulphate arrivals rising fast", "source": "Mysteel, 13 Nov"}], "sources": [{"name": "SMM weekly carbonate inventory", "scope": "four segments since 4 Sep 2026; backdated to 30 Apr", "method": "estimates from public information, market communication and SMM's internal model", "issues": "Scope changed 4 Sep: headline jumped from 78,800 t to about 175,000 t, prices fell over 14% in three days, and an SMM official said the impact may have been underestimated. SMM also says customs timing and sample verification can cause deviations", "cadence": "weekly, Thursday", "cost": "headline free, detail paywalled"}, {"name": "Mysteel weekly carbonate inventory", "scope": "207 samples: converters 74, traders 61-62, cathode makers and end-users 72", "method": "survey", "issues": "About 80% of samples responded as of 16 Nov, so absolute levels carry deviation. Levels are lower than SMM's, and the two surveys can disagree on segment direction", "cadence": "weekly, Monday alert", "cost": "alerts free, data paywalled"}, {"name": "Benchmark monthly chemicals inventory", "scope": "carbonate and hydroxide, China", "method": "analyst tracking", "issues": "Reports -2.8% m/m in August and -10.0% year to date, with no usual H1 build and H2 drawdown", "cadence": "monthly", "cost": "summary free"}, {"name": "GFEX registered receipts", "scope": "exchange-registered stock only", "method": "exchange daily report", "issues": "Registered stock moves when holders cancel or re-register receipts, so a rise can be hidden stock becoming visible, not new supply. Units appear as tonnes in some reports and lots in others. Two newsletter editions disagreed on 16 Oct", "cadence": "daily", "cost": "free"}, {"name": "Fastmarkets benchmarks via CME / Voltaire newsletter", "scope": "spodumene 6% CIF Asia, carbonate CIF Asia", "method": "price assessment, reproduced by a third party", "issues": "Secondary source; weekly points only, and the newsletter files for 30 Oct to 20 Nov could not be retrieved", "cadence": "weekly", "cost": "free"}], "notes": ["Mysteel (12 Aug) on the destocking-with-falling-prices paradox: the market shifted its pricing focus from the monthly inventory drawdown to expectations of weaker demand and more supply in 2027, and would keep pricing that until drawdowns turn into spot tightness.", "Mysteel (12 Nov): warrants fell to a yearly low after concentrated cancellations at end-October, then rose each day in November as a weak basis and wide near-far spreads reopened delivery; some stock is moving from hidden inventory into visible warrants."], "grade_spread": [{"date": "2026-10-26", "bg": 96400, "ig": 93000, "unit": "CNY/t low-end quotes, VAT incl.", "source": "SMM daily review 26 Oct"}, {"date": "2026-11-16", "bg": 89550, "ig": 84600, "unit": "CNY/t, VAT incl.", "source": "SMM daily review 16 Nov"}, {"date": "2026-11-20", "bg": 12115.51, "ig": 11718.07, "unit": "USD/t, SMM-converted", "source": "SMM price table 20 Nov"}]};
+const BUNDLED_DEM = {"schema": "lithium-demand-gwh/1", "updated": "2026-11-22", "config": {"lce_t_per_gwh": 650, "stale_days": 45}, "scope_note": "CABIA monthly China battery data (via CnEVPost, Gasgoo and others). Installations (cells fitted to domestic vehicles), sales (domestic + export shipments) and production (combined power + ESS cell output) use different bases and are NOT additive.", "monthly": [{"month": "2026-07", "published": "2026-08-18", "power_installs_gwh": 74.6, "power_installs_yoy_pct": 33.5, "lfp_installs_gwh": 63.1, "lfp_share_pct": 84.6, "combined_output_gwh": 218.0, "combined_output_yoy_pct": 62.9, "ess_sales_gwh": 56.1, "ess_sales_yoy_pct": 55.4, "source": "CABIA via CnEVPost / ChinaEVHome (18 Aug 2026)"}, {"month": "2026-08", "published": "2026-09-16", "power_installs_gwh": 79.0, "power_installs_yoy_pct": 26.3, "source": "CABIA via CnEVPost / Zhongauto (16 Sep 2026)"}, {"month": "2026-09", "published": "2026-10-15", "power_installs_gwh": 87.2, "power_installs_yoy_pct": 14.7, "lfp_installs_gwh": 74.5, "lfp_share_pct": 85.5, "combined_output_gwh": 237.8, "combined_output_yoy_pct": 57.3, "ess_sales_gwh": 73.5, "ess_sales_yoy_pct": 104.4, "source": "CABIA via CnEVPost / Gasgoo (15 Oct 2026)"}, {"month": "2026-10", "published": "2026-11-19", "power_installs_gwh": 99.4, "power_installs_yoy_pct": 18.2, "lfp_installs_gwh": 86.3, "lfp_share_pct": 86.9, "combined_output_gwh": 245.1, "ess_sales_gwh": 71.7, "ess_sales_yoy_pct": 70.5, "ess_exports_gwh": 17.1, "ess_exports_yoy_pct": 94.4, "nev_retail_yoy_pct": -13.7, "source": "CABIA via CnEVPost and others (19 Nov); CPCA retail -13.7% y/y"}], "balance_views": [{"source": "Cochilco", "year": 2026, "balance_kt_lce": -79, "stance": "Deficit", "driver": "Demand 2.08 Mt vs supply 2.00 Mt; Q4 price assumption near US$19,000/t (far above spot)", "date": "2026-11-17"}, {"source": "Citi", "year": 2027, "balance_kt_lce": 47, "stance": "Surplus", "driver": "Cut 2027 spodumene price deck 38% on China supply rebound", "date": "2026-11-20"}, {"source": "Goldman Sachs", "year": 2028, "balance_kt_lce": 444, "stance": "Surplus", "driver": "Restocking demand fades from 462 kt to about 7 kt; assumes China BESS peaks in 2027", "date": "2026-10-09"}, {"source": "YJ Lee (Arcane)", "year": 2028, "balance_kt_lce": -204, "stance": "Deficit", "driver": "Challenges the BESS peak thesis; expects sustained storage, e-truck and global demand growth", "date": "2026-11-19"}]};
+const SHEET_SPEC = {"inventory_weekly": {"req": ["date"], "cols": {"date": "d", "total": "n", "change": "n", "spot": "n", "spot_verified": "b", "direction": "t", "consecutive_decline_weeks": "n", "upstream": "s", "cathode": "s", "trade": "s", "approx": "b", "derived": "b", "method_break": "b", "source": "t", "note": "t"}}, "mysteel": {"req": ["date"], "cols": {"date": "d", "total": "n", "change": "n", "change_pct": "n", "direction": "t", "upstream": "s", "cathode": "s", "trade": "s", "aligns": "d", "approx": "b", "derived": "b", "source": "t", "note": "t"}}, "receipts_history": {"req": ["date", "quantity"], "cols": {"date": "d", "quantity": "n", "source": "t", "note": "t"}}, "benchmarks": {"req": ["date"], "cols": {"date": "d", "fm_spod6": "n", "fm_carb": "n", "fm_carb_range": "t", "smm_carb_cny": "n", "fm_vs_smm_exvat": "n", "note": "t", "source": "t"}}, "supply_demand": {"req": ["period", "item"], "cols": {"period": "t", "item": "t", "value_t": "n", "kind": "t", "note": "t", "source": "t"}}, "grade_spread": {"req": ["date", "bg", "ig"], "cols": {"date": "d", "bg": "n", "ig": "n", "unit": "t", "source": "t"}}, "sgx_licf": {"req": ["date", "contract", "price_usd_kg"], "cols": {"date": "d", "contract": "t", "price_usd_kg": "n", "note": "t"}}, "spodumene": {"req": ["date", "price_usd_t"], "cols": {"date": "d", "price_usd_t": "n", "low": "n", "high": "n", "chg_pct": "n", "volume_dmt": "n", "kind": "t", "note": "t"}}, "smm_spot": {"req": ["date", "avg"], "cols": {"date": "d", "avg": "n", "low": "n", "high": "n", "chg": "n", "verified": "b", "kind": "t", "source": "t", "note": "t"}}, "cathode": {"req": ["date"], "cols": {"date": "d", "lfp_t_week": "n", "ternary_t_week": "n", "ternary_down_weeks": "n", "lce_per_t_lfp": "n"}}, "evidence": {"req": ["observed", "metric"], "cols": {"observed": "d", "published": "d", "metric": "t", "value": "n", "unit": "t", "scope": "t", "source": "t", "method": "t", "confidence": "t", "next_due": "d"}}, "cabia_monthly": {"req": ["month"], "cols": {"month": "m", "published": "d", "power_installs_gwh": "n", "power_installs_yoy_pct": "n", "lfp_installs_gwh": "n", "lfp_share_pct": "n", "combined_output_gwh": "n", "combined_output_yoy_pct": "n", "ess_sales_gwh": "n", "ess_sales_yoy_pct": "n", "ess_exports_gwh": "n", "ess_exports_yoy_pct": "n", "nev_retail_yoy_pct": "n", "source": "t"}}, "balance_views": {"req": ["source", "year", "balance_kt_lce"], "cols": {"source": "t", "year": "n", "balance_kt_lce": "n", "stance": "t", "driver": "t", "date": "d"}}};
+const clone = o => JSON.parse(JSON.stringify(o));
+let S = clone(BUNDLED_S), INV = clone(BUNDLED_INV), DEM = clone(BUNDLED_DEM);
+let CFG = {sheet_id:''}, SHEET_REPORT = null;
+let FX_OVERRIDE = null;
+const VAT = 0.13, LCE_PER_LI2O = 2.473;
 const fmt=(n,d=0)=>(n==null||isNaN(n))?'\u2014':Number(n).toLocaleString('en-AU',{maximumFractionDigits:d,minimumFractionDigits:d});
 const pct=(n,d=1)=>(n==null||isNaN(n))?'\u2014':(n>0?'+':'')+(n*100).toFixed(d)+'%';
+const fmtSign=(n,d=1)=>(n==null||isNaN(n))?'\u2014':(n>0?'+':'')+Number(n).toFixed(d)+'%';
 const last=a=>a&&a.length?a[a.length-1]:null;
 const $=id=>document.getElementById(id);
-const ser=k=>(S.series&&S.series[k])||[];
+const ser=k=>((S.series&&S.series[k])||[]).slice().sort((a,b)=>a.date<b.date?-1:1);
 const byDate=k=>{const m={};ser(k).forEach(r=>m[r.date]=r);return m;};
-const FX=()=>parseFloat($('fx').value)||S.fx_usdcny||6.6665;
-const YLD=()=>parseFloat($('yld').value)||8;
-const dayDiff=(a,b)=>(new Date(b)-new Date(a))/864e5;
+const dayDiff=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
+const asOf=()=>(S.generated_at||'').slice(0,10);
+const ageOf=d=>dayDiff(d,asOf());
+const isStale=(d,max)=>d==null||ageOf(d)>max;
+const P=()=>S.params||{};
+const num=(id,def)=>{const v=parseFloat($(id).value);return isNaN(v)?def:v;};
+const GRADE=()=>num('grade',P().sc6_grade_pct||6);
+const REC=()=>num('rec',P().conversion_recovery_pct||85);
+const sc6Per=(rec)=>1/((GRADE()/100)*LCE_PER_LI2O*((rec==null?REC():rec)/100));
+const SC=()=>({fin:num('sc-fin',4),sto:num('sc-sto',20),hnd:num('sc-hnd',300),fee:num('sc-fee',0.008),mrg:num('sc-mrg',15),adv:num('sc-adv',10),tpl:num('sc-tpl',1)});
+const arrow=v=>v==='up'?'\u25B2':v==='down'?'\u25BC':v==='flat'?'\u25AC':'\u2014';
+const acell=s=>'<td>'+arrow(s)+'</td>';
+const sw=(c,t)=>'<span><span class="swatch" style="background:'+c+'"></span>'+t+'</span>';
+function readNum(k,def){try{const v=parseFloat(localStorage.getItem(k));return isNaN(v)?def:v;}catch(e){return def;}}
+let usable=readNum('lm-inv-usable',null), convRefCost=readNum('lm-conv-ref-cost',2500), lcePerGwh=readNum('lm-lce-per-gwh',null);
+const usableShare=()=>usable!=null?usable:((INV.config||{}).usable_share_pct!=null?INV.config.usable_share_pct:100);
+const lceGwh=()=>lcePerGwh!=null?lcePerGwh:((DEM.config||{}).lce_t_per_gwh||650);
 
-function computeSignals(){
- const out=[],fx=FX(),smm=byDate('smm_spot');
- const rec=ser('gfex_receipts');
- if(rec.length>=2){const a=rec[0],b=last(rec),ch=b.quantity-a.quantity;
-  out.push({n:'GFEX receipts trend',r:fmt(a.quantity)+' \u2192 '+fmt(b.quantity)+' mt ('+(ch>0?'+':'')+fmt(ch)+') over '+rec.length+' prints',t:ch>0?'bear':ch<0?'bull':'mixed',w:'Rising receipts add deliverable supply; falling receipts tighten delivery.',c:rec.length<5?'low: needs 5+ prints':'ok'});}
- else out.push({n:'GFEX receipts trend',r:'insufficient data',t:'na',w:'Needs at least two prints.',c:'none'});
- const gs=ser('gfex_futures').filter(r=>r.settle!=null).sort((a,b)=>a.date<b.date?-1:1);
- const gl=last(gs);
- if(gl&&gs.length>=2&&gl.oi_change!=null){
-  const p=gs[gs.length-2];
-  if(dayDiff(p.date,gl.date)<=4){
-   const dp=gl.settle-p.settle,up=dp>0,oiUp=gl.oi_change>0;
-   let t,lab;
-   if(up&&oiUp){t='bull';lab='new longs entering';}else if(up&&!oiUp){t='mixed';lab='short covering, not fresh buying';}
-   else if(!up&&oiUp){t='bear';lab='new shorts building';}else{t='bear';lab='long liquidation';}
-   out.push({n:'Price vs open interest',r:gl.date+': settle '+pct(dp/p.settle)+', OI '+(gl.oi_change>0?'+':'')+fmt(gl.oi_change)+' lots \u2192 '+lab,t:t,w:'Price up with OI down is covering; price down with OI up is systematic shorting.',c:'ok (one session)'});
-  }else out.push({n:'Price vs open interest',r:'no consecutive settlements',t:'na',w:'',c:'none'});
- }else out.push({n:'Price vs open interest',r:'no settlement with OI change',t:'na',w:'',c:'none'});
- if(gl&&gl.volume!=null&&gl.oi){const x=gl.volume/gl.oi;
-  out.push({n:'Turnover / OI',r:gl.date+': '+x.toFixed(2)+'x ('+fmt(gl.volume)+' lots vs OI '+fmt(gl.oi)+')',t:x>1?'mixed':'info',w:'Above 1x means speculative, intraday-heavy trading; moves are less anchored to physical.',c:'ok'});}
- let bd=null;for(const r of gs.slice().reverse()){if(smm[r.date]&&smm[r.date].avg!=null){bd=r;break;}}
- if(bd){const sp=smm[bd.date].avg,d=sp-bd.settle,rel=d/bd.settle;
-  out.push({n:'Spot vs futures',r:bd.date+': spot '+fmt(sp)+' vs settle '+fmt(bd.settle)+' = '+(d>0?'+':'')+fmt(d)+' ('+pct(rel,2)+')',t:rel>0.005?'bull':rel<-0.005?'bear':'mixed',w:'Spot at a premium (backwardation) is bullish; spot at a discount (contango) is bearish.',c:'ok'});}
- const sg=last(ser('sgx_licf')),sm=last(ser('smm_spot'));
- if(sg&&sm){const sx=sg.price_usd_kg*1000*fx,ex=sm.avg/(1+VAT);
-  out.push({n:'SGX CIF CJK vs China ex-VAT',r:'SGX '+fmt(sx)+' vs SMM '+fmt(ex)+' CNY/mt = '+pct(sx/ex-1,0),t:'info',w:'Different delivery terms and benchmarks. Watch the trend of the premium: widening favours the physical-deficit view.',c:'low: delayed, thin SGX, no history'});}
- const inv=last(ser('inventory'));
- if(inv)out.push({n:'Inventory level',r:fmt(inv.total)+' mt ('+inv.date+'), '+(inv.trend||'trend unknown')+'; downstream drawing while producers and traders hold more',t:'mixed',w:'Falling stocks support the deficit view, but ownership shifting to traders is a latent overhang.',c:'medium: single point, scope changed Sep 2026'});
- const ca=last(ser('cathode'));
- if(ca){const lce=ca.lfp_t_week*ca.lce_per_t_lfp;
-  out.push({n:'Cathode demand cover',r:'LFP '+fmt(ca.lfp_t_week)+' t/wk implies ~'+fmt(lce)+' t LCE/wk, above cathode-plant carbonate stocks (<1 week of cover); ternary down '+ca.ternary_down_weeks+' weeks',t:'bull',w:'Thin downstream cover means restocking demand arrives quickly if prices stabilise.',c:'medium: SMM weekly estimate'});}
- const sp=last(ser('spodumene'));
- if(sp&&sm){const carb=sm.avg/(1+VAT)/fx,raw=sp.price_usd_t*YLD(),spread=carb-raw;
-  out.push({n:'Conversion spread',r:'Carbonate US$'+fmt(carb)+'/t vs SC6 feed US$'+fmt(raw)+'/t LCE (at '+YLD().toFixed(1)+'x) = US$'+fmt(spread)+' ('+pct(spread/carb,0)+') before conversion cost',t:'info',w:'A thin spread means refiners may slow spodumene withdrawals, which tightens carbonate later.',c:'low: yield is an assumption'});}
- const eq=ser('equities').filter(r=>r.date>='2026-11-06');
- if(eq.length>=2&&smm['2026-11-06']&&sm){const e0=eq[0],e1=last(eq);
-  out.push({n:'LTR / PLS vs spot',r:'since '+e0.date+': LTR '+pct(e1.ltr/e0.ltr-1)+', PLS '+pct(e1.pls/e0.pls-1)+', SMM spot '+pct(sm.avg/smm[e0.date].avg-1),t:'info',w:'Equities falling faster than spot means the market is discounting forward weakness; shares are not a physical price.',c:'ok (short window)'});}
- return out;
+/* ---------- FX, spot, contracts ---------- */
+function fxAt(date){
+ if(FX_OVERRIDE) return {r:FX_OVERRIDE,k:'override'};
+ const l=ser('fx').filter(r=>r.usdcny);let best=null;for(const r of l){if(r.date<=date)best=r;}
+ if(best&&dayDiff(best.date,date)<=7) return {r:best.usdcny,k:'dated',d:best.date};
+ const lat=last(l);if(lat) return {r:lat.usdcny,k:'latest',d:lat.date};
+ return {r:S.fx_usdcny||6.6667,k:'latest',d:S.fx_date||null};
+}
+const fxTag=f=>f.k==='dated'?'FX '+f.r+' ('+f.d+')':f.k==='override'?'FX override '+f.r:'FX '+f.r+' latest, not dated to obs.';
+function spotOnOrBefore(date,gap){
+ const rows=ser('smm_spot').filter(r=>r.avg!=null&&r.kind!=='weekly'&&r.date<=date);
+ const l=last(rows);return(l&&dayDiff(l.date,date)<=gap)?l:null;
+}
+const cMonth=c=>{const m=/(\d{2})(\d{2})$/.exec(c||'');return m?{y:2000+ +m[1],mo:+m[2],idx:(2000+ +m[1])*12+ +m[2]}:null;};
+function mergeHistory(){
+ try{
+  S.series=S.series||{};
+  const arr=S.series.gfex_receipts=S.series.gfex_receipts||[];
+  (INV.receipts_history||[]).forEach(h=>{if(!arr.some(r=>r.date===h.date))arr.push({date:h.date,quantity:h.quantity,source:h.source||'newsletter',kind:'history',note:h.note||''});});
+  arr.sort((a,b)=>a.date<b.date?-1:1);
+ }catch(e){}
 }
 
+/* ---------- curve ---------- */
+function curveNow(){
+ const rows=ser('futures_curve');if(!rows.length)return null;
+ const D=rows[rows.length-1].date,dm=new Date(D),cur=dm.getFullYear()*12+dm.getMonth()+1;
+ const list=rows.filter(r=>r.date===D).map(r=>{const m=cMonth(r.contract);return Object.assign({},r,{m:m,px:r.settle!=null?r.settle:r.close,pxType:r.settle!=null?'settle':'close',to:m?m.idx-cur:null});}).filter(r=>r.px!=null&&r.m).sort((a,b)=>a.m.idx-b.m.idx);
+ return {date:D,list:list};
+}
+function pxChange(contract,D,k){
+ const rows=ser('futures_curve').filter(r=>r.contract===contract&&(r.settle!=null||r.close!=null));
+ const i=rows.findIndex(r=>r.date===D);if(i<k||i<0)return null;
+ const a=rows[i],b=rows[i-k];return (a.settle!=null?a.settle:a.close)-(b.settle!=null?b.settle:b.close);
+}
+function renderCurve(){
+ const c=curveNow();
+ if(!c||c.list.length<2){$('chart-curve').innerHTML='<p class="note gap">No curve data yet. The cloud job fills this after its first successful run.</p>';$('curve').innerHTML='';$('curve-note').textContent='';return;}
+ const L=c.list,tot=L.reduce((a,r)=>a+(r.oi||0),0),near=L.filter(r=>r.to<=2).reduce((a,r)=>a+(r.oi||0),0);
+ $('chart-curve').innerHTML=chartSVG([{color:'#4dd0e1',data:L.map(r=>[r.contract,r.px])}],230,d=>d.replace('LC',''));
+ let h='<tr><th>Contract</th><th>Months to delivery</th><th>Price</th><th>Type</th><th>vs prior contract</th><th>1d \u0394</th><th>5d \u0394</th><th>OI (lots)</th><th>% of OI</th><th>Volume</th><th>Vol / OI</th></tr>';
+ L.forEach((r,i)=>{h+='<tr><td>'+r.contract+'</td><td>'+(r.to===0?'delivery month':r.to)+'</td><td>'+fmt(r.px)+'</td><td>'+r.pxType+'</td><td>'+(i?(r.px-L[i-1].px>0?'+':'')+fmt(r.px-L[i-1].px):'\u2014')+'</td><td>'+fmt(pxChange(r.contract,c.date,1))+'</td><td>'+fmt(pxChange(r.contract,c.date,5))+'</td><td>'+fmt(r.oi)+'</td><td>'+(tot&&r.oi?(100*r.oi/tot).toFixed(1)+'%':'\u2014')+'</td><td>'+fmt(r.volume)+'</td><td>'+(r.oi&&r.volume!=null?(r.volume/r.oi).toFixed(2):'\u2014')+'</td></tr>';});
+ $('curve').innerHTML=h;
+ const f=L.filter(r=>r.to>=1),sh=f.length>=2?(f[1].px>f[0].px?'contango (later contracts dearer)':'backwardation (later contracts cheaper)'):'n/a';
+ $('curve-note').textContent=c.date+': '+L.length+' contracts. Shape of first two non-delivery months: '+sh+'. '+Math.round(100*near/(tot||1))+'% of open interest sits within 2 months of delivery. Each contract keeps its own history; expiry dates are not modelled.';
+}
+
+/* ---------- carry screen & delivery ---------- */
+function carryRows(){
+ const c=curveNow();if(!c)return null;
+ const s=spotOnOrBefore(c.date,3);if(!s)return {err:'no spot within 3 days of the curve date'};
+ const p=SC(),out=[];
+ c.list.filter(r=>r.to>=1).forEach(r=>{
+  const days=Math.max(1,(Date.UTC(r.m.y,r.m.mo-1,15)-Date.parse(c.date))/864e5),months=days/30.4;
+  const carry=k=>k*(s.avg*p.fin/100*days/365+p.sto*months+p.hnd+r.px*p.fee/100*2);
+  const gross=r.px-s.avg,nets=[0.5,1,1.5].map(k=>gross-carry(k));
+  out.push({c:r.contract,px:r.px,gross:gross,days:days,carry:carry(1),nets:nets,ann:nets[1]/s.avg*365/days,margin:r.px*p.mrg/100,buf:r.px*p.adv/100});
+ });
+ return {date:c.date,spot:s,rows:out};
+}
+function renderCarry(){
+ const R=carryRows();
+ if(!R){$('carry').innerHTML='';$('carry-note').textContent='Needs the futures curve (cloud job).';return;}
+ if(R.err){$('carry').innerHTML='';$('carry-note').textContent=R.err;return;}
+ let h='<tr><th>Contract</th><th>Price</th><th>Gross vs spot</th><th>Days (to mid-month)</th><th>Carry cost, base</th><th>Net low cost</th><th>Net base</th><th>Net high cost</th><th>Annualised (base)</th><th>Margin cash /t</th><th>Adverse-move buffer /t</th><th>Status</th></tr>';
+ R.rows.forEach(r=>{const st=r.nets[1]>0?(r.nets[2]>0?'Research candidate':'Marginal'):'No edge after assumed costs';
+  h+='<tr><td>'+r.c+'</td><td>'+fmt(r.px)+'</td><td>'+(r.gross>0?'+':'')+fmt(r.gross)+'</td><td>'+fmt(r.days)+'</td><td>'+fmt(r.carry)+'</td><td class="'+(r.nets[0]>0?'cell-good':'cell-bad')+'">'+fmt(r.nets[0])+'</td><td class="'+(r.nets[1]>0?'cell-good':'cell-bad')+'">'+fmt(r.nets[1])+'</td><td class="'+(r.nets[2]>0?'cell-good':'cell-bad')+'">'+fmt(r.nets[2])+'</td><td>'+pct(r.ann,1)+'</td><td>'+fmt(r.margin)+'</td><td>'+fmt(r.buf)+'</td><td style="text-align:left">'+st+'</td></tr>';});
+ $('carry').innerHTML=h;
+ $('carry-note').textContent='Buy deliverable physical at '+R.date+' spot (SMM '+fmt(R.spot.avg)+(R.spot.verified?'':', not SMM-verified')+') and sell the contract. Costs are scenario inputs (low 0.5x, high 1.5x). Screen only: assumes spot and futures share the VAT basis, ignores brand and warehouse eligibility, quality premiums, delivery fees, daily opening caps and minimum order sizes. Reverse (sell physical, buy futures) is not modelled. Execution is never verified here.';
+}
+function renderDelivery(){
+ const c=curveNow(),rec=last(ser('gfex_receipts').filter(r=>r.quantity!=null)),p=SC();
+ if(!c||!rec){$('deliv').innerHTML='';$('deliv-note').textContent='Needs both the curve and a receipts print.';return;}
+ const near=c.list.filter(r=>r.to<=1),lots=near.reduce((a,r)=>a+(r.oi||0),0),t=lots*p.tpl,stale=isStale(rec.date,3);
+ $('deliv').innerHTML='<tr><th>Item</th><th>Value</th></tr><tr><td>Registered receipts ('+rec.date+', '+ageOf(rec.date)+' days old)</td><td>'+fmt(rec.quantity)+' t'+(stale?' <span class="s-stale">stale</span>':'')+'</td></tr><tr><td>Open interest in contracts \u2264 1 month from delivery ('+near.map(r=>r.contract).join(', ')+')</td><td>'+fmt(lots)+' lots = '+fmt(t)+' t at '+p.tpl+' t/lot</td></tr><tr><td>Nearby OI tonnes / registered receipts</td><td>'+(stale?'not computed (receipts stale)':(rec.quantity?(t/rec.quantity).toFixed(2)+'x':'\u2014'))+'</td></tr>';
+ $('deliv-note').textContent='Context only, not a squeeze probability: most open interest is closed before delivery, receipts are only exchange-registered stock, and t/lot is an editable placeholder.';
+}
+
+/* ---------- inventory analysis (SMM, Mysteel) ---------- */
+const weekly=()=>(INV.weekly||[]).slice().sort((a,b)=>a.date<b.date?-1:1);
+const invStaleDays=()=>(INV.config||{}).stale_days||8;
+function analyse(){
+ const W=weekly(),lv=W.filter(r=>r.total!=null),latest=last(W),out={W:W,lv:lv,latest:latest};
+ let run=0;for(let i=lv.length-1;i>0;i--){const gap=dayDiff(lv[i-1].date,lv[i].date);if(gap>=6&&gap<=8&&lv[i].total<lv[i-1].total)run++;else break;}
+ out.run=run;out.stated=latest&&latest.consecutive_decline_weeks||null;
+ const pr=lv.filter(r=>r.spot!=null);
+ if(pr.length>=2){const a=pr[0],b=pr[pr.length-1];
+  out.pair={a:a,b:b,inv:b.total/a.total-1,spot:b.spot/a.spot-1,unverified:pr.some(r=>r.spot_verified===false)};
+  const lp=W.filter(r=>r.spot!=null),c=lp[lp.length-1];
+  if(c&&c.date>b.date)out.toLatest={a:a,c:c,spot:c.spot/a.spot-1,since:c.spot/b.spot-1,dir:c.direction||null};}
+ const brk=lv.find(r=>r.method_break);
+ if(brk&&lv.length>1){const l=lv[lv.length-1];out.sinceBreak={a:brk,b:l,chg:l.total/brk.total-1,kt:(l.total-brk.total)/1000};}
+ const seg=W.filter(r=>r.segments&&Object.keys(r.segments).length&&!r.method_break);
+ out.comp={weeks:seg.length,supplyBuild:seg.filter(r=>r.segments.upstream==='up'||r.segments.trade==='up').length,consumerDown:seg.filter(r=>r.segments.cathode==='down').length};
+ out.stale=latest?ageOf(latest.date)>invStaleDays():true;
+ out.lastLevel=last(lv.filter(r=>!r.approx));
+ return out;
+}
+function surveyAgreement(){
+ const W=weekly(),out={n:0,agree:0,items:[]};
+ (INV.mysteel||[]).filter(m=>m.aligns).forEach(m=>{const w=W.find(r=>r.date===m.aligns);if(!w)return;const sm=w.segments||{},my=m.segments||{};
+  [['upstream','Upstream / converters'],['cathode','Cathode / end-users'],['trade','Traders']].forEach(p=>{if(sm[p[0]]&&my[p[0]]){out.n++;const same=sm[p[0]]===my[p[0]];if(same)out.agree++;out.items.push({week:w.date,seg:p[1],smm:sm[p[0]],mys:my[p[0]],same:same});}});});
+ return out;
+}
+function classify(p,comp){
+ if(!p)return null;
+ const t=((INV.config||{}).divergence_threshold_pct||1)/100;
+ const mostly=comp&&comp.weeks>=3&&comp.supplyBuild>=Math.ceil(comp.weeks/2);
+ if(p.inv<-t&&p.spot<=t)return mostly?{tone:'mixed',text:'Inventory is falling mainly because consumers are destocking and buying little, while upstream or traders added stock in '+comp.supplyBuild+' of '+comp.weeks+' weeks. That reads as weak procurement more than physical tightness, although SMM also sees marginal improvement signals'}:{tone:'mixed',text:'Inventory falling while price is flat or lower: no price response to destocking so far'};
+ if(p.inv<-t&&p.spot>t)return {tone:'bull',text:'Inventory falling and price rising: price is responding to destocking'};
+ if(p.inv>t&&p.spot<-t)return {tone:'bear',text:'Inventory building and price falling: consistent with weak demand'};
+ if(p.inv>t&&p.spot>=-t)return {tone:'info',text:'Inventory building while price holds: watch for support'};
+ return {tone:'info',text:'Little change in inventory or price'};
+}
+function receiptsInfo(){
+ const rc=last(ser('gfex_receipts').filter(r=>r.quantity!=null)),A=analyse(),lvl=A.lastLevel,c=curveNow();
+ let nearT=null;if(c){nearT=c.list.filter(r=>r.to<=1).reduce((a,r)=>a+(r.oi||0),0)*SC().tpl;}
+ return {rc:rc,lvl:lvl,nearT:nearT,stale:rc?isStale(rc.date,3):true};
+}
+function gradeRows(){
+ return (INV.grade_spread||[]).slice().sort((a,b)=>a.date<b.date?-1:1).map(r=>{const sp=r.bg-r.ig,usd=/^USD/.test(r.unit||''),gf=ser('gfex_futures').find(x=>x.date===r.date&&x.settle!=null);return Object.assign({},r,{sp:sp,pct:sp/r.bg,usd:usd,gf:(!usd&&gf)?gf:null});});
+}
+
+/* ---------- demand ---------- */
+function latestDemand(){
+ const M=(DEM.monthly||[]).slice().sort((a,b)=>a.month<b.month?-1:1);if(!M.length)return null;
+ const lat=M[M.length-1];return {list:M,latest:lat,stale:lat.published?ageOf(lat.published)>((DEM.config||{}).stale_days||45):false};
+}
+
+/* ---------- signals ---------- */
+function computeSignals(){
+ const out=[],add=(n,r,t,w,c)=>out.push({n,r,t,w,c});
+ const rec=ser('gfex_receipts').filter(r=>r.quantity!=null);
+ if(rec.length>=6){const l=last(rec),b=rec[rec.length-6],ch=l.quantity-b.quantity;
+  if(isStale(l.date,3)) add('GFEX receipts, 5-report move','stale: latest print '+l.date+' is '+ageOf(l.date)+' days old','na','Receipts need a print within 3 days.','stale');
+  else add('GFEX receipts, 5-report move',fmt(b.quantity)+' \u2192 '+fmt(l.quantity)+' t ('+(ch>0?'+':'')+fmt(ch)+') over 5 reports',ch>0?'bear':ch<0?'bull':'mixed','Rising receipts add deliverable supply, though a rise can be hidden stock becoming visible; falling receipts tighten delivery.',(l.source||'').indexOf('AKShare')>=0?'ok: exchange report':'medium: manual or newsletter prints');}
+ else{const l=last(rec);add('GFEX receipts, 5-report move','only '+rec.length+' of 6 prints needed'+(l?'; latest '+l.date+' ('+ageOf(l.date)+' days old)':''),'na','Five-report move = latest print minus the print five reports earlier.','insufficient history');}
+ const gs=ser('gfex_futures').filter(r=>r.settle!=null),gl=last(gs);
+ if(gl&&gs.length>=2&&gl.oi_change!=null){const p=gs[gs.length-2];
+  if(isStale(gl.date,5)) add('Price vs open interest','stale: latest settlement '+gl.date+' is '+ageOf(gl.date)+' days old','na','','stale');
+  else if(dayDiff(p.date,gl.date)>4) add('Price vs open interest','no consecutive settlements','na','','none');
+  else{const dp=gl.settle-p.settle,up=dp>0,oiUp=gl.oi_change>0;let t,lab;
+   if(up&&oiUp){t='bull';lab='consistent with new long positions';}else if(up&&!oiUp){t='mixed';lab='consistent with short covering or long exits';}
+   else if(!up&&oiUp){t='bear';lab='consistent with new short positions';}else{t='bear';lab='consistent with long liquidation';}
+   add('Price vs open interest',(gl.contract||'contract')+' '+gl.date+': settle '+pct(dp/p.settle)+', OI '+(gl.oi_change>0?'+':'')+fmt(gl.oi_change)+' lots \u2192 '+lab,t,'Aggregate OI cannot identify who initiated trades; this is an inference, not proof.',p.derived?'medium: prior settlement is derived':'ok (one session)');}}
+ else add('Price vs open interest','no settlement with OI change','na','','none');
+ if(gl&&gl.volume!=null&&gl.oi&&!isStale(gl.date,5)){const x=gl.volume/gl.oi;
+  add('Turnover / OI',gl.date+': '+x.toFixed(2)+'x ('+fmt(gl.volume)+' lots vs OI '+fmt(gl.oi)+')',x>1?'mixed':'info','Turnover intensity: above 1x means more trading relative to positions held. It does not by itself show speculation.','ok');}
+ const sm=byDate('smm_spot');let bd=null;for(const r of gs.slice().reverse()){const s=sm[r.date];if(s&&s.avg!=null&&s.kind!=='weekly'){bd=r;break;}}
+ if(bd&&!isStale(bd.date,5)){const sp=sm[bd.date].avg,d=sp-bd.settle,rel=d/bd.settle;
+  add('Spot vs futures',(bd.contract||'contract')+' '+bd.date+': spot '+fmt(sp)+' vs settle '+fmt(bd.settle)+' = '+(d>0?'+':'')+fmt(d)+' ('+pct(rel,2)+')',rel>0.005?'bull':rel<-0.005?'bear':'mixed','Spot at a premium (backwardation) is bullish; at a discount (contango) bearish.',sm[bd.date].verified?'ok':'medium: spot not SMM-verified');}
+ else add('Spot vs futures','no same-date, fresh spot and settlement pair','na','','none');
+ const c=curveNow();
+ if(c&&c.list.length>=3&&!isStale(c.date,5)){const f=c.list.filter(r=>r.to>=1);
+  if(f.length>=2){const sp=f[1].px-f[0].px;add('Calendar spread',f[0].contract+'/'+f[1].contract+': '+(sp>0?'+':'')+fmt(sp)+' CNY/mt ('+(sp>0?'contango':'backwardation')+')','info','A nearby squeeze shows as a front premium over deferred contracts.','ok: '+c.list.length+' contracts');}}
+ const R=carryRows();
+ if(R&&R.rows){const n=R.rows.filter(r=>r.nets[1]>0).length;add('Carry screen',n+' of '+R.rows.length+' contracts show positive base-case net spread after placeholder costs','info','Screen only: execution, eligibility and opening caps are not checked.','low: placeholder costs');}
+ const sg=last(ser('sgx_licf').filter(r=>r.price_usd_kg!=null));
+ if(sg){const s=spotOnOrBefore(sg.date,3),f=fxAt(sg.date);
+  if(!s||isStale(sg.date,10)) add('SGX CIF CJK vs China ex-VAT','no matching spot or stale SGX print','na','','none');
+  else{const sx=sg.price_usd_kg*1000*f.r,ex=s.avg/(1+VAT);add('SGX CIF CJK vs China ex-VAT',sg.contract+' '+sg.date+': SGX '+fmt(sx)+' vs SMM '+fmt(ex)+' ('+s.date+') CNY/mt = '+pct(sx/ex-1,0),'info','Different delivery terms and benchmarks. Watch the trend of the premium.','low: delayed, thin; '+fxTag(f));}}
+ const A=analyse(),cl=classify(A.pair,A.comp),SA=surveyAgreement();
+ if(A.pair&&!A.stale){const tail=A.toLatest?'; spot '+pct(A.toLatest.spot)+' to '+A.toLatest.c.date+' with inventory '+(A.toLatest.dir||'direction n/a'):'';
+  add('Inventory vs price (SMM weekly)',A.pair.a.date+' \u2192 '+A.pair.b.date+': inventory '+pct(A.pair.inv)+', spot '+pct(A.pair.spot)+tail+'; '+(A.stated||A.run)+' consecutive weekly declines',cl.tone,cl.text+'.','low: short window; SMM and Mysteel agree on '+SA.agree+' of '+SA.n+' segment calls');}
+ else add('Inventory vs price (SMM weekly)',A.stale?'stale: latest week '+(A.latest?A.latest.date:'none'):'needs two weeks with level and spot','na','','stale or insufficient');
+ const RI=receiptsInfo();
+ if(RI.rc&&!RI.stale){const s=usableShare();add('Receipts, quality-adjusted',fmt(RI.rc.quantity*s/100)+' t usable at '+s+'% ('+fmt(RI.rc.quantity)+' t headline)'+(RI.lvl?', '+(100*RI.rc.quantity*s/100/RI.lvl.total).toFixed(1)+'% of SMM inventory':''),'info','Registered receipts can overstate usable supply. The haircut is a scenario.','low: haircut is an assumption');}
+ const G=gradeRows(),g=last(G);
+ if(g)add('Battery vs industrial grade',g.date+': industrial '+(g.pct*100).toFixed(1)+'% below battery ('+(g.unit||'')+')','info','A wide quality spread changes which spot price the futures should be compared with.','low: '+G.length+' pairs, mixed bases');
+ const ca=last(ser('cathode'));
+ if(ca)add('Cathode output',ca.date+': LFP '+fmt(ca.lfp_t_week)+' t/wk (~'+fmt(ca.lfp_t_week*(ca.lce_per_t_lfp||0.24))+' t LCE/wk implied); ternary down '+fmt(ca.ternary_down_weeks)+' weeks','info','Days of cover cannot be scored without a dated downstream inventory series.','SMM weekly estimate');
+ const sp=last(ser('spodumene'));
+ if(sp){const s=spotOnOrBefore(sp.date,3),f=fxAt(sp.date);
+  if(s&&!isStale(sp.date,7)){const carb=s.avg/(1+VAT)/f.r,raw=sp.price_usd_t*sc6Per(),spread=carb-raw;
+   add('Feedstock spread (not margin)','Carbonate US$'+fmt(carb)+'/t vs SC6 feed US$'+fmt(raw)+'/t LCE ('+sc6Per().toFixed(2)+' t SC6 at '+GRADE()+'% grade, '+REC()+'% recovery) = US$'+fmt(spread)+' ('+pct(spread/carb,0)+') before conversion cost','info','See the converter break-even grids for the cost range this spread must cover.','low: recovery is a scenario; '+fxTag(f));}
+  else add('Feedstock spread (not margin)','no matching spot or stale spodumene','na','','none');}
+ const eqm={};ser('equities').filter(r=>!r.intraday&&r.ltr!=null&&r.pls!=null).forEach(r=>eqm[r.date]=r);
+ const pairs=ser('smm_spot').filter(r=>r.verified&&r.avg!=null&&r.kind!=='weekly'&&eqm[r.date]);
+ if(pairs.length>=2){const a=pairs[0],b=last(pairs),e0=eqm[a.date],e1=eqm[b.date];
+  add('LTR / PLS vs spot',a.date+' \u2192 '+b.date+': LTR '+pct(e1.ltr/e0.ltr-1)+', PLS '+pct(e1.pls/e0.pls-1)+', SMM spot '+pct(b.avg/a.avg-1),'info','Verified rows and completed bars only. Shares reflect expected future prices and can lead or lag spot.','low: short window');}
+ else add('LTR / PLS vs spot','fewer than two verified common dates','na','','none');
+ const D=latestDemand();
+ if(D&&!D.stale){const r=D.latest,disc=(r.nev_retail_yoy_pct!=null&&r.nev_retail_yoy_pct<0&&r.power_installs_yoy_pct!=null&&r.power_installs_yoy_pct>10);
+  add('Battery demand (CABIA GWh)',r.month+': power installs '+fmt(r.power_installs_gwh,1)+' GWh ('+fmtSign(r.power_installs_yoy_pct)+' y/y), ESS sales '+fmt(r.ess_sales_gwh,1)+' GWh ('+fmtSign(r.ess_sales_yoy_pct)+' y/y), LFP '+(r.lfp_share_pct!=null?r.lfp_share_pct.toFixed(1)+'%':'\u2014'),r.power_installs_yoy_pct>10?'bull':'info',disc?'GWh demand is expanding even as domestic passenger EV unit headlines fall ('+fmtSign(r.nev_retail_yoy_pct)+' y/y).':'Tracks physical battery pull in GWh rather than vehicle counts.','medium: monthly CABIA release');}
+ return out;
+}
 function renderSignals(){
- const sg=computeSignals();
- const cnt=t=>sg.filter(x=>x.t===t).length;
- $('tally').innerHTML='<span class="t-bull">'+cnt('bull')+' bullish</span> &middot; <span class="t-bear">'+cnt('bear')+' bearish</span> &middot; <span class="t-mixed">'+cnt('mixed')+' mixed</span> &middot; <span class="t-info">'+(cnt('info')+cnt('na'))+' informational / no data</span>';
+ const sg=computeSignals(),cnt=t=>sg.filter(x=>x.t===t).length;
+ $('tally').innerHTML='<span class="t-bull">'+cnt('bull')+' bullish</span> &middot; <span class="t-bear">'+cnt('bear')+' bearish</span> &middot; <span class="t-mixed">'+cnt('mixed')+' mixed</span> &middot; <span class="t-info">'+cnt('info')+' informational</span> &middot; <span class="t-na">'+cnt('na')+' no data / stale</span>';
  const lab={bull:'Bullish',bear:'Bearish',mixed:'Mixed',info:'Info',na:'No data'};
  $('signals').innerHTML='<tr><th>Signal</th><th>Reading</th><th>Lean</th><th>Why it matters</th><th>Confidence</th></tr>'+sg.map(x=>'<tr><td>'+x.n+'</td><td>'+x.r+'</td><td class="t-'+x.t+'">'+lab[x.t]+'</td><td>'+x.w+'</td><td>'+x.c+'</td></tr>').join('');
 }
 
-function renderKPIs(){
- const fx=FX(),smmL=last(ser('smm_spot')),gs=ser('gfex_futures'),gSet=last(gs.filter(r=>r.settle!=null)),gL=last(gs),sgL=last(ser('sgx_licf')),recL=last(ser('gfex_receipts')),sp=last(ser('spodumene')),inv=last(ser('inventory')),eq=last(ser('equities'));
- const smm=byDate('smm_spot');
- const bd=gSet&&smm[gSet.date]?smm[gSet.date].avg-gSet.settle:null;
- const sx=sgL?sgL.price_usd_kg*1000*fx:null,ex=smmL?smmL.avg/(1+VAT):null,spr=(sx!=null&&ex!=null)?sx-ex:null;
- const cards=[
- {l:'SMM BG carbonate spot',v:smmL?fmt(smmL.avg)+' CNY/mt':'\u2014',s:smmL?smmL.date+(smmL.chg!=null?' \u00b7 '+(smmL.chg>0?'+':'')+fmt(smmL.chg)+' DoD':'')+' \u00b7 ~'+fmt(smmL.avg/fx)+' USD/t':'no data'},
- {l:'GFEX LC2701 settle',v:gSet?fmt(gSet.settle)+' CNY/mt':'\u2014',s:gSet?gSet.date+(gSet.oi!=null?' \u00b7 OI '+fmt(gSet.oi)+' lots':''):'no data'},
- {l:'Spot \u2212 futures (same date)',v:bd!=null?(bd>0?'+':'')+fmt(bd)+' CNY/mt':'\u2014',s:bd!=null?gSet.date+(bd>0?' \u00b7 spot premium (backwardation)':' \u00b7 spot discount (contango)'):'no same-date pair'},
- {l:'SGX LICF',v:sgL?sgL.price_usd_kg.toFixed(2)+' USD/kg':'\u2014',s:sgL?sgL.date+' \u00b7 delayed \u00b7 '+(spr!=null?(spr>0?'+':'')+fmt(spr)+' vs SMM ex-VAT':''):'no data'},
- {l:'Spodumene SC6 CIF China',v:sp?fmt(sp.price_usd_t,1)+' USD/t':'\u2014',s:sp?sp.date+' \u00b7 '+sp.kind:'manual feed'},
- {l:'GFEX receipts',v:recL?fmt(recL.quantity)+' mt':'<span class="gap">gap</span>',s:recL?recL.date+(recL.change!=null?' \u00b7 '+(recL.change>0?'+':'')+fmt(recL.change)+' t':'')+' \u00b7 manual':'no data'},
- {l:'SMM weekly inventory',v:inv?fmt(inv.total)+' mt':'\u2014',s:inv?inv.date+' \u00b7 '+(inv.trend||''):'no data'},
- {l:'LTR / PLS',v:eq?'A$'+eq.ltr.toFixed(2)+' / A$'+eq.pls.toFixed(2):'\u2014',s:eq?eq.date+(eq.note?' \u00b7 '+eq.note:''):'no data'}];
- $('kpis').innerHTML=cards.map(c=>'<div class="card"><div class="label">'+c.l+'</div><div class="value">'+c.v+'</div><div class="sub">'+c.s+'</div></div>').join('');
- $('asat').textContent=S.generated_at;
+/* ---------- inconsistency summary ---------- */
+function buildInconsistencies(sigs){
+ const rows=[],add=(area,status,cls,reading,takeaway)=>rows.push({area,status,cls,reading,takeaway});
+ const spSig=sigs.find(x=>x.n==='Spot vs futures'),oiSig=sigs.find(x=>x.n==='Price vs open interest'),calSig=sigs.find(x=>x.n==='Calendar spread');
+ if(!spSig||spSig.t==='na')add('Paper vs physical (China)','Blocked / stale','t-na',spSig?spSig.r:'No same-date spot and settlement pair','Wait for fresh matched spot and settlement.');
+ else{const stretched=spSig.t==='bull'||spSig.t==='bear';
+  const status=stretched?(spSig.t==='bull'?'Backwardation':'Contango'):'Aligned',cls=spSig.t==='bull'?'t-bull':spSig.t==='bear'?'t-bear':'t-mixed';
+  const bits=[spSig.r];if(oiSig&&oiSig.t!=='na')bits.push('OI: '+oiSig.r.split('\u2192').slice(-1)[0].trim());if(calSig&&calSig.t!=='na')bits.push(calSig.r);
+  add('Paper vs physical (China)',status,cls,bits.join(' \u00b7 '),spSig.t==='bear'?'Futures above spot: check the carry screen to see whether the contango clears costs.':spSig.t==='bull'?'Spot above futures: the physical market is paying a premium over paper.':'Spot and futures broadly aligned.');}
+ const sgSig=sigs.find(x=>x.n==='SGX CIF CJK vs China ex-VAT');
+ if(!sgSig||sgSig.t==='na')add('Regional split (SGX vs China)','Blocked / stale','t-na',sgSig?sgSig.r:'No matched SGX and spot print','Needs a fresh SGX print within 10 days.');
+ else{const m=/([+-]?\d+)%/.exec(sgSig.r),val=m?parseFloat(m[1]):null;
+  add('Regional split (SGX vs China)',val==null?'Info':(val>=10?'Wide ex-China premium':val<=-5?'Ex-China discount':'Normal range'),(val!=null&&Math.abs(val)>=10)?'t-mixed':'t-info',sgSig.r,'Different delivery terms (CIF CJK vs DDP) and thin SGX liquidity: track the trend, not an executable arb.');}
+ const sp=last(ser('spodumene')),sm=sp?spotOnOrBefore(sp.date,3):null;
+ if(!sp||!sm||isStale(sp.date,7))add('Converter economics (SC6 vs LCE)','Blocked / stale','t-na','No fresh matched spodumene and carbonate pair','Update the SC6 price on the spodumene tab.');
+ else{const f=fxAt(sp.date),carb=sm.avg/(1+VAT)/f.r,q=sc6Per(),be=(carb-convRefCost)/q,gap=be-sp.price_usd_t;
+  const status=gap<-50?'Converter squeeze':gap>50?'Positive conversion room':'Near break-even',cls=gap<-50?'t-mixed':gap>50?'t-bull':'t-info';
+  add('Converter economics (SC6 vs LCE)',status,cls,'Observed SC6 US$'+fmt(sp.price_usd_t,1)+'/t vs break-even US$'+fmt(be)+'/t (at '+REC()+'% recovery, US$'+fmt(convRefCost)+'/t conversion cost)',gap<-50?'Observed SC6 exceeds converter break-even at the assumed cost: spodumene must fall, carbonate must rise, or refiners slow intake.':gap>50?'Spot carbonate covers SC6 feed plus the assumed conversion cost.':'SC6 sits right at converter break-even under the assumed cost; small moves tip the margin.');}
+ const invSig=sigs.find(x=>x.n==='Inventory vs price (SMM weekly)');
+ if(invSig&&invSig.t!=='na')add('Inventory vs price (China)',invSig.t==='mixed'?'Disconnect':invSig.t==='bull'?'Confirming':invSig.t==='bear'?'Weak':'Neutral','t-'+invSig.t,invSig.r,invSig.w);
+ else add('Inventory vs price (China)','Blocked / stale','t-na','No fresh weekly inventory series loaded','Add the latest SMM week on the inventory_weekly tab.');
+ const D=latestDemand();
+ if(!D||D.stale)add('Demand: GWh vs EV headlines','Stale / missing','t-na','No recent monthly CABIA GWh release','Add the latest month on the cabia_monthly tab.');
+ else{const r=D.latest,disc=(r.nev_retail_yoy_pct!=null&&r.nev_retail_yoy_pct<0&&r.power_installs_yoy_pct!=null&&r.power_installs_yoy_pct>10);
+  const bits=[r.month+': power installs '+fmt(r.power_installs_gwh,1)+' GWh ('+fmtSign(r.power_installs_yoy_pct)+' y/y)'];
+  if(r.ess_sales_gwh!=null)bits.push('ESS sales '+fmt(r.ess_sales_gwh,1)+' GWh ('+fmtSign(r.ess_sales_yoy_pct)+' y/y)');if(r.nev_retail_yoy_pct!=null)bits.push('NEV retail '+fmtSign(r.nev_retail_yoy_pct)+' y/y');
+  add('Demand: GWh vs EV headlines',disc?'Headline disconnect':(r.power_installs_yoy_pct>10?'GWh expanding':'Softening'),r.power_installs_yoy_pct>10?'t-bull':'t-mixed',bits.join(' \u00b7 '),disc?'Negative car-unit headlines mask strong GWh growth from larger packs and energy storage.':'Track GWh pull rather than vehicle unit counts.');}
+ const eqSig=sigs.find(x=>x.n==='LTR / PLS vs spot');
+ if(!eqSig||eqSig.t==='na')add('Equities vs spot (sentiment)','Insufficient','t-na',eqSig?eqSig.r:'Need 2+ common verified dates','Builds as verified spot rows accumulate.');
+ else add('Equities vs spot (sentiment)','Divergence check','t-info',eqSig.r,'Equities price forward expectations; a broader basket would give a cleaner global gauge.');
+ return rows;
+}
+function renderStrip(){
+ const rows=buildInconsistencies(computeSignals()),active=rows.filter(r=>r.cls!=='t-na').length;
+ const flagged=rows.filter(r=>/Disconnect|Headline disconnect|Converter squeeze|Wide ex-China|Contango|Backwardation/.test(r.status)).length;
+ let h='<h2>Market inconsistency summary</h2><div class="inputs"><span>Reference conversion cost US$/t LCE (converter test) <input id="md-conv-cost" type="number" step="250" value="'+convRefCost+'"></span><span><b>'+flagged+'</b> stretched or disconnected &middot; <b>'+active+'</b> of '+rows.length+' checks active</span></div>';
+ h+='<table class="txt"><tr><th>Market mechanism</th><th>State</th><th>Latest reading</th><th>Implication</th></tr>'+rows.map(r=>'<tr><td><b>'+r.area+'</b></td><td class="'+r.cls+'">'+r.status+'</td><td>'+r.reading+'</td><td>'+r.takeaway+'</td></tr>').join('')+'</table><p class="note">Six broad market checks built from the live feeds below. A check reads Blocked / stale whenever its data fails the freshness rules. The thresholds (for example a 10% ex-China premium or a 50 US$/t converter band) are judgement calls, not tested rules, so treat the stretched count as a prompt to look, not a verdict.</p>';
+ $('inconsistency-strip').innerHTML=h;
+ const inp=$('md-conv-cost');if(inp)inp.addEventListener('change',()=>{const v=parseFloat(inp.value);if(!isNaN(v)&&v>=0){convRefCost=v;try{localStorage.setItem('lm-conv-ref-cost',String(v));}catch(e){}renderAll();}});
 }
 
-function chartSVG(series,h){
+/* ---------- confidence ---------- */
+function renderSheetReport(){
+ const R=SHEET_REPORT;
+ if(!R){$('sheet-report').innerHTML='<tr><td>No Google Sheet configured: the repo JSON files and embedded copies are in use.</td></tr>';return;}
+ const rows=Object.keys(R.tabs).map(k=>{const t=R.tabs[k];const cls=t.status==='ok'?'s-fresh':t.status==='empty'?'s-due':'s-fail';
+  return '<tr><td>'+k+'</td><td class="'+cls+'">'+t.status+'</td><td>'+t.rows+'</td><td>'+t.skipped+'</td><td>'+(t.messages.slice(0,3).join(' | ')||'')+(t.messages.length>3?' (+'+(t.messages.length-3)+' more)':'')+'</td></tr>';}).join('');
+ $('sheet-report').innerHTML='<tr><th>Tab</th><th>Status</th><th>Rows loaded</th><th>Rows skipped</th><th>Messages</th></tr>'+rows+'<tr><td colspan="5">Loaded '+R.loaded_at+' from sheet '+R.id.slice(0,8)+'... ; '+R.ok+' tabs applied, '+R.bad+' with problems.</td></tr>';
+}
+function renderConfidence(){
+ const mk=(name,row,max,src,quote,valid,comp)=>{const d=row&&row.date,a=d?ageOf(d):null,st=d==null?'na':(a>max?'stale':'fresh');
+  return '<tr><td>'+name+'</td><td>'+(d||'\u2014')+'</td><td>'+(a==null?'\u2014':a+'d')+'</td><td class="s-'+st+'">'+(st==='na'?'no data':st)+'</td><td>'+src+'</td><td>'+quote+'</td><td>'+valid+'</td><td>'+comp+'</td></tr>';};
+ const spot=last(ser('smm_spot').filter(r=>r.kind!=='weekly')),gs=last(ser('gfex_futures')),gset=last(ser('gfex_futures').filter(r=>r.settle!=null)),cv=curveNow(),rc=last(ser('gfex_receipts')),sg=last(ser('sgx_licf')),sp=last(ser('spodumene')),A=analyse(),eq=last(ser('equities')),fx=last(ser('fx')),D=latestDemand();
+ let h='<tr><th>Stream</th><th>Observed</th><th>Age</th><th>Status</th><th>Source</th><th>Quote type</th><th>Validation</th><th>Comparability</th></tr>';
+ h+=mk('China spot',spot,5,spot?(spot.source||'unspecified'):'\u2014',spot&&spot.source==='100ppi'?'assessment proxy':'assessment, VAT-inclusive, DDP China',spot?(spot.verified===false?'unverified':'verified'):'\u2014','domestic benchmark; not comparable with SGX CIF');
+ h+=mk('GFEX settlement',gset,5,'AKShare / manual','settlement',gset?(gset.derived?'derived':'read from source'):'\u2014','selected contract '+(gset&&gset.contract||'\u2014'));
+ h+=mk('GFEX close (latest)',gs,5,'AKShare / manual','close',gs&&gs.derived?'derived':'read','not a settlement');
+ h+=mk('GFEX curve',cv?{date:cv.date}:null,5,'AKShare (Sina)',cv?cv.list.length+' contracts, '+cv.list[0].pxType:'\u2014','job-collected','each contract kept separate');
+ h+=mk('Receipts',rc,3,rc?(rc.source||'manual'):'\u2014','registered receipts',rc?(rc.derived?'derived':(String(rc.source||'').indexOf('AKShare')>=0?'exchange report':'manual / newsletter')):'\u2014','exchange-registered stock only');
+ h+=mk('SGX LICF',sg,10,'delayed quote',sg?sg.contract:'\u2014','delayed, thin','unverified','CIF CJK basis; contract-specific');
+ h+=mk('Spodumene SC6',sp,7,sp?(sp.kind||'sheet'):'\u2014','assessment / auction','manual','CIF China, dry basis');
+ h+=mk('SMM weekly inventory',A.lastLevel,invStaleDays(),'SMM weekly (post-Sep method)','survey estimate','manual; method break 4 Sep','cross-checked against Mysteel');
+ h+=mk('CABIA battery GWh',D?{date:D.latest.published}:null,45,'CABIA via media','monthly release','manual','installs, sales and output not additive');
+ h+=mk('LTR / PLS',eq,5,'yfinance / finance connector',eq&&eq.intraday?'intraday':'close','unofficial feed','excluded when intraday');
+ h+=mk('USD/CNY',fx,5,fx?(fx.source||'unspecified'):'\u2014','reference rate','dated','dated to observation where available');
+ $('conf').innerHTML=h;
+ const flags=[],sgxx=ser('sgx_licf').filter(r=>r.price_usd_kg!=null),fb=sgxx.filter(r=>fxAt(r.date).k==='latest').length;
+ if(fb)flags.push(fb+' of '+sgxx.length+' SGX points use the latest FX rate because no rate is dated to them.');
+ const unv=ser('smm_spot').filter(r=>r.verified===false&&r.kind!=='weekly').length;if(unv)flags.push(unv+' spot rows are unverified and excluded from equity comparisons.');
+ const der=['gfex_futures','gfex_receipts'].reduce((a,k)=>a+ser(k).filter(r=>r.derived).length,0);if(der)flags.push(der+' futures or receipt rows are derived by arithmetic, not read from a source.');
+ const rl=S.run_log||{},times=Object.values(rl).map(x=>x.time).filter(Boolean).sort();
+ if(!times.length)flags.push('No cloud-job run is recorded in this snapshot: the numbers are the bundled set.');
+ else if(ageOf(times[times.length-1].slice(0,10))>3)flags.push('Last cloud-job run was '+ageOf(times[times.length-1].slice(0,10))+' days ago.');
+ const fails=Object.keys(rl).filter(k=>rl[k].status==='fail');if(fails.length)flags.push('Failed feeds in the last run: '+fails.join(', ')+'.');
+ if(FX_OVERRIDE)flags.push('FX override is active: every conversion uses '+FX_OVERRIDE+'.');
+ const SA=surveyAgreement();if(SA.n)flags.push('SMM and Mysteel agree on '+SA.agree+' of '+SA.n+' overlapping segment calls: inventory direction by segment is not settled.');
+ if(SHEET_REPORT&&SHEET_REPORT.bad)flags.push('Google Sheet: '+SHEET_REPORT.bad+' tab(s) had problems, so those tables are using the repo copy. See the load report.');
+ if(!SHEET_REPORT)flags.push('No Google Sheet connected: manual data comes from the repo JSON files.');
+ $('flags').innerHTML=flags.map(f=>'<li>'+f+'</li>').join('')||'<li>No quality flags.</li>';
+ renderSheetReport();
+ const names=Object.keys(rl);
+ $('health').innerHTML=names.length?'<tr><th>Step</th><th>Status</th><th>Run time</th><th>Last OK</th><th>Error</th></tr>'+names.map(k=>'<tr><td>'+k+'</td><td class="s-'+(rl[k].status==='ok'?'fresh':'fail')+'">'+rl[k].status+'</td><td>'+(rl[k].time||'')+'</td><td>'+(rl[k].last_ok||(rl[k].status==='ok'?rl[k].time:''))+'</td><td>'+(rl[k].error||'')+'</td></tr>').join(''):'<tr><td>No job run recorded yet.</td></tr>';
+}
+
+/* ---------- KPIs ---------- */
+function renderKPIs(){
+ const gs=ser('gfex_futures'),gSet=last(gs.filter(r=>r.settle!=null)),smmL=last(ser('smm_spot').filter(r=>r.kind!=='weekly')),sgL=last(ser('sgx_licf')),recL=last(ser('gfex_receipts')),sp=last(ser('spodumene')),A=analyse(),eq=last(ser('equities'));
+ const sm=byDate('smm_spot'),bd=gSet&&sm[gSet.date]?sm[gSet.date].avg-gSet.settle:null;
+ let sgx='\u2014',sgs='no data';
+ if(sgL){const f=fxAt(sgL.date),s=spotOnOrBefore(sgL.date,3);sgx=sgL.price_usd_kg.toFixed(2)+' USD/kg';sgs=sgL.contract+' \u00b7 '+sgL.date+' \u00b7 delayed'+(s?' \u00b7 '+(sgL.price_usd_kg*1000*f.r-s.avg/(1+VAT)>0?'+':'')+fmt(sgL.price_usd_kg*1000*f.r-s.avg/(1+VAT))+' vs SMM ex-VAT':'')+' \u00b7 '+fxTag(f);}
+ const lv=A.lastLevel;
+ const cards=[
+ {l:'SMM BG carbonate spot',v:smmL?fmt(smmL.avg)+' CNY/mt':'\u2014',s:smmL?smmL.date+(smmL.chg!=null?' \u00b7 '+(smmL.chg>0?'+':'')+fmt(smmL.chg)+' DoD':'')+' \u00b7 ~'+fmt(smmL.avg/fxAt(smmL.date).r)+' USD/t incl. VAT':'no data'},
+ {l:(gSet&&gSet.contract?gSet.contract:'GFEX')+' settle (selected contract)',v:gSet?fmt(gSet.settle)+' CNY/mt':'\u2014',s:gSet?gSet.date+(gSet.oi!=null?' \u00b7 contract OI '+fmt(gSet.oi)+' lots':''):'no data'},
+ {l:'Spot \u2212 futures (same date)',v:bd!=null?(bd>0?'+':'')+fmt(bd)+' CNY/mt':'\u2014',s:bd!=null?gSet.date+(bd>0?' \u00b7 spot premium (backwardation)':' \u00b7 spot discount (contango)'):'no same-date pair'},
+ {l:'SGX LICF',v:sgx,s:sgs},
+ {l:'Spodumene SC6 CIF China',v:sp?fmt(sp.price_usd_t,1)+' USD/t':'\u2014',s:sp?sp.date+' \u00b7 '+(sp.kind||''):'manual feed'},
+ {l:'GFEX receipts',v:recL?fmt(recL.quantity)+' t':'<span class="gap">gap</span>',s:recL?recL.date+' \u00b7 '+ageOf(recL.date)+' days old':'no data'},
+ {l:'SMM weekly inventory',v:lv?fmt(lv.total)+' mt':'\u2014',s:lv?lv.date+' \u00b7 '+(A.stated?A.stated+' straight weekly declines':'level only')+' \u00b7 method changed 4 Sep':'no data'},
+ {l:'LTR / PLS',v:eq?'A$'+eq.ltr.toFixed(2)+' / A$'+eq.pls.toFixed(2):'\u2014',s:eq?eq.date+(eq.intraday?' \u00b7 intraday':' \u00b7 close'):'no data'}];
+ $('kpis').innerHTML=cards.map(c=>'<div class="card"><div class="label">'+c.l+'</div><div class="value">'+c.v+'</div><div class="sub">'+c.s+'</div></div>').join('');
+ $('asat').textContent=S.generated_at;
+ const l=last(ser('fx').filter(r=>r.usdcny));
+ $('fxinfo').textContent=FX_OVERRIDE?'(override)':(l?'latest '+l.usdcny+' ('+l.date+')':'');
+ if(!FX_OVERRIDE)$('fx').value=l?l.usdcny:S.fx_usdcny;
+}
+
+/* ---------- charts ---------- */
+function chartSVG(series,h,lbl){
+ lbl=lbl||(d=>d.slice(5));
  const dates=[...new Set(series.flatMap(s=>s.data.map(p=>p[0])))].sort();
  if(!dates.length)return '<p class="note gap">No data.</p>';
- const W=640,H=h||250,P={l:56,r:12,t:12,b:26};
+ const W=640,H=h||250,Pd={l:56,r:12,t:12,b:26};
  const vals=series.flatMap(s=>s.data.map(p=>p[1])).filter(v=>v!=null);
  let lo=Math.min(...vals),hi=Math.max(...vals);if(hi===lo){hi+=1;lo-=1}
  const pad=(hi-lo)*0.08;lo-=pad;hi+=pad;
- const x=d=>P.l+(dates.indexOf(d)/(dates.length-1||1))*(W-P.l-P.r),y=v=>P.t+(1-(v-lo)/(hi-lo))*(H-P.t-P.b);
+ const x=d=>Pd.l+(dates.indexOf(d)/(dates.length-1||1))*(W-Pd.l-Pd.r),y=v=>Pd.t+(1-(v-lo)/(hi-lo))*(H-Pd.t-Pd.b);
  let g='';
- for(let i=0;i<=4;i++){const vv=lo+(hi-lo)*i/4,yy=y(vv);g+='<line x1="'+P.l+'" y1="'+yy+'" x2="'+(W-P.r)+'" y2="'+yy+'" stroke="#2a313c"/>';g+='<text x="'+(P.l-6)+'" y="'+(yy+3)+'" text-anchor="end">'+fmt(vv,hi-lo<20?1:0)+'</text>';}
- const step=Math.max(1,Math.floor(dates.length/5));
- dates.forEach((d,i)=>{if(i%step===0||i===dates.length-1)g+='<text x="'+x(d)+'" y="'+(H-6)+'" text-anchor="middle">'+d.slice(5)+'</text>';});
+ for(let i=0;i<=4;i++){const vv=lo+(hi-lo)*i/4,yy=y(vv);g+='<line x1="'+Pd.l+'" y1="'+yy+'" x2="'+(W-Pd.r)+'" y2="'+yy+'" stroke="#2a313c"/>';g+='<text x="'+(Pd.l-6)+'" y="'+(yy+3)+'" text-anchor="end">'+fmt(vv,hi-lo<20?1:0)+'</text>';}
+ const step=Math.max(1,Math.floor(dates.length/6));
+ dates.forEach((d,i)=>{if(i%step===0||i===dates.length-1)g+='<text x="'+x(d)+'" y="'+(H-6)+'" text-anchor="middle">'+lbl(d)+'</text>';});
  series.forEach(s=>{const pts=s.data.filter(p=>p[1]!=null);
   if(pts.length>1)g+='<polyline fill="none" stroke="'+s.color+'" stroke-width="2" points="'+pts.map(p=>x(p[0])+','+y(p[1])).join(' ')+'"/>';
   pts.forEach(p=>{g+='<circle cx="'+x(p[0])+'" cy="'+y(p[1])+'" r="3" fill="'+s.color+'"/>';});});
  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">'+g+'</svg>';
 }
-const sw=(c,t)=>'<span><span class="swatch" style="background:'+c+'"></span>'+t+'</span>';
-
 function renderCharts(){
- const smm=byDate('smm_spot'),gf=byDate('gfex_futures'),fx=FX();
- const ds=[...new Set([...Object.keys(smm),...Object.keys(gf)])].sort();
- const spot=ds.filter(d=>smm[d]&&smm[d].avg!=null).map(d=>[d,smm[d].avg]);
- const set=ds.filter(d=>gf[d]&&gf[d].settle!=null).map(d=>[d,gf[d].settle]);
- const cl=ds.filter(d=>gf[d]&&gf[d].settle==null&&gf[d].close!=null).map(d=>[d,gf[d].close]);
+ const smmRows=ser('smm_spot').filter(r=>r.avg!=null&&r.kind!=='weekly'),smm=byDate('smm_spot');
+ const spot=smmRows.map(r=>[r.date,r.avg]);
+ const set=ser('gfex_futures').filter(r=>r.settle!=null).map(r=>[r.date,r.settle]);
+ const cl=ser('gfex_futures').filter(r=>r.settle==null&&r.close!=null).map(r=>[r.date,r.close]);
  $('chart-cn').innerHTML=chartSVG([{color:'#57c785',data:spot},{color:'#4dd0e1',data:set},{color:'#e8b93e',data:cl}]);
- $('legend-cn').innerHTML=sw('#57c785','SMM spot')+sw('#4dd0e1','LC2701 settle')+sw('#e8b93e','LC2701 close (no settle)');
- const bd=set.length?smm[last(set)[0]]:null;
- $('basis-note').textContent=(bd&&bd.avg!=null)?'Latest same-date spot minus settle ('+last(set)[0]+'): '+fmt(bd.avg-gf[last(set)[0]].settle)+' CNY/mt. Negative = spot at a discount.':'No same-date spot and settlement pair yet.';
- const sgp=ser('sgx_licf').filter(r=>r.price_usd_kg!=null).map(r=>[r.date,r.price_usd_kg*1000*fx]);
- const exp=Object.values(smm).filter(r=>r.avg!=null).map(r=>[r.date,r.avg/(1+VAT)]);
- $('chart-sg').innerHTML=chartSVG([{color:'#e8b93e',data:sgp},{color:'#57c785',data:exp}]);
- $('legend-sg').innerHTML=sw('#e8b93e','SGX LICF CIF CJK')+sw('#57c785','SMM ex-VAT DDP China');
- const a=last(sgp),b=last(exp);
- $('spread-note').textContent=(a&&b)?'Spread '+(a[1]-b[1]>0?'+':'')+fmt(a[1]-b[1])+' CNY/mt ('+pct(a[1]/b[1]-1,0)+'). Different terms and benchmarks; SGX leg is delayed and thin.':'Needs both legs.';
- const eq=ser('equities').filter(r=>r.date>='2026-11-06');
- if(eq.length){
-  const e0=eq[0],s0=smm[e0.date]?smm[e0.date].avg:null;
-  const spotI=s0?Object.values(smm).filter(r=>r.date>=e0.date&&r.avg!=null).map(r=>[r.date,100*r.avg/s0]):[];
-  $('chart-eq').innerHTML=chartSVG([{color:'#57c785',data:spotI},{color:'#4dd0e1',data:eq.map(r=>[r.date,100*r.ltr/e0.ltr])},{color:'#e8b93e',data:eq.map(r=>[r.date,100*r.pls/e0.pls])}]);
-  $('legend-eq').innerHTML=sw('#57c785','SMM spot')+sw('#4dd0e1','LTR')+sw('#e8b93e','PLS');
-  const e1=last(eq);$('eq-note').textContent='Rebased to '+e0.date+'. LTR '+pct(e1.ltr/e0.ltr-1)+', PLS '+pct(e1.pls/e0.pls-1)+' to '+e1.date+(e1.note?' ('+e1.note+')':'')+'. Share prices reflect expected future prices, so they can lead or lag spot.';
- }
- const sp=ser('spodumene'),sm=last(ser('smm_spot'));
- let h='<tr><th>Date</th><th>US$/t SC6</th><th>Basis</th></tr>'+sp.map(r=>'<tr><td>'+r.date+'</td><td>'+fmt(r.price_usd_t,1)+(r.low?' ('+fmt(r.low)+'\u2013'+fmt(r.high)+')':'')+'</td><td>'+r.kind+'</td></tr>').join('');
- if(sm&&sp.length){const c=sm.avg/(1+VAT)/fx,raw=last(sp).price_usd_t*YLD();
-  h+='<tr class="hl"><td>Carbonate ex-VAT</td><td>'+fmt(c)+'</td><td>US$/t from SMM spot at FX '+fx+'</td></tr><tr class="hl"><td>SC6 feed per t LCE</td><td>'+fmt(raw)+'</td><td>at '+YLD().toFixed(1)+' t SC6 per t LCE (assumption)</td></tr><tr class="hl"><td>Gross spread</td><td>'+fmt(c-raw)+'</td><td>'+pct((c-raw)/c,0)+' of carbonate, before conversion cost and recovery</td></tr>';}
+ $('legend-cn').innerHTML=sw('#57c785','SMM daily spot')+sw('#4dd0e1','contract settle')+sw('#e8b93e','contract close (no settle)');
+ const lastSet=last(set),s0=lastSet?smm[lastSet[0]]:null;
+ $('basis-note').textContent=(s0&&s0.avg!=null)?'Spot minus settle on '+lastSet[0]+': '+fmt(s0.avg-lastSet[1])+' CNY/mt (negative = spot at a discount). Single-contract basis, not total-market.':'No same-date spot and settlement pair yet.';
+ const cons={};ser('sgx_licf').filter(r=>r.price_usd_kg!=null).forEach(r=>{(cons[r.contract]=cons[r.contract]||[]).push([r.date,r.price_usd_kg*1000*fxAt(r.date).r]);});
+ const palette=['#e8b93e','#ef6c57','#b48ead'],names=Object.keys(cons),exp=smmRows.map(r=>[r.date,r.avg/(1+VAT)]);
+ $('chart-sg').innerHTML=chartSVG(names.map((n,i)=>({color:palette[i%3],data:cons[n]})).concat([{color:'#57c785',data:exp}]));
+ $('legend-sg').innerHTML=names.map((n,i)=>sw(palette[i%3],n)).join('')+sw('#57c785','SMM ex-VAT DDP China');
+ const sgl=last(ser('sgx_licf')),ms=sgl?spotOnOrBefore(sgl.date,3):null;
+ $('spread-note').textContent=(sgl&&ms)?'Latest '+sgl.contract+' ('+sgl.date+') vs SMM ex-VAT ('+ms.date+'): '+pct(sgl.price_usd_kg*1000*fxAt(sgl.date).r/(ms.avg/(1+VAT))-1,0)+'. Contracts are drawn separately; each point uses FX dated to its own observation where available; delivery terms differ.':'Needs an SGX print and a matching spot.';
+ const eqm={};ser('equities').filter(r=>!r.intraday&&r.ltr!=null&&r.pls!=null).forEach(r=>eqm[r.date]=r);
+ const pairs=smmRows.filter(r=>r.verified&&eqm[r.date]);
+ if(pairs.length>=2){const a=pairs[0],e0=eqm[a.date],eqd=Object.values(eqm).filter(r=>r.date>=a.date);
+  $('chart-eq').innerHTML=chartSVG([{color:'#57c785',data:smmRows.filter(r=>r.verified&&r.date>=a.date).map(r=>[r.date,100*r.avg/a.avg])},{color:'#4dd0e1',data:eqd.map(r=>[r.date,100*r.ltr/e0.ltr])},{color:'#e8b93e',data:eqd.map(r=>[r.date,100*r.pls/e0.pls])}]);
+  $('legend-eq').innerHTML=sw('#57c785','SMM spot (verified)')+sw('#4dd0e1','LTR')+sw('#e8b93e','PLS');
+  const b=last(pairs),e1=eqm[b.date];
+  $('eq-note').textContent='Rebased to '+a.date+'; common end '+b.date+'. LTR '+pct(e1.ltr/e0.ltr-1)+', PLS '+pct(e1.pls/e0.pls-1)+', spot '+pct(b.avg/a.avg-1)+'. Intraday bars and unverified spot rows are excluded.';
+ } else {$('chart-eq').innerHTML='<p class="note gap">Needs two common dates with verified spot and completed equity closes.</p>';$('legend-eq').innerHTML='';$('eq-note').textContent='';}
+ const sps=ser('spodumene'),spL=last(sps);
+ let h='<tr><th>Date</th><th>US$/t SC6</th><th>Basis</th></tr>'+sps.map(r=>'<tr><td>'+r.date+'</td><td>'+fmt(r.price_usd_t,1)+(r.low?' ('+fmt(r.low)+'\u2013'+fmt(r.high)+')':'')+'</td><td>'+(r.kind||'')+'</td></tr>').join('');
+ const s=spL?spotOnOrBefore(spL.date,3):null;
+ if(spL&&s){const f=fxAt(spL.date),carb=s.avg/(1+VAT)/f.r;
+  h+='<tr class="hl"><td>Carbonate ex-VAT</td><td>'+fmt(carb)+'</td><td>US$/t from SMM '+s.date+'; '+fxTag(f)+'</td></tr><tr><th>Recovery</th><th>SC6 t / t LCE</th><th>Feed US$/t LCE &middot; spread US$/t LCE</th></tr>';
+  [80,85,90,95,100].forEach(rv=>{const t=sc6Per(rv),raw=spL.price_usd_t*t;h+='<tr'+(rv===REC()?' class="hl"':'')+'><td>'+rv+'%'+(rv===100?' (theoretical)':'')+'</td><td>'+t.toFixed(2)+'</td><td>'+fmt(raw)+' &middot; '+fmt(carb-raw)+' ('+pct((carb-raw)/carb,0)+')</td></tr>';});}
  $('spod').innerHTML=h;
- $('spod-note').textContent='SMM publishes the daily SC6 price free but its history is login-gated, so this series grows only as it is added. Adjust the SC6 yield box in the header.';
+ $('spod-note').textContent='SC6 t per t LCE = 1 / (grade \u00d7 '+LCE_PER_LI2O+' \u00d7 recovery); recovery is chemical conversion from purchased concentrate, not mine recovery. Excludes conversion costs; SC6 is CIF China so freight is included.';
 }
-
+function renderConverter(){
+ const sps=ser('spodumene'),sel=$('sel-feed');
+ if(!sps.length){$('conv1').innerHTML='';$('conv2').innerHTML='';$('conv-note').textContent='Needs a spodumene price.';return;}
+ if(sel.options.length!==sps.length){sel.innerHTML=sps.map((r,i)=>'<option value="'+i+'">'+r.date+' \u00b7 '+fmt(r.price_usd_t,1)+' \u00b7 '+(r.kind||'')+'</option>').join('');sel.value=String(sps.length-1);}
+ const sp=sps[parseInt(sel.value)||sps.length-1],s=spotOnOrBefore(last(sps).date,3);
+ if(!s){$('conv1').innerHTML='';$('conv2').innerHTML='';$('conv-note').textContent='No spot within 3 days of the latest spodumene print.';return;}
+ const f=fxAt(last(sps).date),carb=s.avg/(1+VAT)/f.r,obs=sp.price_usd_t,costs=[1500,2000,2500,3000,3500],recs=[80,85,90,95,100];
+ let a='<tr><th>Recovery (rows) vs conversion cost US$/t LCE (columns)</th>'+costs.map(c=>'<th>'+fmt(c)+'</th>').join('')+'</tr>',b=a;
+ recs.forEach(rv=>{const q=sc6Per(rv);a+='<tr><td>'+rv+'% ('+q.toFixed(2)+' t)</td>'+costs.map(c=>{const be=(carb-c)/q;return '<td class="'+(be>=obs?'cell-good':'cell-bad')+'">'+fmt(be)+'</td>';}).join('')+'</tr>';
+  b+='<tr><td>'+rv+'%</td>'+costs.map(c=>{const be=q*obs+c;return '<td class="'+(carb>=be?'cell-good':'cell-bad')+'">'+fmt(be)+'</td>';}).join('')+'</tr>';});
+ $('conv1').innerHTML=a;$('conv2').innerHTML=b;
+ $('conv-note').textContent='Carbonate US$'+fmt(carb)+'/t ex-VAT (SMM '+s.date+', '+fxTag(f)+'); observed SC6 US$'+fmt(obs,1)+'/t ('+sp.date+'). Break-even SC6 = (carbonate \u2212 conversion cost) \u00f7 SC6 per t LCE; break-even carbonate = SC6 per t LCE \u00d7 SC6 price + conversion cost. The cost columns are a range to read across, not an estimate of any converter\u2019s cost. Replacement economics only: converters holding earlier-priced feedstock realise a different margin.';
+}
+function pctRank(a){const n=a.length;if(n<2)return null;const x=a[n-1];return a.slice(0,n-1).filter(v=>v<=x).length/(n-1);}
+function renderPct(){
+ const smm=byDate('smm_spot'),rows=[];
+ const basis=ser('gfex_futures').filter(r=>r.settle!=null&&smm[r.date]&&smm[r.date].avg!=null&&smm[r.date].kind!=='weekly').map(r=>smm[r.date].avg-r.settle);
+ const dates=[...new Set(ser('futures_curve').map(r=>r.date))].sort(),spr=[];
+ dates.forEach(d=>{const dm=new Date(d),cur=dm.getFullYear()*12+dm.getMonth()+1;const l=ser('futures_curve').filter(r=>r.date===d&&(r.settle!=null||r.close!=null)).map(r=>({m:cMonth(r.contract),p:r.settle!=null?r.settle:r.close})).filter(r=>r.m&&r.m.idx-cur>=1).sort((a,b)=>a.m.idx-b.m.idx);if(l.length>=2)spr.push(l[1].p-l[0].p);});
+ const rec=ser('gfex_receipts').filter(r=>r.quantity!=null),rch=[];for(let i=5;i<rec.length;i++)rch.push(rec[i].quantity-rec[i-5].quantity);
+ const rat=ser('equities').filter(r=>!r.intraday&&r.ltr&&r.pls).map(r=>r.ltr/r.pls);
+ [['Spot \u2212 settle, CNY/mt',basis,0],['Calendar spread (first two non-delivery months), CNY/mt',spr,0],['Receipts 5-report change, t',rch,0],['LTR / PLS price ratio',rat,3]].forEach(x=>{
+  const a=x[1],n=a.length,p=pctRank(a);
+  rows.push('<tr><td>'+x[0]+'</td><td>'+(n?fmt(a[n-1],x[2]):'\u2014')+'</td><td>'+n+'</td><td>'+(n>=20&&p!=null?(p*100).toFixed(0)+'th':'needs 20+ observations')+'</td><td>'+(n?fmt(Math.min(...a),x[2])+' to '+fmt(Math.max(...a),x[2]):'\u2014')+'</td></tr>');});
+ $('pct').innerHTML='<tr><th>Metric</th><th>Latest</th><th>Observations</th><th>Percentile of own history</th><th>Range</th></tr>'+rows.join('');
+ $('pct-note').textContent='Percentiles are shown only with 20+ observations, and they describe how unusual a reading is within this short, job-built history, not whether it is mispriced. Event studies are not included until the history is long and clean.';
+}
 function renderPvP(){
  const smm=byDate('smm_spot'),gf=byDate('gfex_futures'),rec=byDate('gfex_receipts');
- const ds=[...new Set([...Object.keys(smm),...Object.keys(gf),...Object.keys(rec)])].sort().reverse();
- let html='<tr><th>Date</th><th>SMM spot</th><th>GFEX LC2701 settle</th><th>Spot \u2212 settle</th><th>OI</th><th>OI change</th><th>Volume</th><th>Receipts (mt)</th></tr>';
- ds.forEach(d=>{const s=smm[d],g=gf[d],r=rec[d],b=(g&&g.settle!=null&&s&&s.avg!=null)?s.avg-g.settle:null,ind=g&&g.settle==null&&g.close;
-  html+='<tr'+(d===ds[0]?' class="hl"':'')+'><td>'+d+'</td><td>'+(s&&s.avg!=null?fmt(s.avg)+(s.chg!=null?' ('+(s.chg>0?'+':'')+fmt(s.chg)+')':''):'\u2014')+'</td><td'+(ind?' class="indic"':'')+'>'+(g&&g.settle!=null?fmt(g.settle):(ind?'~'+fmt(g.close)+'*':'\u2014'))+'</td><td>'+(b!=null?(b>0?'+':'')+fmt(b):'\u2014')+'</td><td>'+(g&&g.oi!=null?fmt(g.oi):'\u2014')+'</td><td>'+(g&&g.oi_change!=null?(g.oi_change>0?'+':'')+fmt(g.oi_change):'\u2014')+'</td><td>'+(g&&g.volume!=null?fmt(g.volume):'\u2014')+'</td><td>'+(r&&r.quantity!=null?fmt(r.quantity)+(r.change!=null?' ('+(r.change>0?'+':'')+fmt(r.change)+')':''):'\u2014')+'</td></tr>';});
+ const ds=[...new Set([...Object.keys(smm),...Object.keys(gf),...Object.keys(rec)])].sort().reverse().slice(0,40);
+ let html='<tr><th>Date</th><th>SMM spot</th><th>Selected contract settle</th><th>Spot \u2212 settle</th><th>Contract OI</th><th>OI change</th><th>Volume</th><th>Receipts (t)</th></tr>';
+ ds.forEach(d=>{const s=smm[d],g=gf[d],r=rec[d],b=(g&&g.settle!=null&&s&&s.avg!=null&&s.kind!=='weekly')?s.avg-g.settle:null,ind=g&&g.settle==null&&g.close;
+  html+='<tr'+(d===ds[0]?' class="hl"':'')+'><td>'+d+'</td><td>'+(s&&s.avg!=null?fmt(s.avg)+(s.kind==='weekly'?' (wk avg)':'')+(s.verified===false?'\u2020':'')+(s.chg!=null?' ('+(s.chg>0?'+':'')+fmt(s.chg)+')':''):'\u2014')+'</td><td'+(ind?' class="indic"':'')+'>'+(g&&g.settle!=null?fmt(g.settle)+(g.derived?'\u2021':''):(ind?'~'+fmt(g.close)+'*':'\u2014'))+'</td><td>'+(b!=null?(b>0?'+':'')+fmt(b):'\u2014')+'</td><td>'+(g&&g.oi!=null?fmt(g.oi):'\u2014')+'</td><td>'+(g&&g.oi_change!=null?(g.oi_change>0?'+':'')+fmt(g.oi_change):'\u2014')+'</td><td>'+(g&&g.volume!=null?fmt(g.volume):'\u2014')+'</td><td>'+(r&&r.quantity!=null?fmt(r.quantity)+(r.derived?'\u2021':'')+(r.change!=null?' ('+(r.change>0?'+':'')+fmt(r.change)+')':''):'\u2014')+'</td></tr>';});
  $('pvp').innerHTML=html;
  const rc=ser('gfex_receipts');
- $('receipt-note').textContent=rc.length?'Latest receipts print '+last(rc).date+' ('+rc.length+' points). No free automated feed exists; update manually. * = close, not an official settlement.':'No receipts loaded.';
+ $('receipt-note').textContent='Latest 40 dates. \u2020 spot not SMM-verified. \u2021 derived by arithmetic. * close, not an official settlement. Receipts: '+rc.length+' prints loaded, latest '+(last(rc)?last(rc).date:'none')+'. OI is for the selected contract only.';
+}
+function renderLedger(){
+ const ev=ser('evidence').slice().sort((a,b)=>(a.observed||'')<(b.observed||'')?1:-1);
+ $('ledger').innerHTML='<tr><th>Observed</th><th>Published</th><th>Metric</th><th>Value</th><th>Unit</th><th>Scope</th><th>Source</th><th>Method</th><th>Confidence</th><th>Next due</th></tr>'+ev.map(r=>{
+  let due='\u2014',cls='s-na';if(r.next_due){const d=dayDiff(r.next_due,asOf());due=r.next_due+(d>0?' (overdue '+d+'d)':d===0?' (due today)':'');cls=d>0?'s-stale':d===0?'s-due':'s-fresh';}
+  return '<tr><td>'+(r.observed||'')+'</td><td>'+(r.published||'')+'</td><td>'+(r.metric||'')+'</td><td>'+fmt(r.value,r.value%1?1:0)+'</td><td>'+(r.unit||'')+'</td><td>'+(r.scope||'')+'</td><td>'+(r.source||'')+'</td><td>'+(r.method||'')+'</td><td>'+(r.confidence||'')+'</td><td class="'+cls+'">'+due+'</td></tr>';}).join('');
 }
 
-function renderInv(){
- const inv=ser('inventory'),ca=ser('cathode');
- let h='<tr><th>Date</th><th>Scope</th><th>Total (mt)</th><th>Downstream</th><th>Other (traders etc.)</th><th>Smelter</th></tr>'+inv.map(r=>'<tr><td>'+r.date+'</td><td style="text-align:left">'+r.scope+'</td><td>'+fmt(r.total)+'</td><td>'+fmt(r.downstream)+'</td><td>'+fmt(r.other)+'</td><td>'+fmt(r.smelter)+'</td></tr>').join('');
- ca.forEach(c=>{h+='<tr class="hl"><td>'+c.date+'</td><td style="text-align:left">Weekly cathode output: LFP '+fmt(c.lfp_t_week)+' t, ternary '+fmt(c.ternary_t_week)+' t (down '+c.ternary_down_weeks+' weeks)</td><td colspan="4" style="text-align:left">Implied LFP carbonate use ~'+fmt(c.lfp_t_week*c.lce_per_t_lfp)+' t LCE/week at '+c.lce_per_t_lfp+' t per t LFP</td></tr>';});
- $('inv').innerHTML=h;
- $('inv-note').textContent='Rows on different scopes are not comparable: SMM revised its weekly inventory method from 4 Sep 2026 and backdated it to 30 Apr 2026, so the May row uses the earlier scope.';
+/* ---------- inventory, receipts, benchmarks, sources ---------- */
+function renderInvModule(){
+ const root=$('inv-module');
+ const A=analyse(),cl=classify(A.pair,A.comp),R=receiptsInfo(),G=gradeRows(),share=usableShare(),SA=surveyAgreement();
+ let h='<h2>Inventory, receipts, benchmarks and source reliability</h2><h3>1. SMM weekly inventory vs price</h3><div class="kpis">';
+ h+='<div class="card"><div class="label">Consecutive weekly declines</div><div class="value">'+(A.stated!=null?A.stated:A.run)+'</div><div class="sub">'+(A.stated!=null?'stated by SMM, week of '+A.latest.date+'; ':'')+A.run+' computable from loaded levels</div></div>';
+ const lvl=last(A.lv);
+ h+='<div class="card"><div class="label">Latest loaded level</div><div class="value">'+(lvl?fmt(lvl.total)+' mt':'\u2014')+'</div><div class="sub">'+(lvl?lvl.date+' \u00b7 '+(lvl.change!=null?(lvl.change>0?'+':'')+fmt(lvl.change)+' WoW':'')+(A.latest&&A.latest.total==null?' \u00b7 newer week has no level loaded':''):'no data')+'</div></div>';
+ if(A.sinceBreak)h+='<div class="card"><div class="label">Since the 4 Sep method change</div><div class="value">'+pct(A.sinceBreak.chg)+'</div><div class="sub">about 175,000 t \u2192 '+fmt(A.sinceBreak.b.total)+' mt ('+fmt(A.sinceBreak.kt,0)+' kt); weekly levels in between are not loaded</div></div>';
+ if(A.pair)h+='<div class="card"><div class="label">Inventory vs spot, '+A.pair.a.date+' \u2192 '+A.pair.b.date+'</div><div class="value">'+pct(A.pair.inv)+' / '+pct(A.pair.spot)+'</div><div class="sub">levels and spot both loaded for these weeks</div></div>';
+ if(A.toLatest)h+='<div class="card"><div class="label">Spot to latest week, '+A.toLatest.a.date+' \u2192 '+A.toLatest.c.date+'</div><div class="value">'+pct(A.toLatest.spot)+'</div><div class="sub">inventory '+(A.toLatest.dir||'direction n/a')+' in the latest week (level n/a); spot '+pct(A.toLatest.since)+' since '+A.pair.b.date+'</div></div>';
+ h+='</div>';
+ if(cl)h+='<p class="note"><b>Reading:</b> '+cl.text+'.</p>';
+ h+='<div class="charts" style="margin-top:12px"><div class="chart"><h3>Rebased to 100 (weeks with both inventory and spot)</h3><div id="inv-chart"></div><p class="note" id="inv-chart-note"></p></div>';
+ h+='<div class="chart"><table class="txt"><tr><th>Week</th><th>Inventory (mt)</th><th>WoW</th><th>SMM spot</th><th>Upstream</th><th>Cathode</th><th>Trade</th><th>Source</th></tr>';
+ A.W.slice().reverse().forEach(r=>{const s=r.segments||{};h+='<tr><td>'+r.date+(r.derived?'\u2021':'')+(r.method_break?'\u00a7':'')+'</td><td>'+(r.total!=null?(r.approx?'~':'')+fmt(r.total):'n/a'+(r.direction?' ('+r.direction+')':''))+'</td><td>'+(r.change!=null?(r.change>0?'+':'')+fmt(r.change):'\u2014')+'</td><td>'+(r.spot!=null?fmt(r.spot)+(r.spot_verified===false?'\u2020':''):'\u2014')+'</td>'+acell(s.upstream)+acell(s.cathode)+acell(s.trade)+'<td>'+(r.source||'')+'</td></tr>';});
+ h+='</table><p class="note">\u2021 derived by arithmetic. \u00a7 first reading under the new SMM method. \u2020 spot unverified. \u25BC destocking, \u25B2 building. Spot is SMM\u2019s Thursday average, matching the Thursday release. '+(INV.scope_note||'')+'</p></div></div>';
+ h+='<h3 style="margin-top:14px">2. Mysteel survey cross-check (207 samples, different scope)</h3><table class="txt"><tr><th>Date</th><th>Total (t)</th><th>Change</th><th>Converters</th><th>Cathode / end-users</th><th>Traders</th><th>Note</th><th>Source</th></tr>';
+ (INV.mysteel||[]).slice().sort((a,b)=>a.date<b.date?1:-1).forEach(m=>{const s=m.segments||{};h+='<tr><td>'+m.date+(m.derived?'\u2021':'')+'</td><td>'+(m.total!=null?(m.approx?'~':'')+fmt(m.total):'n/a')+'</td><td>'+(m.change!=null?(m.change>0?'+':'')+fmt(m.change):(m.change_pct!=null?pct(m.change_pct/100,2):'\u2014'))+'</td>'+acell(s.upstream)+acell(s.cathode)+acell(s.trade)+'<td>'+(m.note||'')+'</td><td>'+(m.source||'')+'</td></tr>';});
+ h+='</table>';
+ if(SA.n)h+='<p class="note"><b>Where the two surveys overlap they agree on '+SA.agree+' of '+SA.n+' segment calls.</b> '+SA.items.filter(x=>!x.same).map(x=>'Week of '+x.week+', '+x.seg+': SMM '+x.smm+' vs Mysteel '+x.mys+'.').join(' ')+' Mysteel\u2019s levels run well below SMM\u2019s (99,280 t on 23 Oct against SMM\u2019s 130,279 t on 22 Oct), the samples differ, and the two moved at different speeds in the week to 5 Nov (SMM -2.3%, Mysteel -0.63%), so no single survey is decisive.</p>';
+ const rcs=ser('gfex_receipts').filter(r=>r.quantity!=null);
+ h+='<h3 style="margin-top:16px">3. GFEX registered receipts: history and quality scenario</h3><div class="charts"><div class="chart"><h3>Registered stock, t</h3><div id="rc-chart"></div><p class="note">Includes newsletter history (Jul and Oct) merged with your own prints. Stock fell from a 56,045 t peak to about 20,952 t on 22\u201323 Oct, then rebuilt to about 23,800 t by 10 Nov. Mysteel reads the November rise as stock moving from hidden inventory into visible warrants after end-October cancellations, not necessarily new supply.</p></div><div class="chart">';
+ h+='<div class="inputs"><span>Usable share of registered receipts % <input id="inv-usable" type="number" step="5" min="0" max="100" value="'+share+'"></span></div>';
+ if(R.rc){const rows=[100,75,50,25];
+  let t='<table><tr><th>Usable share</th><th>Usable receipts (t)</th><th>% of SMM inventory</th><th>Nearby OI t / usable receipts</th></tr>';
+  rows.concat(rows.indexOf(share)<0?[share]:[]).sort((a,b)=>b-a).forEach(s=>{const u=R.rc.quantity*s/100;t+='<tr'+(s===share?' class="hl"':'')+'><td>'+s+'%</td><td>'+fmt(u)+'</td><td>'+(R.lvl?(100*u/R.lvl.total).toFixed(1)+'%':'\u2014')+'</td><td>'+((R.nearT!=null&&u>0&&!R.stale)?(R.nearT/u).toFixed(2)+'x':'\u2014')+'</td></tr>';});
+  t+='</table>';
+  h+='<p class="note" style="margin-top:0">Latest '+fmt(R.rc.quantity)+' t ('+R.rc.date+', '+ageOf(R.rc.date)+' days old'+(R.stale?', <span class="s-stale">stale</span>':'')+'). SMM level used: '+(R.lvl?R.lvl.date:'n/a')+'. The usable share is a scenario: no source here measures it, and the claim that some GFEX stock is unsuitable for cathode makers is commentary.</p>'+t;
+ } else h+='<p class="note">No receipts loaded.</p>';
+ h+='</div></div><h3 style="margin-top:16px">4. Battery-grade vs industrial-grade carbonate</h3>';
+ if(G.length){h+='<table><tr><th>Date</th><th>Battery</th><th>Industrial</th><th>Spread</th><th>% of battery</th><th>Unit</th><th>Settle \u2212 battery</th><th>Settle \u2212 industrial</th></tr>';
+  G.slice().reverse().forEach(r=>{h+='<tr><td>'+r.date+'</td><td>'+fmt(r.bg,r.usd?2:0)+'</td><td>'+fmt(r.ig,r.usd?2:0)+'</td><td>'+fmt(r.sp,r.usd?2:0)+'</td><td>'+(r.pct*100).toFixed(1)+'%</td><td style="text-align:left">'+(r.unit||'')+'</td><td>'+(r.gf?fmt(r.gf.settle-r.bg)+(r.gf.derived?'\u2021':''):'\u2014')+'</td><td>'+(r.gf?fmt(r.gf.settle-r.ig)+(r.gf.derived?'\u2021':''):'\u2014')+'</td></tr>';});
+  h+='</table><p class="note">Rows use different bases, so compare the percentage column loosely. Which grade GFEX delivery requires must be checked against the contract rules, which I have not verified.</p>';}
+ h+='<h3 style="margin-top:16px">5. Fastmarkets benchmarks (free, via CME / Voltaire newsletter)</h3><table class="txt"><tr><th>Date</th><th>Spodumene 6% CIF Asia US$/t</th><th>Carbonate CIF Asia US$/kg</th><th>SMM carbonate CNY/t</th><th>Fastmarkets premium to SMM ex-VAT US$/kg</th><th>Note</th><th>Source</th></tr>'+(INV.benchmarks||[]).slice().sort((a,b)=>a.date<b.date?1:-1).map(b=>'<tr><td>'+b.date+'</td><td>'+(b.fm_spod6!=null?fmt(b.fm_spod6):'\u2014')+'</td><td>'+(b.fm_carb!=null?fmt(b.fm_carb,2)+(b.fm_carb_range?' ('+b.fm_carb_range+')':''):'\u2014')+'</td><td>'+(b.smm_carb_cny!=null?fmt(b.smm_carb_cny):'\u2014')+'</td><td>'+(b.fm_vs_smm_exvat!=null?fmt(b.fm_vs_smm_exvat,2):'\u2014')+'</td><td>'+(b.note||'')+'</td><td>'+(b.source||'')+'</td></tr>').join('')+'</table>';
+ const sp=last(ser('spodumene')),fm=last((INV.benchmarks||[]).slice().sort((a,b)=>a.date<b.date?-1:1).filter(b=>b.fm_spod6!=null));
+ if(sp&&fm)h+='<p class="note">Latest SMM SC6 CIF China is US$'+fmt(sp.price_usd_t)+'/t ('+sp.date+') against Fastmarkets 6% CIF Asia US$'+fmt(fm.fm_spod6)+'/t ('+fm.date+'). Different assessors and dates, so it indicates direction only. Newsletter files after 23 Oct could not be retrieved; add later weeks when available.</p>';
+ h+='<h3 style="margin-top:16px">6. China carbonate supply, demand and imports</h3><table class="txt"><tr><th>Period</th><th>Item</th><th>Value (t)</th><th>Type</th><th>Detail</th><th>Source</th></tr>'+(INV.supply_demand||[]).slice().sort((a,b)=>String(a.period)<String(b.period)?1:-1).map(r=>'<tr><td>'+r.period+'</td><td>'+r.item+'</td><td>'+(r.value_t!=null?fmt(r.value_t):'\u2014')+'</td><td>'+(r.kind||'')+'</td><td>'+(r.note||'')+'</td><td>'+(r.source||'')+'</td></tr>').join('')+'</table>';
+ h+='<h3 style="margin-top:16px">7. Source reliability and method breaks</h3><table class="txt"><tr><th>Source</th><th>Scope</th><th>Method</th><th>Known issues</th><th>Cadence</th><th>Access</th></tr>'+(INV.sources||[]).map(s=>'<tr><td><b>'+s.name+'</b></td><td>'+s.scope+'</td><td>'+s.method+'</td><td>'+s.issues+'</td><td>'+s.cadence+'</td><td>'+s.cost+'</td></tr>').join('')+'</table>';
+ if((INV.notes||[]).length)h+='<ul class="ctx" style="margin-top:8px">'+INV.notes.map(n=>'<li>'+n+'</li>').join('')+'</ul>';
+ const trade=A.latest&&A.latest.segments&&A.latest.segments.trade;
+ h+='<p class="note">'+(A.stale?'<span class="s-stale">Stale: latest SMM week '+(A.latest?A.latest.date:'none')+' is older than '+invStaleDays()+' days. </span>':'')+(trade==='up'?'In the latest SMM week cathode plants kept drawing down while traders added stock, so part of the headline decline is stock moving into trade hands. ':'')+'Consumer destocking can coexist with weak buying, so a falling total is not by itself a tightness signal.</p>';
+ root.innerHTML=h;
+ const pr=A.lv.filter(r=>r.spot!=null),box=$('inv-chart');
+ if(box){if(pr.length>=2){const a=pr[0];box.innerHTML=chartSVG([{color:'#4dd0e1',data:pr.map(r=>[r.date,100*r.total/a.total])},{color:'#57c785',data:pr.map(r=>[r.date,100*r.spot/a.spot])}],220);
+   $('inv-chart-note').innerHTML='<span class="swatch" style="background:#4dd0e1"></span>inventory &nbsp; <span class="swatch" style="background:#57c785"></span>SMM spot. '+pr.length+' weeks.';}
+  else box.innerHTML='<p class="note gap">Needs two weeks with both a level and a spot price.</p>';}
+ const rb=$('rc-chart');if(rb)rb.innerHTML=rcs.length>=2?chartSVG([{color:'#e8b93e',data:rcs.map(r=>[r.date,r.quantity])}],220):'<p class="note gap">Needs two receipts prints.</p>';
+ const inp=$('inv-usable');
+ if(inp)inp.addEventListener('change',()=>{const v=parseFloat(inp.value);usable=isNaN(v)?null:Math.max(0,Math.min(100,v));try{localStorage.setItem('lm-inv-usable',String(usable));}catch(e){}renderAll();});
+}
+
+/* ---------- demand (GWh) ---------- */
+function renderDemand(){
+ const root=$('demand-gwh-module'),D=latestDemand();
+ let h='<h2>Battery demand (GWh) &amp; supply-demand balance</h2>';
+ if(!D){root.innerHTML=h+'<p class="note gap">No monthly GWh data loaded.</p>';return;}
+ const lat=D.latest,M=D.list,impLce=lat.combined_output_gwh!=null?(lat.combined_output_gwh*lceGwh()/1000):null;
+ h+='<div class="inputs"><span>Assumed LCE intensity (t LCE / GWh cell output) <input id="md-lce-gwh" type="number" step="25" value="'+lceGwh()+'"></span><span>Scenario parameter applied only to combined cell output, never by adding installs + sales.</span></div><div class="kpis">';
+ h+='<div class="card"><div class="label">Power battery installs ('+lat.month+')</div><div class="value">'+fmt(lat.power_installs_gwh,1)+' GWh</div><div class="sub">'+fmtSign(lat.power_installs_yoy_pct)+' y/y &middot; LFP share '+(lat.lfp_share_pct!=null?lat.lfp_share_pct.toFixed(1)+'%':'\u2014')+'</div></div>';
+ h+='<div class="card"><div class="label">ESS battery sales ('+lat.month+')</div><div class="value">'+(lat.ess_sales_gwh!=null?fmt(lat.ess_sales_gwh,1)+' GWh':'\u2014')+'</div><div class="sub">'+fmtSign(lat.ess_sales_yoy_pct)+' y/y'+(lat.ess_exports_gwh!=null?' &middot; exports '+fmt(lat.ess_exports_gwh,1)+' GWh ('+fmtSign(lat.ess_exports_yoy_pct)+')':'')+'</div></div>';
+ h+='<div class="card"><div class="label">Combined cell output ('+lat.month+')</div><div class="value">'+(lat.combined_output_gwh!=null?fmt(lat.combined_output_gwh,1)+' GWh':'\u2014')+'</div><div class="sub">'+(impLce!=null?'implies ~'+fmt(impLce,1)+' kt LCE/mo at '+lceGwh()+' t/GWh':'no output figure')+'</div></div>';
+ h+='<div class="card"><div class="label">Domestic NEV retail ('+lat.month+')</div><div class="value">'+fmtSign(lat.nev_retail_yoy_pct)+'</div><div class="sub">CPCA passenger units y/y &middot; compare against GWh installs</div></div></div>';
+ h+='<div class="charts" style="margin-top:12px"><div class="chart"><h3>Monthly China GWh</h3><div id="gwh-chart"></div><div class="legend">'+sw('#4dd0e1','Combined output (power+ESS)')+sw('#57c785','Power installs (EV)')+sw('#e8b93e','ESS sales')+'</div><p class="note">Different bases (output vs installs vs sales): plotted for trend only, not additive.</p></div>';
+ h+='<div class="chart"><h3>2026\u20132028 balance views (published estimates)</h3><table class="txt"><tr><th>Source</th><th>Year</th><th>Balance (kt LCE)</th><th>Stance</th><th>Core driver / assumption</th></tr>'+(DEM.balance_views||[]).map(b=>'<tr><td>'+b.source+'</td><td>'+b.year+'</td><td class="'+(b.balance_kt_lce<0?'t-bull':'t-bear')+'">'+(b.balance_kt_lce>0?'+':'')+fmt(b.balance_kt_lce)+'</td><td>'+(b.stance||'')+'</td><td>'+(b.driver||'')+'</td></tr>').join('')+'</table><p class="note">Shows where forecasts diverge (restocking fade and BESS peak timing), not an endorsement of any house view.</p></div></div>';
+ h+='<h3 style="margin-top:14px">Monthly CABIA log</h3><table><tr><th>Month</th><th>Power installs (GWh)</th><th>YoY</th><th>LFP share</th><th>Combined output (GWh)</th><th>ESS sales (GWh)</th><th>ESS YoY</th><th>NEV retail YoY</th><th>Implied LCE from output (kt)</th></tr>';
+ M.slice().reverse().forEach(r=>{const lce=r.combined_output_gwh!=null?(r.combined_output_gwh*lceGwh()/1000):null;h+='<tr><td>'+r.month+'</td><td>'+fmt(r.power_installs_gwh,1)+'</td><td>'+fmtSign(r.power_installs_yoy_pct)+'</td><td>'+(r.lfp_share_pct!=null?r.lfp_share_pct.toFixed(1)+'%':'\u2014')+'</td><td>'+fmt(r.combined_output_gwh,1)+'</td><td>'+fmt(r.ess_sales_gwh,1)+'</td><td>'+fmtSign(r.ess_sales_yoy_pct)+'</td><td>'+fmtSign(r.nev_retail_yoy_pct)+'</td><td>'+fmt(lce,1)+'</td></tr>';});
+ h+='</table><p class="note">'+(DEM.scope_note||'')+'</p>';
+ root.innerHTML=h;
+ const box=$('gwh-chart');
+ if(box){const pick=k=>M.filter(r=>r[k]!=null).map(r=>[r.month,r[k]]);box.innerHTML=chartSVG([{color:'#4dd0e1',data:pick('combined_output_gwh')},{color:'#57c785',data:pick('power_installs_gwh')},{color:'#e8b93e',data:pick('ess_sales_gwh')}],220,d=>d);}
+ const inp=$('md-lce-gwh');
+ if(inp)inp.addEventListener('change',()=>{const v=parseFloat(inp.value);if(!isNaN(v)&&v>0){lcePerGwh=v;try{localStorage.setItem('lm-lce-per-gwh',String(v));}catch(e){}renderAll();}});
 }
 
 function renderStatic(){
  const rows=[
- ['GFEX LC daily bar (close, volume, OI)','AKShare (cloud job)','Free','ok','Exact EOD; official settlement via 100ppi dominant contract'],
- ['Spot (100ppi battery-grade)','AKShare futures_spot_price (cloud job)','Free','proxy','Proxy for SMM; never overwrites exact SMM rows'],
- ['SMM spot ranges','news.metal.com daily reviews','Free','ok','Manual or semi-manual'],
- ['USD/CNY','frankfurter.app (cloud job)','Free','ok','ECB daily reference'],
- ['LTR, PLS closes','Yahoo Finance via yfinance (cloud job), or the finance connector','Free','ok','Unofficial endpoint; can rate-limit cloud IPs'],
- ['SMM spodumene SC6 CIF China','metal.com latest value; Albemarle auction notices','Free (latest only)','manual','History is login-gated; enter daily'],
- ['SMM weekly carbonate inventory','SMM weekly articles','Free (headline totals)','manual','Scope break Sep 2026; component split only partly published'],
- ['Cathode output, imports, port stocks','SMM and Mysteel analysis articles','Free (prose)','manual','Enter figures as published'],
- ['GFEX receipts','GFEX Chinese bulletin; X transcriptions','Free manual','manual','MetalCharts per-warehouse API is US$249/month'],
- ['SGX LICF','SGX / TradingView delayed','Free','delayed','Thin; no free live feed'],
- ['Fastmarkets CJK, MB-LI-0012; Benchmark Minerals','Vendor portals','Subscription','gap','No free equivalent; not modelled']];
- const cls={ok:'Exact',proxy:'Proxy',manual:'Manual',delayed:'Delayed',gap:'Not available free'};
- $('feeds').innerHTML='<tr><th>Feed</th><th>Route</th><th>Cost</th><th>Status</th><th>Notes</th></tr>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="status-'+(r[3]==='ok'?'ok':r[3]==='gap'?'gap':'proxy')+'">'+cls[r[3]]+'</td><td>'+r[4]+'</td></tr>').join('');
+ ['Manual inputs (SMM, Mysteel, SC6, SGX, CABIA, ledger ...)','Your Google Sheet, read by this page','Free','ok','One tab per table; validated on load; report shown under Data confidence'],
+ ['USD/CNY (dated)','Frankfurter / ECB reference (cloud job)','Free','ok','Published ~16:00 CET; the 17:37 AWST job sees the prior ECB day'],
+ ['GFEX selected-contract bar and curve','AKShare / Sina (cloud job)','Free','ok','Settle column used when present; endpoint shape unverified'],
+ ['GFEX registered receipts','AKShare futures_receipt (cloud job); sheet history','Free','ok','Confirm units once against a GFEX bulletin'],
+ ['Spot (100ppi) and dominant settlement','AKShare futures_spot_price (cloud job)','Free','proxy','Proxy for SMM; stored unverified; sheet rows for the same date win'],
+ ['LTR, PLS closes','yfinance (cloud job)','Free','ok','Unofficial endpoint; intraday bars flagged'],
+ ['SMM, Mysteel, Fastmarkets, CABIA figures','Typed into the sheet from the public pages','Free (headlines)','proxy','Level for the latest SMM week is often paywalled'],
+ ['Fastmarkets full price series, Benchmark Minerals','Vendor portals','Subscription','gap','No free equivalent']];
+ const cls={ok:'Automated',proxy:'Manual or proxy',gap:'Not available free'};
+ $('feeds').innerHTML='<tr><th>Feed</th><th>Route</th><th>Cost</th><th>Status</th><th>Notes</th></tr>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="status-'+r[3]+'">'+cls[r[3]]+'</td><td>'+r[4]+'</td></tr>').join('');
  $('ctx').innerHTML=(S.context||[]).map(c=>'<li>'+c+'</li>').join('');
 }
 
-function renderAll(){renderKPIs();renderSignals();renderCharts();renderPvP();renderInv();renderStatic();save();}
-function save(){try{localStorage.setItem('lithium-monitor-v2',JSON.stringify(S));}catch(e){}}
-function loadLocal(){try{const t=localStorage.getItem('lithium-monitor-v2');if(t){const j=JSON.parse(t);if(j&&j.series&&j.series.smm_spot){S=j;return true;}}}catch(e){}return false;}
-
-async function fetchLatest(silent){
- if(!/^https?:$/.test(location.protocol)){if(!silent)$('msg').textContent='Auto-fetch needs the page hosted over http(s), e.g. GitHub Pages. Use Import for local files.';return false;}
- try{const r=await fetch('market_snapshot.json',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);
-  const j=await r.json();if(!j||!j.series||!j.series.smm_spot)throw new Error('snapshot has no series');
-  S=j;$('fx').value=S.fx_usdcny||$('fx').value;renderAll();
-  $('msg').textContent='Fetched published snapshot '+S.generated_at+' (cloud job runs weekdays 17:30 AWST).';return true;
- }catch(e){if(!silent)$('msg').textContent='Fetch failed: '+e.message+' - showing bundled or saved data.';return false;}
+/* ---------- Google Sheet loader ---------- */
+function parseCSV(t){
+ const rows=[];let row=[],cur='',q=false;
+ for(let i=0;i<t.length;i++){const c=t[i];
+  if(q){if(c==='"'){if(t[i+1]==='"'){cur+='"';i++;}else q=false;}else cur+=c;}
+  else if(c==='"')q=true;
+  else if(c===','){row.push(cur);cur='';}
+  else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(cur);rows.push(row);row=[];cur='';}
+  else cur+=c;}
+ if(cur!==''||row.length){row.push(cur);rows.push(row);}
+ return rows;
+}
+const pad2=n=>String(n).padStart(2,'0');
+function normDate(s){
+ let m=/^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s);let y,mo,d;
+ if(m){y=+m[1];mo=+m[2];d=+m[3];}
+ else if((m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(s))){d=+m[1];mo=+m[2];y=+m[3];}
+ else if((m=/^(\d{4})\/(\d{1,2})\/(\d{1,2})/.exec(s))){y=+m[1];mo=+m[2];d=+m[3];}
+ else throw new Error('bad date "'+s+'" (use YYYY-MM-DD)');
+ if(mo<1||mo>12||d<1||d>31)throw new Error('impossible date "'+s+'"');
+ return y+'-'+pad2(mo)+'-'+pad2(d);
+}
+function normMonth(s){
+ let m=/^(\d{4})-(\d{1,2})$/.exec(s);if(m&&+m[2]>=1&&+m[2]<=12)return m[1]+'-'+pad2(m[2]);
+ m=/^(\d{4})-(\d{1,2})-\d{1,2}/.exec(s);if(m&&+m[2]>=1&&+m[2]<=12)return m[1]+'-'+pad2(m[2]);
+ m=/^\d{1,2}\/(\d{1,2})\/(\d{4})/.exec(s);if(m&&+m[1]>=1&&+m[1]<=12)return m[2]+'-'+pad2(m[1]);
+ throw new Error('bad month "'+s+'" (use YYYY-MM)');
+}
+function convCell(type,raw){
+ const s=String(raw==null?'':raw).trim();
+ if(s===''||s==='\u2014'||/^n\/?a$/i.test(s))return undefined;
+ if(type==='t')return s;
+ if(type==='d')return normDate(s);
+ if(type==='m')return normMonth(s);
+ if(type==='n'){const v=Number(s.replace(/[,%\s]/g,''));if(isNaN(v))throw new Error('not a number "'+s+'"');return v;}
+ if(type==='b'){const l=s.toLowerCase();if(['true','yes','y','1'].indexOf(l)>=0)return true;if(['false','no','n','0'].indexOf(l)>=0)return false;throw new Error('not TRUE/FALSE "'+s+'"');}
+ if(type==='s'){const l=s.toLowerCase();if(l==='up'||l==='\u25b2')return 'up';if(l==='down'||l==='\u25bc')return 'down';if(l==='flat')return 'flat';throw new Error('segment must be up, down or flat, not "'+s+'"');}
+ return s;
+}
+function processTab(name,csv){
+ const spec=SHEET_SPEC[name],raw=parseCSV(csv),res={status:'ok',rows:0,skipped:0,messages:[],data:[]};
+ if(!raw.length||!raw[0].length){res.status='mismatch';res.messages.push('no data returned: tab missing, misnamed, or the sheet is not shared');return res;}
+ const hdr=raw[0].map(h=>String(h).trim().toLowerCase().replace(/\s+/g,'_'));
+ const missing=Object.keys(spec.cols).filter(c=>hdr.indexOf(c)<0);
+ if(missing.length){res.status='mismatch';res.messages.push('header mismatch, so the tab is missing, misnamed or edited. Missing: '+missing.slice(0,5).join(', ')+(missing.length>5?' ...':''));return res;}
+ for(let i=1;i<raw.length;i++){
+  const cells=raw[i];if(cells.every(c=>String(c).trim()===''))continue;
+  const obj={};let err=null;
+  for(const col of Object.keys(spec.cols)){
+   try{const v=convCell(spec.cols[col],cells[hdr.indexOf(col)]);if(v!==undefined)obj[col]=v;}
+   catch(e){err=col+': '+e.message;break;}}
+  if(!err){const miss=spec.req.filter(c=>obj[c]===undefined);if(miss.length)err='missing '+miss.join(', ');}
+  if(err){res.skipped++;res.messages.push('row '+(i+1)+' skipped: '+err);continue;}
+  res.data.push(obj);
+ }
+ res.rows=res.data.length;
+ if(!res.data.length){res.status='empty';res.messages.unshift('no valid rows, so the repo copy of this table is kept');}
+ return res;
+}
+function withSeg(r){const seg={};['upstream','cathode','trade'].forEach(k=>{if(r[k]!==undefined)seg[k]=r[k];delete r[k];});r.segments=seg;return r;}
+const APPLY={
+ inventory_weekly:rows=>{INV.weekly=rows.map(withSeg);},
+ mysteel:rows=>{INV.mysteel=rows.map(withSeg);},
+ receipts_history:rows=>{INV.receipts_history=rows;},
+ benchmarks:rows=>{INV.benchmarks=rows;},
+ supply_demand:rows=>{INV.supply_demand=rows;},
+ grade_spread:rows=>{INV.grade_spread=rows;},
+ sgx_licf:rows=>{S.series.sgx_licf=rows;},
+ spodumene:rows=>{S.series.spodumene=rows.map(r=>{if(!r.kind)r.kind='SMM SC6 CIF China';return r;});},
+ cathode:rows=>{S.series.cathode=rows.map(r=>{if(r.lce_per_t_lfp===undefined)r.lce_per_t_lfp=0.24;return r;});},
+ evidence:rows=>{S.series.evidence=rows;},
+ smm_spot:rows=>{const cur=S.series.smm_spot||[];rows.forEach(r=>{if(r.verified===undefined)r.verified=true;if(!r.source)r.source='SMM';const i=cur.findIndex(x=>x.date===r.date);if(i>=0)cur[i]=r;else cur.push(r);});cur.sort((a,b)=>a.date<b.date?-1:1);S.series.smm_spot=cur;},
+ cabia_monthly:rows=>{DEM.monthly=rows;},
+ balance_views:rows=>{DEM.balance_views=rows;}
+};
+function extractSheetId(s){s=String(s||'').trim();const m=/\/d\/([a-zA-Z0-9_-]+)/.exec(s);return m?m[1]:s;}
+function sheetId(){let v='';try{v=localStorage.getItem('lm-sheet-id')||'';}catch(e){}return extractSheetId(v||CFG.sheet_id||'');}
+async function fetchTab(id,name){
+ const u='https://docs.google.com/spreadsheets/d/'+encodeURIComponent(id)+'/gviz/tq?tqx=out:csv&headers=1&sheet='+encodeURIComponent(name);
+ const r=await fetch(u,{cache:'no-store'});
+ if(!r.ok)throw new Error('HTTP '+r.status);
+ return await r.text();
+}
+async function loadSheets(id){
+ const rep={id:id,tabs:{},ok:0,bad:0,loaded_at:new Date().toISOString().slice(0,16).replace('T',' ')};
+ const names=Object.keys(SHEET_SPEC);
+ const got=await Promise.all(names.map(n=>fetchTab(id,n).then(t=>({t:t}),e=>({e:e}))));
+ names.forEach((n,i)=>{const x=got[i];
+  if(x.e){rep.tabs[n]={status:'error',rows:0,skipped:0,messages:[((x.e&&x.e.message)||'fetch failed')+'. Check the sheet is shared as Anyone with the link, Viewer, and the ID is right']};rep.bad++;return;}
+  const r=processTab(n,x.t);
+  rep.tabs[n]={status:r.status,rows:r.rows,skipped:r.skipped,messages:r.messages};
+  if(r.status==='ok'){APPLY[n](r.data);rep.ok++;}else if(r.status==='empty'){rep.ok++;}else rep.bad++;
+ });
+ return rep;
 }
 
-$('fx').value=S.fx_usdcny;
-$('fx').addEventListener('change',()=>{S.fx_usdcny=parseFloat($('fx').value)||S.fx_usdcny;renderAll();});
-$('yld').addEventListener('change',renderAll);
-$('btn-fetch').addEventListener('click',()=>fetchLatest(false));
+/* ---------- render pipeline ---------- */
+function renderAll(){
+ mergeHistory();
+ renderKPIs();renderStrip();renderConfidence();renderSignals();renderCurve();renderCarry();renderDelivery();renderCharts();renderConverter();renderInvModule();renderDemand();renderPct();renderPvP();renderLedger();renderStatic();
+ save();
+}
+function save(){try{localStorage.setItem('lithium-monitor-v6',JSON.stringify({S:S,INV:INV,DEM:DEM}));}catch(e){}}
+function loadLocal(){try{const t=localStorage.getItem('lithium-monitor-v6');if(t){const j=JSON.parse(t);if(j&&j.S&&j.S.series&&j.S.series.smm_spot){S=j.S;if(j.INV&&j.INV.weekly)INV=j.INV;if(j.DEM&&j.DEM.monthly)DEM=j.DEM;return true;}}}catch(e){}return false;}
+function syncParams(){
+ $('grade').value=P().sc6_grade_pct||6;$('rec').value=P().conversion_recovery_pct||85;const sc=P().scanner||{};
+ $('sc-fin').value=sc.financing_pct!=null?sc.financing_pct:4;$('sc-sto').value=sc.storage_cny_t_month!=null?sc.storage_cny_t_month:20;$('sc-hnd').value=sc.handling_cny_t!=null?sc.handling_cny_t:300;$('sc-fee').value=sc.fee_pct_side!=null?sc.fee_pct_side:0.008;$('sc-mrg').value=sc.margin_pct!=null?sc.margin_pct:15;$('sc-adv').value=sc.adverse_pct!=null?sc.adverse_pct:10;$('sc-tpl').value=sc.t_per_lot!=null?sc.t_per_lot:1;
+}
 
+/* ---------- loading ---------- */
+async function fetchJSON(name){try{const r=await fetch(name,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}catch(e){return {__error:name+': '+e.message};}}
+async function loadAll(silent){
+ const hosted=/^https?:$/.test(location.protocol),got=[],bad=[];
+ if(hosted){
+  const res=await Promise.all([fetchJSON('market_snapshot.json'),fetchJSON('inventory_data.json'),fetchJSON('demand_gwh.json'),fetchJSON('sheet_config.json')]);
+  if(res[0]&&res[0].series&&res[0].series.smm_spot){S=res[0];got.push('snapshot '+S.generated_at);}else bad.push(res[0]&&res[0].__error||'market_snapshot.json invalid');
+  if(res[1]&&res[1].weekly){INV=res[1];got.push('inventory file');}else bad.push(res[1]&&res[1].__error||'inventory_data.json invalid');
+  if(res[2]&&res[2].monthly){DEM=res[2];got.push('demand file');}else bad.push(res[2]&&res[2].__error||'demand_gwh.json invalid');
+  if(res[3]&&typeof res[3].sheet_id==='string')CFG=res[3];
+ } else if(!silent){$('msg').textContent='Not hosted over http(s): using embedded copies. Any sheet ID you enter will still be read.';}
+ const id=sheetId();$('sheet-id').value=id;
+ SHEET_REPORT=null;let sheetMsg='';
+ if(id){
+  try{SHEET_REPORT=await loadSheets(id);sheetMsg=' Sheet: '+SHEET_REPORT.ok+' tabs applied, '+SHEET_REPORT.bad+' with problems.';}
+  catch(e){sheetMsg=' Sheet could not be read: '+e.message;}
+ }
+ if(!got.length&&!(SHEET_REPORT&&SHEET_REPORT.ok))return false;
+ syncParams();$('sel-feed').innerHTML='';renderAll();
+ $('msg').textContent='Loaded '+(got.join(', ')||'embedded files')+'.'+(bad.length?' Not loaded (embedded copy used): '+bad.join('; ')+'.':'')+sheetMsg;
+ $('sheet-state').textContent=id?(SHEET_REPORT?'connected: '+SHEET_REPORT.ok+' ok, '+SHEET_REPORT.bad+' problem tabs':'not readable'):'not connected';
+ return true;
+}
+
+/* ---------- events ---------- */
+['grade','rec','sc-fin','sc-sto','sc-hnd','sc-fee','sc-mrg','sc-adv','sc-tpl','sel-feed'].forEach(id=>$(id).addEventListener('change',()=>renderAll()));
+$('fx').addEventListener('change',()=>{const v=parseFloat($('fx').value);FX_OVERRIDE=v>0?v:null;renderAll();});
+$('btn-fxclear').addEventListener('click',()=>{FX_OVERRIDE=null;renderAll();});
+$('btn-fetch').addEventListener('click',()=>loadAll(false));
+$('btn-sheet').addEventListener('click',()=>{const v=extractSheetId($('sheet-id').value);try{if(v)localStorage.setItem('lm-sheet-id',v);else localStorage.removeItem('lm-sheet-id');}catch(e){}loadAll(false);});
 $('filein').addEventListener('change',ev=>{
  const file=ev.target.files[0];if(!file)return;const rd=new FileReader();
  rd.onload=()=>{let ok=false,msg='';
   try{
    if(/\.json$/i.test(file.name)){const j=JSON.parse(rd.result);
-    if(j&&j.series){S=j;ok=true;msg='Imported JSON snapshot ('+(j.generated_at||'undated')+').';}else msg='JSON has no "series" object.';}
+    if(j&&j.weekly){INV=j;ok=true;msg='Imported inventory data.';}
+    else if(j&&j.monthly){DEM=j;ok=true;msg='Imported demand data.';}
+    else if(j&&j.series){S=j;ok=true;msg='Imported snapshot ('+(j.generated_at||'undated')+').';}
+    else msg='JSON not recognised: expected a snapshot (series), inventory data (weekly) or demand data (monthly).';}
    else{
     const lines=rd.result.trim().split(/\r?\n/),hdr=lines[0].split(',').map(s=>s.trim()),idx=n=>hdr.indexOf(n);
-    const maps={smm_spot_avg:['smm_spot','avg'],gfex_lc_settle:['gfex_futures','settle'],gfex_lc_close:['gfex_futures','close'],gfex_oi:['gfex_futures','oi'],gfex_oi_change:['gfex_futures','oi_change'],gfex_volume:['gfex_futures','volume'],sgx_licf_usd_kg:['sgx_licf','price_usd_kg'],gfex_receipts:['gfex_receipts','quantity'],ltr_close:['equities','ltr'],pls_close:['equities','pls'],spodumene_sc6_usd_t:['spodumene','price_usd_t']};
-    Object.values(maps).forEach(m=>{S.series[m[0]]=S.series[m[0]]||[];});
-    let n=0;
-    for(let i=1;i<lines.length;i++){const c=lines[i].split(',');const d=c[0];if(!d)continue;
-     for(const col in maps){const p=idx(col);if(p>=0&&c[p]!==''&&c[p]!=null){const arr=S.series[maps[col][0]];let r=arr.find(x=>x.date===d);if(!r){r={date:d};arr.push(r);}r[maps[col][1]]=Number(c[p]);n++;}}}
-    Object.keys(S.series).forEach(k=>S.series[k].sort((a,b)=>a.date<b.date?-1:1));
-    ok=true;msg='Merged CSV: '+n+' values across '+(lines.length-1)+' rows.';}
+    S.series=S.series||{};
+    if(hdr.indexOf('contract')>=0&&hdr.indexOf('date')>=0&&hdr.indexOf('settle')>=0){S.series.futures_curve=S.series.futures_curve||[];let n=0;
+     for(let i=1;i<lines.length;i++){const c=lines[i].split(','),d=c[0],k=c[idx('contract')];if(!d||!k)continue;let r=S.series.futures_curve.find(x=>x.date===d&&x.contract===k);if(!r){r={date:d,contract:k};S.series.futures_curve.push(r);}
+      ['close','settle','volume','oi','oi_change'].forEach(f=>{const p=idx(f);if(p>=0&&c[p]!==''&&c[p]!=null){r[f]=Number(c[p]);n++;}});}
+     ok=true;msg='Merged futures_curve.csv: '+n+' values.';}
+    else{const maps={smm_spot_avg:['smm_spot','avg'],gfex_lc_settle:['gfex_futures','settle'],gfex_lc_close:['gfex_futures','close'],gfex_oi:['gfex_futures','oi'],gfex_oi_change:['gfex_futures','oi_change'],gfex_volume:['gfex_futures','volume'],sgx_licf_usd_kg:['sgx_licf','price_usd_kg'],gfex_receipts:['gfex_receipts','quantity'],ltr_close:['equities','ltr'],pls_close:['equities','pls'],spodumene_sc6_usd_t:['spodumene','price_usd_t'],usdcny:['fx','usdcny']};
+     Object.values(maps).forEach(m=>{S.series[m[0]]=S.series[m[0]]||[];});let n=0;
+     for(let i=1;i<lines.length;i++){const c=lines[i].split(','),d=c[0];if(!d)continue;
+      for(const col in maps){const p=idx(col);if(p>=0&&c[p]!==''&&c[p]!=null){const arr=S.series[maps[col][0]];let r=arr.find(x=>x.date===d);if(!r){r={date:d};arr.push(r);}r[maps[col][1]]=Number(c[p]);n++;}}}
+     ok=true;msg='Merged CSV: '+n+' values across '+(lines.length-1)+' rows.';}
+    Object.keys(S.series).forEach(k=>S.series[k].sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:0)));}
   }catch(e){msg='Parse failed: '+e.message;}
-  if(ok){$('fx').value=S.fx_usdcny||$('fx').value;renderAll();}$('msg').textContent=msg;};
+  if(ok){syncParams();$('sel-feed').innerHTML='';renderAll();}$('msg').textContent=msg;};
  rd.readAsText(file);
 });
 $('btn-export').addEventListener('click',()=>{const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='market_snapshot.json';a.click();URL.revokeObjectURL(a.href);});
-$('btn-reset').addEventListener('click',()=>{S=JSON.parse(JSON.stringify(BUNDLED));$('fx').value=S.fx_usdcny;renderAll();$('msg').textContent='Reset to bundled snapshot '+S.generated_at+'.';});
+$('btn-reset').addEventListener('click',()=>{S=clone(BUNDLED_S);INV=clone(BUNDLED_INV);DEM=clone(BUNDLED_DEM);FX_OVERRIDE=null;SHEET_REPORT=null;syncParams();$('sel-feed').innerHTML='';renderAll();$('msg').textContent='Reset to the bundled data (snapshot '+S.generated_at+'). Click Load sheet to apply your sheet again.';});
 
 (async function(){
- const hosted=await fetchLatest(true);
- if(!hosted){if(loadLocal()){$('fx').value=S.fx_usdcny||6.6665;renderAll();$('msg').textContent='Loaded saved local snapshot '+S.generated_at+'.';}
-  else{renderAll();$('msg').textContent='Showing bundled snapshot '+S.generated_at+'. Host on GitHub Pages for automatic updates.';}}
+ syncParams();$('sheet-id').value=sheetId();
+ let ok=false;
+ try{ok=await loadAll(true);}catch(e){console.error(e);}
+ if(!ok){if(loadLocal()){syncParams();renderAll();$('msg').textContent='Loaded saved local data (snapshot '+S.generated_at+').';}
+  else{renderAll();$('msg').textContent='Showing bundled data (snapshot '+S.generated_at+').'+(SHEET_REPORT&&SHEET_REPORT.bad?' The Google Sheet could not be read: see the load report.':' Host on GitHub Pages and connect a Google Sheet for updates.');}}
 })();
-</script></body></html>
+
+</script>
+</body></html>

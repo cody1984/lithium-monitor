@@ -1,54 +1,30 @@
-# Lithium Supply-Chain Monitor - cloud pipeline
+# Lithium Market Monitor
 
-market_daily.csv and market_snapshot.json are produced by a scheduled GitHub
-Actions job, not by anything running locally.
+One dashboard page, a daily data job, and a Google Sheet for the numbers that have no free feed.
 
-## One-time setup (about 10 minutes)
+## Files in the repo root
 
-1. Create a GitHub repository (public = free unlimited Actions minutes;
-   private works too within the 2,000 min/month free allowance).
-2. Upload these four files, keeping names exact:
-   - lithium_monitor.html
-   - market_snapshot.json   (bundled starting data - the job merges into it)
-   - fetch_data.py
-   - .github/workflows/update.yml   (rename update.yml to this path)
-3. Get a free MetalCharts API key (no card) at the MetalCharts API console,
-   then add it as a repository secret named METALCHARTS_KEY
-   (Settings -> Secrets and variables -> Actions -> New repository secret).
-   Optional: the job runs fine without it; you just lose the indicative
-   USD-converted quote.
-4. Enable GitHub Pages: Settings -> Pages -> Deploy from a branch -> main / root.
-   The dashboard is then live at:
-   https://YOURNAME.github.io/REPO/lithium_monitor.html
-5. Actions tab -> "Update lithium data" -> Run workflow, to test once.
+| File | What it is |
+|---|---|
+| lithium_monitor.html | The dashboard (single file, no other scripts) |
+| fetch_data.py | Daily job: FX, GFEX bar, futures curve, receipts, proxy spot, LTR/PLS |
+| .github/workflows/update.yml | Schedules the job (weekdays 17:37 AWST). Upload update.yml into that folder |
+| market_snapshot.json | Job output; also the dashboard's fallback copy |
+| inventory_data.json, demand_gwh.json | Fallback copies of the manual tables (used if the sheet is unreachable) |
+| sheet_config.json | Holds your Google Sheet ID |
+| market_daily.csv, futures_curve.csv | Created by the job |
 
-## What runs automatically
+Delete old files if present: inventory_module.js, market_dynamics_module.js.
 
-Weekdays 17:30 AWST (= 17:30 Beijing, after the GFEX close), the job:
+## One-time setup
 
-- pulls the LC contract daily bar (close, volume, OI) via AKShare
-- pulls the 99qh lithium carbonate spot trend via AKShare (flagged PROXY for SMM)
-- optionally pulls the MetalCharts live lithium quote (free tier: 200 calls/month)
-- pulls the ECB USD/CNY reference rate (keyless)
-- merges into market_snapshot.json and writes market_daily.csv
-- commits both to the repo
+1. Repo public, GitHub Pages on (Settings > Pages > main / root), Actions enabled.
+2. Run the workflow once from the Actions tab.
+3. Google Sheet: File > Import > Upload lithium_sheet_template.xlsx > Replace spreadsheet. Keep all tab names. Share > Anyone with the link > Viewer.
+4. Paste the sheet URL into the dashboard (Data update > Google Sheet box > Load sheet), or put the ID in sheet_config.json as {"sheet_id": "..."}.
 
-Opening the dashboard on GitHub Pages auto-fetches the latest snapshot.
+## Rules
 
-## What stays manual (by design)
-
-- GFEX registered warehouse receipts: no free automated feed. Update
-  occasionally from the X transcriptions or the GFEX Chinese bulletin, via the
-  dashboard import (paste rows into a market_daily.csv with the gfex_receipts
-  column, or edit market_snapshot.json and commit).
-- SGX LICF: delayed/thin prints; update occasionally by hand.
-- Contract roll: when LC2701 approaches delivery, change GFEX_CONTRACT in
-  .github/workflows/update.yml (e.g. to LC2705).
-
-## Notes
-
-- AKShare scrapes public Chinese sites; endpoints can break. A failed feed
-  keeps its last values and the run still commits - check the Actions log.
-- Free-tier MetalCharts usage is ~30 calls/month at one run per weekday.
-- If the repo is public, give MetalCharts a visible credit link on any public
-  display of their data (free-plan condition).
+- Dates are YYYY-MM-DD text; months are YYYY-MM. Leave unknowns empty. Fill source every time.
+- A tab with at least one valid row replaces the repo copy of that table; smm_spot merges by date.
+- The sheet is readable by anyone with the link: public market data only.

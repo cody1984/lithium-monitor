@@ -1,0 +1,93 @@
+{
+  "schema": "lithium-demand-gwh/1",
+  "updated": "2026-11-22",
+  "config": {
+    "lce_t_per_gwh": 650,
+    "stale_days": 45
+  },
+  "scope_note": "CABIA monthly China battery data (via CnEVPost, Gasgoo and others). Installations (cells fitted to domestic vehicles), sales (domestic + export shipments) and production (combined power + ESS cell output) use different bases and are NOT additive.",
+  "monthly": [
+    {
+      "month": "2026-07",
+      "published": "2026-08-18",
+      "power_installs_gwh": 74.6,
+      "power_installs_yoy_pct": 33.5,
+      "lfp_installs_gwh": 63.1,
+      "lfp_share_pct": 84.6,
+      "combined_output_gwh": 218.0,
+      "combined_output_yoy_pct": 62.9,
+      "ess_sales_gwh": 56.1,
+      "ess_sales_yoy_pct": 55.4,
+      "source": "CABIA via CnEVPost / ChinaEVHome (18 Aug 2026)"
+    },
+    {
+      "month": "2026-08",
+      "published": "2026-09-16",
+      "power_installs_gwh": 79.0,
+      "power_installs_yoy_pct": 26.3,
+      "source": "CABIA via CnEVPost / Zhongauto (16 Sep 2026)"
+    },
+    {
+      "month": "2026-09",
+      "published": "2026-10-15",
+      "power_installs_gwh": 87.2,
+      "power_installs_yoy_pct": 14.7,
+      "lfp_installs_gwh": 74.5,
+      "lfp_share_pct": 85.5,
+      "combined_output_gwh": 237.8,
+      "combined_output_yoy_pct": 57.3,
+      "ess_sales_gwh": 73.5,
+      "ess_sales_yoy_pct": 104.4,
+      "source": "CABIA via CnEVPost / Gasgoo (15 Oct 2026)"
+    },
+    {
+      "month": "2026-10",
+      "published": "2026-11-19",
+      "power_installs_gwh": 99.4,
+      "power_installs_yoy_pct": 18.2,
+      "lfp_installs_gwh": 86.3,
+      "lfp_share_pct": 86.9,
+      "combined_output_gwh": 245.1,
+      "ess_sales_gwh": 71.7,
+      "ess_sales_yoy_pct": 70.5,
+      "ess_exports_gwh": 17.1,
+      "ess_exports_yoy_pct": 94.4,
+      "nev_retail_yoy_pct": -13.7,
+      "source": "CABIA via CnEVPost and others (19 Nov); CPCA retail -13.7% y/y"
+    }
+  ],
+  "balance_views": [
+    {
+      "source": "Cochilco",
+      "year": 2026,
+      "balance_kt_lce": -79,
+      "stance": "Deficit",
+      "driver": "Demand 2.08 Mt vs supply 2.00 Mt; Q4 price assumption near US$19,000/t (far above spot)",
+      "date": "2026-11-17"
+    },
+    {
+      "source": "Citi",
+      "year": 2027,
+      "balance_kt_lce": 47,
+      "stance": "Surplus",
+      "driver": "Cut 2027 spodumene price deck 38% on China supply rebound",
+      "date": "2026-11-20"
+    },
+    {
+      "source": "Goldman Sachs",
+      "year": 2028,
+      "balance_kt_lce": 444,
+      "stance": "Surplus",
+      "driver": "Restocking demand fades from 462 kt to about 7 kt; assumes China BESS peaks in 2027",
+      "date": "2026-10-09"
+    },
+    {
+      "source": "YJ Lee (Arcane)",
+      "year": 2028,
+      "balance_kt_lce": -204,
+      "stance": "Deficit",
+      "driver": "Challenges the BESS peak thesis; expects sustained storage, e-truck and global demand growth",
+      "date": "2026-11-19"
+    }
+  ]
+}

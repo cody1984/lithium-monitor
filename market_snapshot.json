@@ -1,82 +1,98 @@
 {
-  "schema": "lithium-monitor/2",
-  "generated_at": "2026-11-21T01:55:36+08:00",
-  "fx_usdcny": 6.6777,
-  "feeds": {
-    "smm_spot": {
-      "status": "proxy",
-      "last_date": "2026-11-20",
-      "note": "Automated leg is 100ppi battery-grade spot via AKShare - a proxy for SMM. Existing exact SMM rows are never overwritten."
-    },
-    "equities": {
-      "status": "ok",
-      "last_date": "2026-11-20",
-      "note": "LTR.AX and PLS.AX closes via yfinance (Yahoo, unofficial endpoint). The latest bar can be intraday."
+  "schema": "lithium-monitor/6",
+  "generated_at": "2026-11-22T17:00:00+08:00",
+  "fx_usdcny": 6.6667,
+  "fx_date": "2026-11-19",
+  "params": {
+    "li2o_to_lce": 2.473,
+    "sc6_grade_pct": 6.0,
+    "conversion_recovery_pct": 85.0,
+    "scanner": {
+      "financing_pct": 4.0,
+      "storage_cny_t_month": 20,
+      "handling_cny_t": 300,
+      "fee_pct_side": 0.008,
+      "margin_pct": 15,
+      "adverse_pct": 10,
+      "t_per_lot": 1
     }
   },
+  "feeds": {},
+  "run_log": {},
   "series": {
+    "fx": [
+      {
+        "date": "2026-11-16",
+        "usdcny": 6.6645,
+        "source": "Bloomberg Linea market quote (approx; job replaces with ECB)"
+      },
+      {
+        "date": "2026-11-18",
+        "usdcny": 6.6665,
+        "source": "market quotes 6.6657-6.6671 (approx; job replaces with ECB)"
+      },
+      {
+        "date": "2026-11-19",
+        "usdcny": 6.6667,
+        "source": "ECB cross: CNY/EUR 7.3280 / USD/EUR 1.0992"
+      }
+    ],
     "smm_spot": [
       {
         "date": "2026-09-29",
-        "avg": 118800
+        "avg": 118800,
+        "verified": false,
+        "note": "earlier session; unverified"
       },
       {
         "date": "2026-11-06",
-        "avg": 93600
+        "avg": 93600,
+        "kind": "friday",
+        "verified": true,
+        "source": "SMM",
+        "note": "Friday average, implied by SMM weekly comment"
       },
       {
         "date": "2026-11-12",
         "avg": 90650,
-        "note": "weekly avg"
-      },
-      {
-        "date": "2026-11-13",
-        "avg": 91000.0,
-        "note": "100ppi battery-grade spot via AKShare - proxy for SMM"
+        "verified": true,
+        "source": "SMM",
+        "note": "Thursday average (SMM weekly comment)"
       },
       {
         "date": "2026-11-16",
         "avg": 89550,
         "low": 87800,
         "high": 91300,
-        "chg": -2800
+        "chg": -2800,
+        "verified": true,
+        "source": "SMM"
       },
       {
         "date": "2026-11-17",
         "avg": 89050,
         "low": 87000,
         "high": 91100,
-        "chg": -500
+        "chg": -500,
+        "verified": true,
+        "source": "SMM"
       },
       {
         "date": "2026-11-18",
         "avg": 91800,
         "chg": 2750,
+        "verified": true,
+        "source": "SMM",
         "note": "+3.09% DoD"
-      },
-      {
-        "date": "2026-11-19",
-        "avg": 91500.0,
-        "note": "100ppi battery-grade spot via AKShare - proxy for SMM"
-      },
-      {
-        "date": "2026-11-20",
-        "avg": 91500.0,
-        "note": "100ppi battery-grade spot via AKShare - proxy for SMM"
       }
     ],
     "gfex_futures": [
       {
-        "date": "2026-09-29",
-        "contract": "LC2701",
-        "settle": 118800,
-        "oi_change": -8400
-      },
-      {
         "date": "2026-11-06",
         "contract": "LC2701",
         "close": 92860,
-        "note": "derived"
+        "derived": true,
+        "note": "derived from Nov-9 print"
       },
       {
         "date": "2026-11-09",
@@ -93,63 +109,28 @@
       {
         "date": "2026-11-12",
         "contract": "LC2701",
-        "close": 90900,
-        "settle": 90900.0,
-        "note": "dominant-contract settlement via 100ppi/AKShare"
-      },
-      {
-        "date": "2026-11-13",
-        "contract": "LC2701",
-        "settle": 90580.0,
-        "note": "dominant-contract settlement via 100ppi/AKShare"
+        "close": 90900
       },
       {
         "date": "2026-11-16",
         "contract": "LC2701",
-        "settle": 88240.0,
-        "close": 88240.0,
-        "note": "dominant-contract settlement via 100ppi/AKShare",
-        "volume": 243195.0,
-        "oi": 374250.0
+        "settle": 85380,
+        "close": 88240,
+        "derived": true,
+        "note": "derived from Nov-17 deltas"
       },
       {
         "date": "2026-11-17",
         "contract": "LC2701",
-        "settle": 93180.0,
-        "close": 93180.0,
-        "oi": 349426.0,
+        "settle": 89980,
+        "close": 93180,
+        "oi": 349400,
         "oi_change": -24824,
-        "volume": 424783.0,
-        "note": "dominant-contract settlement via 100ppi/AKShare"
-      },
-      {
-        "date": "2026-11-18",
-        "contract": "LC2701",
-        "close": 91520.0,
-        "volume": 383415.0,
-        "oi": 343103.0,
-        "note": "dominant-contract settlement via 100ppi/AKShare",
-        "settle": 91520.0
-      },
-      {
-        "date": "2026-11-19",
-        "contract": "LC2701",
-        "close": 91500.0,
-        "volume": 330709.0,
-        "oi": 342568.0,
-        "note": "dominant-contract settlement via 100ppi/AKShare",
-        "settle": 91500.0
-      },
-      {
-        "date": "2026-11-20",
-        "contract": "LC2701",
-        "close": 90040.0,
-        "volume": 387210.0,
-        "oi": 326054.0,
-        "note": "dominant-contract settlement via 100ppi/AKShare",
-        "settle": 90040.0
+        "volume": 424800,
+        "note": "low 86,740"
       }
     ],
+    "futures_curve": [],
     "sgx_licf": [
       {
         "date": "2026-10-09",
@@ -159,7 +140,8 @@
       {
         "date": "2026-10-13",
         "contract": "LICF Oct-26",
-        "price_usd_kg": 16.79
+        "price_usd_kg": 16.79,
+        "note": "final print before expiry"
       },
       {
         "date": "2026-11-18",
@@ -172,17 +154,21 @@
       {
         "date": "2026-11-08",
         "quantity": 21720,
-        "note": "derived"
+        "derived": true,
+        "note": "derived from Nov-9 change",
+        "source": "manual"
       },
       {
         "date": "2026-11-09",
         "quantity": 23760,
-        "change": 2040
+        "change": 2040,
+        "source": "manual (X transcription)"
       },
       {
         "date": "2026-11-10",
         "quantity": 23810,
-        "change": 50
+        "change": 50,
+        "source": "manual (X transcription)"
       }
     ],
     "spodumene": [
@@ -201,22 +187,6 @@
         "kind": "SMM SC6 CIF China"
       }
     ],
-    "inventory": [
-      {
-        "date": "2026-05-21",
-        "scope": "SMM large-sample (pre-Sep revision)",
-        "total": 137260,
-        "downstream": 42729,
-        "other": 76157,
-        "smelter": 18374
-      },
-      {
-        "date": "2026-11-13",
-        "scope": "SMM weekly, post-Sep revision (carried from earlier session; verify)",
-        "total": 122644,
-        "trend": "falling"
-      }
-    ],
     "cathode": [
       {
         "date": "2026-11-18",
@@ -230,140 +200,238 @@
       {
         "date": "2026-10-19",
         "ltr": 0.69,
-        "pls": 2.9
+        "pls": 2.9,
+        "intraday": false
       },
       {
         "date": "2026-10-20",
         "ltr": 0.69,
-        "pls": 2.93
+        "pls": 2.93,
+        "intraday": false
       },
       {
         "date": "2026-10-21",
         "ltr": 0.69,
-        "pls": 2.91
+        "pls": 2.91,
+        "intraday": false
       },
       {
         "date": "2026-10-22",
         "ltr": 0.69,
-        "pls": 2.85
+        "pls": 2.85,
+        "intraday": false
       },
       {
         "date": "2026-10-23",
         "ltr": 0.64,
-        "pls": 2.62
+        "pls": 2.62,
+        "intraday": false
       },
       {
         "date": "2026-10-26",
         "ltr": 0.68,
-        "pls": 2.84
+        "pls": 2.84,
+        "intraday": false
       },
       {
         "date": "2026-10-27",
         "ltr": 0.69,
-        "pls": 2.88
+        "pls": 2.88,
+        "intraday": false
       },
       {
         "date": "2026-10-28",
         "ltr": 0.7,
-        "pls": 2.99
+        "pls": 2.99,
+        "intraday": false
       },
       {
         "date": "2026-10-29",
         "ltr": 0.67,
-        "pls": 2.75
+        "pls": 2.75,
+        "intraday": false
       },
       {
         "date": "2026-10-30",
         "ltr": 0.62,
-        "pls": 2.64
+        "pls": 2.64,
+        "intraday": false
       },
       {
         "date": "2026-11-02",
         "ltr": 0.6,
-        "pls": 2.61
+        "pls": 2.61,
+        "intraday": false
       },
       {
         "date": "2026-11-03",
         "ltr": 0.61,
-        "pls": 2.63
+        "pls": 2.63,
+        "intraday": false
       },
       {
         "date": "2026-11-04",
         "ltr": 0.6,
-        "pls": 2.6
+        "pls": 2.6,
+        "intraday": false
       },
       {
         "date": "2026-11-05",
         "ltr": 0.67,
-        "pls": 2.83
+        "pls": 2.83,
+        "intraday": false
       },
       {
         "date": "2026-11-06",
-        "ltr": 0.6449999809265137,
-        "pls": 2.8299999237060547
+        "ltr": 0.65,
+        "pls": 2.83,
+        "intraday": false
       },
       {
         "date": "2026-11-09",
-        "ltr": 0.675000011920929,
-        "pls": 2.890000104904175
+        "ltr": 0.68,
+        "pls": 2.89,
+        "intraday": false
       },
       {
         "date": "2026-11-10",
-        "ltr": 0.6899999976158142,
-        "pls": 2.9100000858306885
+        "ltr": 0.69,
+        "pls": 2.91,
+        "intraday": false
       },
       {
         "date": "2026-11-11",
-        "ltr": 0.7149999737739563,
-        "pls": 3.0999999046325684
+        "ltr": 0.71,
+        "pls": 3.1,
+        "intraday": false
       },
       {
         "date": "2026-11-12",
-        "ltr": 0.6650000214576721,
-        "pls": 2.8499999046325684
+        "ltr": 0.67,
+        "pls": 2.85,
+        "intraday": false
       },
       {
         "date": "2026-11-13",
-        "ltr": 0.6600000262260437,
-        "pls": 2.859999895095825
+        "ltr": 0.66,
+        "pls": 2.86,
+        "intraday": false
       },
       {
         "date": "2026-11-16",
-        "ltr": 0.6399999856948853,
-        "pls": 2.890000104904175
+        "ltr": 0.64,
+        "pls": 2.89,
+        "intraday": false
       },
       {
         "date": "2026-11-17",
-        "ltr": 0.6000000238418579,
-        "pls": 2.640000104904175
+        "ltr": 0.6,
+        "pls": 2.64,
+        "intraday": false
       },
       {
         "date": "2026-11-18",
-        "ltr": 0.5899999737739563,
-        "pls": 2.5999999046325684
+        "ltr": 0.59,
+        "pls": 2.6,
+        "intraday": false
       },
       {
         "date": "2026-11-19",
-        "ltr": 0.5799999833106995,
-        "pls": 2.559999942779541,
-        "note": "intraday close at time of pull"
+        "ltr": 0.58,
+        "pls": 2.56,
+        "intraday": false
+      }
+    ],
+    "evidence": [
+      {
+        "observed": "2026-11-13",
+        "published": "2026-11-13",
+        "metric": "SMM weekly carbonate inventory",
+        "value": 122644,
+        "unit": "mt",
+        "scope": "SMM weekly, post-Sep revision",
+        "source": "SMM",
+        "method": "weekly estimate",
+        "confidence": "medium",
+        "next_due": "2026-11-27"
       },
       {
-        "date": "2026-11-20",
-        "ltr": 0.5550000071525574,
-        "pls": 2.619999885559082
+        "observed": "2026-11-18",
+        "published": "2026-11-18",
+        "metric": "LFP cathode output",
+        "value": 141600,
+        "unit": "t/week",
+        "scope": "China, SMM estimate",
+        "source": "SMM",
+        "method": "weekly estimate",
+        "confidence": "medium",
+        "next_due": "2026-11-25"
+      },
+      {
+        "observed": "2026-11-18",
+        "published": "2026-11-18",
+        "metric": "Ternary cathode output",
+        "value": 18000,
+        "unit": "t/week",
+        "scope": "China, SMM estimate; down 9 straight weeks",
+        "source": "SMM",
+        "method": "weekly estimate",
+        "confidence": "medium",
+        "next_due": "2026-11-25"
+      },
+      {
+        "observed": "2026-10-31",
+        "published": "2026-11-20",
+        "metric": "China spodumene imports",
+        "value": 1004300,
+        "unit": "t",
+        "scope": "October, record; about 80,200 t LCE",
+        "source": "SMM (customs data)",
+        "method": "monthly",
+        "confidence": "medium",
+        "next_due": "2026-12-20"
+      },
+      {
+        "observed": "2026-11-17",
+        "published": "2026-11-17",
+        "metric": "Albemarle spodumene auction",
+        "value": 1241.5,
+        "unit": "USD/dmt SC6 CIF",
+        "scope": "16,785 dmt",
+        "source": "SMM flash",
+        "method": "auction result",
+        "confidence": "medium"
+      },
+      {
+        "observed": "2026-10-15",
+        "published": "2026-10-15",
+        "metric": "GFEX receipts change since early Sep",
+        "value": -17378,
+        "unit": "t",
+        "scope": "GFEX LC registered receipts",
+        "source": "Mysteel",
+        "method": "analysis",
+        "confidence": "medium"
+      },
+      {
+        "observed": "2026-11-17",
+        "published": "2026-11-17",
+        "metric": "Cochilco 2026 balance forecast",
+        "value": -79000,
+        "unit": "t LCE (deficit)",
+        "scope": "demand 2.08 Mt vs supply 2.0 Mt; Q4 price near US$19,000/t",
+        "source": "Cochilco via IndustrialInfo",
+        "method": "forecast",
+        "confidence": "low"
       }
     ]
   },
   "context": [
-    "Q3 2026: three consecutive deficit months (about 84,000 mt LCE cumulative) while prices fell stepwise; inventory destocking of about 68,000 mt filled the deficit, so inventory acted as a buffer rather than letting the deficit clear through price.",
-    "Destocking is downstream-led: over 13 weeks to early October total inventory fell 30%+, cathode-plant stocks nearly halved, smelter stocks fell nearly 40%, while the trader share rose from under 30% to over one-third. SMM says ownership is shifting from consumers to producers and traders - a latent supply overhang.",
-    "SMM revised its weekly inventory scope from 4 Sep 2026 (title-based, adds trading segment and battery-cell makers), backdated to 30 Apr 2026. Do not compare levels across the break.",
-    "Cathode output stays high: LFP about 141,600 t/week, ternary about 18,000 t/week and down nine straight weeks. LFP alone implies about 34,000 t LCE/week of carbonate use, above reported cathode-plant carbonate inventory.",
-    "China spodumene imports were about 970,100 t in September (+7% m/m), Zimbabwe about 136,000 t (+83%). Port stocks stay high while carbonate stocks fall: the lag runs through port storage, refinery feed and conversion, and refiners can slow withdrawals when margins compress.",
-    "GFEX receipts: down 17,378 t since early September (Mysteel) but +2,040 t on Nov 9 and +50 t on Nov 10 - watch whether the drawdown has stalled.",
-    "Nov 17: LC2701 rallied to 93,180 on lower open interest (short covering) while spot kept falling.",
-    "Cochilco forecasts 2026 lithium demand 2.08 Mt LCE vs supply 2.0 Mt (79,000 t deficit) and a Q4 average price near US$19,000/t - far above current spot of about US$13,700/t, so treat that forecast with caution.",
-    "Supply restarts: Bald Hill, Finniss; Rio Tinto spending $1.4bn on Fenix 1B and Sal de Vida."
+    "Q3 2026: three consecutive deficit months (about 84,000 mt LCE) while prices fell; destocking of about 68,000 mt filled the deficit, so inventory acted as a buffer.",
+    "SMM revised its weekly inventory scope on 4 Sep 2026: the headline jumped from 78,800 t to about 175,000 t. Do not compare levels across the break.",
+    "Per SMM, LFP output implies roughly 34,000 t LCE/week of carbonate use. No dated days-of-inventory series is loaded, so the dashboard does not score cover. Mysteel projects inventory days near 15 in November.",
+    "Nov 17: LC2701 rallied to a 93,180 close on lower open interest while spot kept falling. That is consistent with short covering, but aggregate OI cannot identify who initiated trades.",
+    "GFEX parameters 18 Nov (third-party compile): speculative margin 15%, price limit 13%, fee 0.008% of turnover. Exchange notices also cap daily opening volume: check contract-level limits before treating any spread as tradable.",
+    "Cochilco's Q4 price near US$19,000/t is far above current spot of about US$13,700/t: treat with caution."
   ]
 }
