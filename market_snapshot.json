@@ -1,8 +1,8 @@
 {
   "schema": "lithium-monitor/6",
-  "generated_at": "2026-11-25T04:22:21+08:00",
-  "fx_usdcny": 6.6645,
-  "fx_date": "2026-11-24",
+  "generated_at": "2026-11-26T03:35:17+08:00",
+  "fx_usdcny": 6.6757,
+  "fx_date": "2026-11-25",
   "params": {
     "li2o_to_lce": 2.473,
     "sc6_grade_pct": 6.0,
@@ -20,59 +20,59 @@
   "feeds": {
     "fx": {
       "status": "ok",
-      "last_date": "2026-11-24",
+      "last_date": "2026-11-25",
       "note": "ECB reference rate, published ~16:00 CET: the 17:37 AWST job normally sees the previous ECB business day. Reference rate, not a live quote."
     },
     "curve": {
       "status": "ok",
-      "last_date": "2026-11-24",
+      "last_date": "2026-11-25",
       "note": "13 contracts. Uses the Sina settle column when present, else close. Expiry dates are not modelled."
     },
     "smm_spot": {
       "status": "proxy",
-      "last_date": "2026-11-24",
+      "last_date": "2026-11-25",
       "note": "Automated leg is 100ppi battery-grade spot - a proxy for SMM. Existing SMM rows are never overwritten."
     },
     "equities": {
       "status": "ok",
-      "last_date": "2026-11-24",
+      "last_date": "2026-11-25",
       "note": "LTR.AX / PLS.AX via yfinance (unofficial). Bars dated today before 16:30 Sydney are flagged intraday and excluded from comparisons."
     },
     "receipts": {
       "status": "ok",
-      "last_date": "2026-11-24",
+      "last_date": "2026-11-25",
       "note": "Automated from exchange daily report; units assumed tonnes, confirm against a GFEX bulletin once."
     }
   },
   "run_log": {
     "fx": {
       "status": "ok",
-      "time": "2026-11-25T04:20:19+08:00",
+      "time": "2026-11-26T03:34:45+08:00",
       "error": ""
     },
     "gfex-akshare": {
       "status": "ok",
-      "time": "2026-11-25T04:20:22+08:00",
+      "time": "2026-11-26T03:34:49+08:00",
       "error": ""
     },
     "curve": {
       "status": "ok",
-      "time": "2026-11-25T04:20:31+08:00",
+      "time": "2026-11-26T03:35:01+08:00",
       "error": ""
     },
     "receipts": {
       "status": "ok",
-      "time": "2026-11-25T04:22:10+08:00",
+      "time": "2026-11-26T03:35:12+08:00",
       "error": ""
     },
     "spot-99qh": {
       "status": "ok",
-      "time": "2026-11-25T04:22:20+08:00",
+      "time": "2026-11-26T03:35:16+08:00",
       "error": ""
     },
     "equities": {
       "status": "ok",
-      "time": "2026-11-25T04:22:21+08:00",
+      "time": "2026-11-26T03:35:17+08:00",
       "error": ""
     }
   },
@@ -242,6 +242,11 @@
         "date": "2026-11-24",
         "usdcny": 6.6645,
         "source": "ECB reference via Frankfurter v1"
+      },
+      {
+        "date": "2026-11-25",
+        "usdcny": 6.6757,
+        "source": "ECB reference via Frankfurter v1"
       }
     ],
     "smm_spot": [
@@ -316,6 +321,13 @@
       {
         "date": "2026-11-24",
         "avg": 90500.0,
+        "verified": false,
+        "source": "100ppi",
+        "note": "100ppi battery-grade spot via AKShare - proxy for SMM"
+      },
+      {
+        "date": "2026-11-25",
+        "avg": 88000.0,
         "verified": false,
         "source": "100ppi",
         "note": "100ppi battery-grade spot via AKShare - proxy for SMM"
@@ -413,6 +425,16 @@
         "oi_change": 1108.0,
         "note": "dominant-contract settlement via 100ppi/AKShare",
         "settle": 88940.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2701",
+        "close": 82620.0,
+        "volume": 367219.0,
+        "oi": 329246.0,
+        "oi_change": -560.0,
+        "note": "dominant-contract settlement via 100ppi/AKShare",
+        "settle": 82620.0
       }
     ],
     "futures_curve": [
@@ -1509,6 +1531,114 @@
         "volume": 18.0,
         "oi": 27.0,
         "oi_change": 9.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2612",
+        "close": 84100.0,
+        "settle": 84560.0,
+        "volume": 4358.0,
+        "oi": 16378.0,
+        "oi_change": -1388.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2701",
+        "close": 82620.0,
+        "settle": 84180.0,
+        "volume": 367219.0,
+        "oi": 329246.0,
+        "oi_change": -560.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2702",
+        "close": 81960.0,
+        "settle": 83140.0,
+        "volume": 1770.0,
+        "oi": 9068.0,
+        "oi_change": -142.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2703",
+        "close": 81620.0,
+        "settle": 82740.0,
+        "volume": 9548.0,
+        "oi": 23955.0,
+        "oi_change": 1333.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2704",
+        "close": 82200.0,
+        "settle": 82580.0,
+        "volume": 4052.0,
+        "oi": 19157.0,
+        "oi_change": -355.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2705",
+        "close": 82000.0,
+        "settle": 83260.0,
+        "volume": 114709.0,
+        "oi": 239245.0,
+        "oi_change": 10800.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2706",
+        "close": 81920.0,
+        "settle": 83100.0,
+        "volume": 7982.0,
+        "oi": 30041.0,
+        "oi_change": 1565.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2707",
+        "close": 81980.0,
+        "settle": 82620.0,
+        "volume": 4609.0,
+        "oi": 15283.0,
+        "oi_change": 2122.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2708",
+        "close": 83740.0,
+        "settle": 84480.0,
+        "volume": 358.0,
+        "oi": 613.0,
+        "oi_change": 148.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2709",
+        "close": 82440.0,
+        "settle": 83280.0,
+        "volume": 1129.0,
+        "oi": 1785.0,
+        "oi_change": 157.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2710",
+        "close": 83760.0,
+        "settle": 83980.0,
+        "volume": 16.0,
+        "oi": 69.0,
+        "oi_change": 4.0
+      },
+      {
+        "date": "2026-11-25",
+        "contract": "LC2711",
+        "close": 82360.0,
+        "settle": 82960.0,
+        "volume": 13.0,
+        "oi": 36.0,
+        "oi_change": 9.0
       }
     ],
     "sgx_licf": [
@@ -1627,14 +1757,14 @@
         "quantity": 18674.0,
         "change": -434.0,
         "derived": false,
-        "source": "AKShare GFEX warehouse receipt bulletin (column shape unverified)"
+        "source": "AKShare futures_receipt (exchange daily report)"
       },
       {
         "date": "2026-11-20",
         "quantity": 19174.0,
         "change": 500.0,
         "derived": false,
-        "source": "AKShare GFEX warehouse receipt bulletin (column shape unverified)"
+        "source": "AKShare futures_receipt (exchange daily report)"
       },
       {
         "date": "2026-11-23",
@@ -1647,7 +1777,15 @@
         "date": "2026-11-24",
         "quantity": 19253.0,
         "derived": false,
-        "source": "AKShare GFEX warehouse receipt bulletin (column shape unverified)"
+        "source": "AKShare futures_receipt (exchange daily report)",
+        "change": -166.0
+      },
+      {
+        "date": "2026-11-25",
+        "quantity": 13476.0,
+        "change": -5777.0,
+        "derived": false,
+        "source": "AKShare futures_receipt (exchange daily report)"
       }
     ],
     "spodumene": [
@@ -1836,6 +1974,12 @@
         "date": "2026-11-24",
         "ltr": 0.5799999833106995,
         "pls": 2.7200000286102295,
+        "intraday": false
+      },
+      {
+        "date": "2026-11-25",
+        "ltr": 0.5299999713897705,
+        "pls": 2.559999942779541,
         "intraday": false
       }
     ],
